@@ -323,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 22h00 · monstres visibles pour l'assassin"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 22h15 · soin en % et plus de donjons"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -415,7 +415,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h00 · monstres visibles pour l'assassin</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h15 · soin en % et plus de donjons</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -456,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 22h00 · monstres visibles pour l'assassin</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 22h15 · soin en % et plus de donjons</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1223,7 +1223,7 @@ function onPeers(peers){
       r.p=p;
       if(typeof p.m==='string'&&p.m!==r.lastMsg){r.lastMsg=p.m;const t=filtrer(clean(p.m.slice(p.m.indexOf('|')+1)).slice(0,100));if(t){chatLog.push({n:clean(p.n).slice(0,16)||'?',t,life:14,col:t.startsWith('✦')?'#3ff0ff':'#ebe6f6'});r.bubble={t,life:5};}}
       if(typeof p.ev==='string'&&p.ev!==r.lastEv){r.lastEv=p.ev;if(p.s===sceneKey())remoteEv(p.ev,r);}
-      if(typeof p.hl==='string'&&p.hl!==r.lastHl){r.lastHl=p.hl;const hf=p.hl.split('|'),a=clamp(parseInt(hf[1],10)||0,0,800),hr=clamp(parseFloat(hf[2])||4.5,1,12);if(p.s===sceneKey())vfx.push({k:'healring',x:r.x,y:r.y,r:hr,t:0,life:0.6,col:'#bff5a0'});if(!safe()&&p.s===sceneKey()&&Math.hypot(r.x-P.x,r.y-P.y)<hr&&a>0){const st=S();const got=Math.min(a,st.tot.vie-P.hp);if(got>0){P.hp+=got;ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);}}}
+      if(typeof p.hl==='string'&&p.hl!==r.lastHl){r.lastHl=p.hl;const hf=p.hl.split('|'),pcH=hf[1]&&hf[1][0]==='p',a=pcH?Math.round(S().tot.vie*clamp(parseInt(hf[1].slice(1),10)||0,0,60)/100):clamp(parseInt(hf[1],10)||0,0,800),hr=clamp(parseFloat(hf[2])||4.5,1,12);if(p.s===sceneKey())vfx.push({k:'healring',x:r.x,y:r.y,r:hr,t:0,life:0.6,col:'#bff5a0'});if(!safe()&&p.s===sceneKey()&&Math.hypot(r.x-P.x,r.y-P.y)<hr&&a>0){const st=S();const got=Math.min(a,st.tot.vie-P.hp);if(got>0){P.hp+=got;ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);}}}
       if(amHost&&!safe()&&p.s===sceneKey()&&typeof p.h==='string')applyHits(pe.peer,p.h);
       if(typeof p.bq==='number'){if(r.lastBq==null)r.lastBq=p.bq;else if(p.bq!==r.lastBq){r.lastBq=p.bq;if(amHost&&scene==='dungeon'&&p.s===sceneKey()&&fight===0&&inArena(num(p.x,0)/10,num(p.y,0)/10))startFight();}}
     }
@@ -1730,13 +1730,19 @@ function abilityInfo(it){const t=it.tier,rel=t>=7,m=S().mult;return{
   casque:`Berserk ${3+0.5*t} s : +50 % vitesse d'attaque, +${20+5*t} % dégâts${rel?' · invulnérable 2 s':''}`,
   sort:`Explosion : 16 × ${Math.round((35+22*t)*m)} dégâts${rel?' · lancée 3 fois au même endroit':''}`,
   carquois:rel?`Flèches dans toutes les directions : ${Math.round((110+65*6)*m)} dégâts + 50 % de la vie du monstre (15 % pour un boss)`:`Flèche perçante : ${Math.round((110+65*t)*m)} dégâts`,
-  tome:`Soigne ${70+35*t} PV dans un rayon de ${(3+0.7*t).toFixed(1)} cases${rel?' · les monstres à l\'écran subissent +50 % de dégâts pendant 6 s':''}`,
+  tome:`Soigne ${tomePct(t)} % de la vie max (toi et les alliés) dans un rayon de ${(t>=7?8.5:3+0.7*t).toFixed(1)} cases · recharge ${tomeCd(t)} s${rel?' · les monstres à l\'écran subissent +50 % de dégâts pendant 6 s':''}`,
   prisme:`Téléportation jusqu'à ${(7+t*0.4).toFixed(1)} cases · recharge ${Math.max(0.8,3.5-0.4*t).toFixed(1)} s${rel?' · laisse une bombe au départ':''}`,
   voile:`Invisible pour les monstres pendant ${(rel?7:2.5+0.6*t).toFixed(1)} s${rel?' · invulnérable pendant ce temps':''}`}[it.kind]||'';}
+// soin du prêtre : pourcentage de la vie max de chaque joueur soigné, selon le tier du tome ; recharge de quelques secondes
+function tomePct(t){return t>=7?60:20+5*t;}
+function tomeCd(t){return t>=7?4:Math.max(4.5,6-0.25*t);}
+// chance qu'un monstre du Royaume ouvre un portail de donjon (toutes les zones)
+const DUN_RATE=[1/25,1/22,1/20,1/18,1/16,1/14,1/12];
+function dunChance(m){const r=m.r!=null&&m.r>=0&&m.r<7?m.r:6;return DUN_RATE[r];}
 function useAbility(){
   const it=C().equip[1];if(!it){note('Aucune capacité équipée');return;}
   if(safe()&&it.kind!=='tome'){note('Pas de capacités ici');return;}
-  if(P.acd>0)return;if(it.kind==='prisme'&&P.tpcd>0){note('Téléportation dans '+P.tpcd.toFixed(1)+' s');return;}
+  if(P.acd>0)return;if(it.kind==='tome'&&P.healcd>0){note('Soin disponible dans '+P.healcd.toFixed(1)+' s');return;}if(it.kind==='prisme'&&P.tpcd>0){note('Téléportation dans '+P.tpcd.toFixed(1)+' s');return;}
   if(P.mp<it.cost){note('Pas assez de mana');return;}
   const st=S(),t=it.tier,rel=t>=7;
   if(it.kind==='prisme'){const g=tpTarget();if(!g){note('Impossible de se téléporter ici');return;}
@@ -1750,8 +1756,8 @@ function useAbility(){
   else if(it.kind==='carquois'){const a=aimWorld(),an=Math.atan2(a.y-P.y,a.x-P.x);
     if(rel){const dm=Math.round((110+65*6)*st.mult),vol=new Set();for(let i=0;i<24;i++){const aa=an+i*TAU/24;pb.push({x:P.x,y:P.y,vx:Math.cos(aa)*16,vy:Math.sin(aa)*16,life:10/16,dmg:dm,pct:true,vol,r:0.22,col:'#3ff0ff',kind:'fleche',pierce:true,hit:new Set(),trail:'#3ff0ff'});}burst(P.x,P.y,'#3ff0ff',24,5);}
     else pb.push({x:P.x,y:P.y,vx:Math.cos(an)*16,vy:Math.sin(an)*16,life:10/16,dmg:Math.round((110+65*t)*st.mult),r:0.22,col:'#ffd23f',kind:'fleche',pierce:true,hit:new Set()});}
-  else if(it.kind==='tome'){const h=70+35*t,R0=rel?8.5:3+0.7*t,max=st.tot.vie;const got=Math.min(h,max-P.hp);P.hp=Math.min(max,P.hp+h);ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);burst(P.x,P.y,'#bff5a0',22,2.5);
-    vfx.push({k:'healring',x:P.x,y:P.y,r:R0,t:0,life:0.6,col:'#bff5a0'});myHeal=(++healSeq)+'|'+h+'|'+R0.toFixed(1);
+  else if(it.kind==='tome'){const pc=tomePct(t),R0=rel?8.5:3+0.7*t,max=st.tot.vie,h=Math.round(max*pc/100);const got=Math.min(h,max-P.hp);P.hp=Math.min(max,P.hp+h);P.healcd=tomeCd(t);ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);burst(P.x,P.y,'#bff5a0',22,2.5);
+    vfx.push({k:'healring',x:P.x,y:P.y,r:R0,t:0,life:0.6,col:'#bff5a0'});myHeal=(++healSeq)+'|p'+pc+'|'+R0.toFixed(1);
     if(rel&&!safe()){const n=markVuln(P.x,P.y);vfx.push({k:'healring',x:P.x,y:P.y,r:10,t:0,life:0.8,col:'#ffd23f'});ft(P.x,P.y-1.3,'Jugement divin · '+n+' monstre'+(n>1?'s':''),'#ffd23f',true);myEv=(++evSeq)+'|v|'+Math.round(P.x*10)+'|'+Math.round(P.y*10);}
     sendPresence();}
   else if(it.kind==='voile'){P.invis=rel?7:2.5+0.6*t;if(rel)P.invul=7;ft(P.x,P.y-0.8,rel?'Invisible et invulnérable':'Invisible','#b46aff',true);burst(P.x,P.y,'#2a2a3a',26,3);burst(P.x,P.y,'#b46aff',14,2);sendPresence();}
@@ -1761,7 +1767,7 @@ function strikeTick(dt){for(const k of strikes){k.t-=dt;if(k.t<=0&&!k.hit){k.hit
   strikes=strikes.filter(k=>k.t>-0.4);}
 function abilityTick(dt){strikeTick(dt);
   if(P.invis>0){P.invis-=dt;if(Math.random()<dt*10)parts.push({x:P.x+rnd(-.3,.3),y:P.y+rnd(-.1,.4),vx:0,vy:-0.6,life:.5,col:Math.random()<.5?'#2a2a3a':'#6a3a9a',s:.09});if(P.invis<=0){note('Tu redeviens visible');sendPresence();}}
-  if(P.invul>0)P.invul-=dt;if(P.tpcd>0)P.tpcd-=dt;
+  if(P.invul>0)P.invul-=dt;if(P.tpcd>0)P.tpcd-=dt;if(P.healcd>0)P.healcd-=dt;
   for(const q of P.castQ){q.t-=dt;if(q.t<=0){q.done=true;castSort(q.x,q.y,q.dm);}}P.castQ=P.castQ.filter(q=>!q.done);
   for(const b of bombs){b.t-=dt;if(b.t<=0){b.done=true;boomFx(b.x,b.y,4.5);if(b.own&&!safe())for(const m of monsters)if(m.hp>0&&!m.pend&&Math.hypot(m.x-b.x,m.y-b.y)<4.5+m.d.sz*0.4)hitMon(m,b.dm,'#ff9ae8');}}bombs=bombs.filter(b=>!b.done);
 }
@@ -1826,7 +1832,7 @@ function hostKill(m){
   if(scene==='realm'&&m.d.boss&&!m.adm)bossTimers[m.key]=150;
   if(m.d.boss){const rows=[[pseudo,(dmgTot.get(m.id)||{tot:0}).tot]];for(const [peer,mp] of applied){const r=remotes.get(peer);if(!r||!r.p)continue;const dd=mp.get(m.id)||0;if(dd>0)rows.push([clean(r.p.n).slice(0,16)||'Joueur',dd]);}
     bossBoardStr=m.key+'|'+m.id.toString(36)+'|'+rows.map(([n,dd])=>n.replace(/[|;:]/g,'')+':'+Math.round(dd)).join(';');bossBoardT=time+12;showBossBoard(bossBoardStr);}
-  if(scene==='realm'&&m.d.dun&&Math.random()<m.d.dun){const t=REG_DUN[Math.floor(Math.random()*REG_DUN.length)];dportals.push({id:m.id,x:m.x,y:m.y,life:60,t});showBanner('Un portail s\'ouvre !',DTYPES[t].nom+' · 60 secondes',DTYPES[t].col[1]);}
+  if(scene==='realm'&&!m.d.boss&&!m.adm&&Math.random()<dunChance(m)){const t=REG_DUN[Math.floor(Math.random()*REG_DUN.length)];dportals.push({id:m.id,x:m.x,y:m.y,life:60,t});showBanner('Un portail s\'ouvre !',DTYPES[t].nom+' · 60 secondes',DTYPES[t].col[1]);}
   if(scene==='realm'&&!m.d.boss&&(m.r===0||m.r===1)&&Math.random()<0.036){dportals.push({id:m.id,x:m.x,y:m.y,life:60,t:'b'});showBanner('Un portail s\'ouvre !','Terrier des Gobelins · donjon débutant · 60 s','#9fd06a');}
   if(scene==='realm'&&m.d.dun2&&Math.random()<m.d.dun2){dportals.push({id:++monId,x:m.x,y:m.y+2.5,life:90,t:'a'});showBanner('Un portail doré s\'ouvre !','Observatoire Céleste · 90 secondes','#ffd23f');}
   if(scene==='dungeon'&&m.d.star!=null)setStars(stars|(1<<m.d.star));
