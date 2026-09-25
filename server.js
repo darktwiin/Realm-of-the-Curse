@@ -158,7 +158,12 @@ wss.on('connection', (ws, req) => {
       const cible = trouverJoueur(String(m.to || ''));
       if (!cible) { res(false, 'Joueur introuvable (déconnecté ?)'); return; }
       const nom = String((cible.etat && cible.etat.n) || 'Joueur').slice(0, 16);
-      if (cmd === 'kill') {
+      if (cmd === 'party') {
+        const a = m.arg || {};
+        const arg = { c: String(a.c || '').slice(0, 12), sk: String(a.sk || '').slice(0, 12), n: String(a.n || '').slice(0, 16), w: String(a.w || '').slice(0, 12), wt: Math.max(0, Math.min(7, Math.floor(Number(a.wt) || 0))) };
+        envoyer(cible.ws, { t: 'dev', cmd: 'party', arg });
+        res(true, 'Fête lancée chez ' + nom);
+      } else if (cmd === 'kill') {
         envoyer(cible.ws, { t: 'dev', cmd: 'kill', arg: 0 });
         res(true, nom + ' a été tué par un admin');
       } else if (cmd === 'summon') {
