@@ -179,6 +179,12 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .seg button{background:var(--panel2);border:2px solid var(--line);padding:3px 12px;cursor:pointer;font-size:13px}
 .seg button.on{border-color:var(--gold);color:var(--gold)}
 .opts h3{margin:6px 0 0}
+.kb-inner{max-width:620px}.kblist{display:flex;flex-direction:column;gap:3px;max-height:min(60vh,520px);overflow:auto;padding-right:4px}
+.kbrow{display:grid;grid-template-columns:1fr 150px 150px;gap:6px;align-items:center;padding:3px 6px;background:var(--panel2);border:1px solid var(--line)}
+.kbrow.sep{background:none;border:0;padding:6px 0 0;font-family:var(--display);color:var(--gold);font-size:13px;display:block}
+.kbrow span{font-size:14px}.kbrow button{font:inherit;font-size:13px;padding:4px 6px;background:#0b0a12;color:#f4f1e8;border:2px solid var(--line2);cursor:pointer;min-height:30px}
+.kbrow button:hover{border-color:var(--gold)}.kbrow button.empty{color:var(--muted)}.kbrow button.wait{border-color:var(--gold);color:var(--gold);animation:dpulse 1s infinite}
+.kbrow button.flash{border-color:#ff5a6a}
 #opts{z-index:8}
 #pupitre,#skins{z-index:6}
 .devk{border-color:#8a2a3a;color:#ff8a9a}
@@ -272,7 +278,7 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .dopt.perma b{color:#e0b8ff}
 .dopt.perma.arm{background:#3a1f3a;border-color:#ff4fd8}
 @media (max-width:560px){.dchoice{grid-template-columns:1fr}}
-#curWin{z-index:9}
+#curWin,#kbWin{z-index:9}
 .curnow{display:flex;align-items:center;gap:10px}
 .curnow img{width:32px;height:32px;image-rendering:pixelated;background:#3a3551;border:2px solid var(--line)}
 .swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
@@ -317,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 20h50 · cadeaux de connexion"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 21h15 · touches personnalisables"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -407,8 +413,17 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label for="volSfx">Effets sonores</label><input type="range" id="volSfx" min="0" max="100" step="5"><span class="val" id="volSfxV">60 %</span></div>
         <label class="chk"><input type="checkbox" id="muteAll"> Couper tout le son</label>
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
+        <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 20h50 · cadeaux de connexion</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 21h15 · touches personnalisables</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+      </div>
+    </div>
+    <div class="overlay" id="kbWin" hidden>
+      <div class="shop-inner opts kb-inner" role="dialog" aria-label="Touches et souris">
+        <h2>Touches et souris</h2>
+        <p class="hint">Clique sur une case puis appuie sur une touche ou un bouton de la souris. Échap : annuler · Retour arrière : vider la case.</p>
+        <div class="kblist" id="kbList"></div>
+        <div class="shop-foot"><button type="button" class="act" id="kbReset">Touches par défaut</button><button type="button" class="act" id="kbClose">Valider · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="curWin" hidden>
@@ -441,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 20h50 · cadeaux de connexion</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 21h15 · touches personnalisables</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -526,7 +541,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     </section>
     <details class="help" open>
       <summary>Commandes</summary>
-      <dl>
+      <dl id="helpDl">
         <dt>ZQSD</dt><dd>se déplacer (WASD, flèches)</dd>
         <dt>Clic</dt><dd>maintenir pour tirer vers la souris</dd>
         <dt>T</dt><dd>tir automatique on/off</dd>
@@ -536,7 +551,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <dt>R</dt><dd>retour au Nexus (seul moyen de quitter le Royaume)</dd>
         <dt>I / C</dt><dd>inventaire / statistiques</dd>
         <dt>Entrée</dt><dd>écrire aux autres joueurs</dd>
-        <dt>O</dt><dd>options : son, musique, curseur</dd>
+        <dt>O</dt><dd>options : son, musique, curseur, touches</dd>
         <dt>L</dt><dd>classement des joueurs</dd>
         <dt>Glisser</dt><dd>déplacer un objet (ou clic, puis clic sur une case vide)</dd>
       </dl>
@@ -2495,7 +2510,7 @@ function fillTitles(){const sel=$('#titleSel');sel.textContent='';const o0=docum
   sel.value=myTitle()||'';sel.disabled=!(save.titles||[]).length;sel.title=sel.disabled?'Gagne des titres avec les récompenses de connexion':'';}
 $('#titleSel').addEventListener('change',e=>{save.title=e.target.value||null;persist();sendPresence();});
 function openOpts(){fillTitles();TU.opt=1;optEl.hidden=false;keys.clear();mouse.down=false;renderOpts();}
-function closeOpts(){optEl.hidden=true;curWin.hidden=true;cv.focus();}
+function closeOpts(){optEl.hidden=true;curWin.hidden=true;kbWin.hidden=true;KB_CAP=null;cv.focus();}
 $('#gear').addEventListener('click',()=>{optEl.hidden?openOpts():closeOpts();});
 $('#optClose').addEventListener('click',closeOpts);
 $('#curOpen').addEventListener('click',()=>{curWin.hidden=false;renderCurWin();});
@@ -2580,29 +2595,95 @@ function interact(){
   }
   if(groundBag)takeAll();
 }
+/* ================= touches personnalisables ================= */
+const KB_ACTS=[
+  ['Déplacement'],['up','Aller en haut'],['down','Aller en bas'],['left','Aller à gauche'],['right','Aller à droite'],
+  ['Combat'],['shoot','Tirer (maintenir, vers la souris)'],['ability','Capacité de classe'],['auto','Tir automatique on/off'],['hp','Potion de vie'],['mp','Potion de mana'],
+  ['Actions'],['interact','Interagir (portail, marchand, ramasser…)'],['nexus','Retour au Nexus'],['chat','Écrire dans le chat'],
+  ['Menus'],['inv','Inventaire'],['stats','Statistiques'],['lb','Classement'],['opts','Options']];
+const KB_DEF={up:['KeyW','ArrowUp'],down:['KeyS','ArrowDown'],left:['KeyA','ArrowLeft'],right:['KeyD','ArrowRight'],shoot:['Mouse0',null],ability:['Space',null],auto:['KeyT',null],hp:['KeyF',null],mp:['KeyV',null],
+  interact:['KeyE','KeyG'],nexus:['KeyR',null],chat:['Enter','NumpadEnter'],inv:['KeyI',null],stats:['KeyC',null],lb:['KeyL',null],opts:['KeyO',null]};
+const KB_KEY='royaume-maudit-touches';
+let BINDS=JSON.parse(JSON.stringify(KB_DEF));
+try{const o=JSON.parse(localStorage.getItem(KB_KEY)||'null');if(o)for(const a in KB_DEF)if(Array.isArray(o[a]))BINDS[a]=[o[a][0]||null,o[a][1]||null];}catch(e){}
+let KB_LAY=null;try{if(navigator.keyboard&&navigator.keyboard.getLayoutMap)navigator.keyboard.getLayoutMap().then(m=>{KB_LAY=m;updHelp();}).catch(()=>{});}catch(e){}
+let codeMap={}; // code -> actions
+function rebuildMap(){codeMap={};for(const a in BINDS)for(const c of BINDS[a])if(c)(codeMap[c]=codeMap[c]||[]).push(a);}
+rebuildMap();
+function actsOf(c){return codeMap[c]||[];}
+function held(a){return BINDS[a].some(c=>c&&keys.has(c));}
+const KN={Space:'Espace',Enter:'Entrée',NumpadEnter:'Entrée (pavé)',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→',ShiftLeft:'Maj gauche',ShiftRight:'Maj droite',ControlLeft:'Ctrl gauche',ControlRight:'Ctrl droite',AltLeft:'Alt',AltRight:'Alt Gr',Tab:'Tab',CapsLock:'Verr. maj',Backquote:'²',
+  Mouse0:'Clic gauche',Mouse1:'Clic molette',Mouse2:'Clic droit',Mouse3:'Souris bouton 4',Mouse4:'Souris bouton 5'};
+function keyName(c){if(!c)return '—';if(KN[c])return KN[c];if(KB_LAY&&KB_LAY.get(c))return KB_LAY.get(c).toUpperCase();
+  // sans carte du clavier : on suppose un clavier AZERTY
+  const az={KeyQ:'A',KeyA:'Q',KeyW:'Z',KeyZ:'W',Semicolon:'M',KeyM:','};if(az[c])return az[c];
+  if(c.startsWith('Key'))return c.slice(3);if(c.startsWith('Digit'))return c.slice(5);if(c.startsWith('Numpad'))return 'Pavé '+c.slice(6);return c;}
+function kn(a){return keyName(BINDS[a][0]||BINDS[a][1]);}
+function kn2(a){return BINDS[a].filter(Boolean).map(keyName).join(' / ')||'—';}
+function saveBinds(){rebuildMap();try{localStorage.setItem(KB_KEY,JSON.stringify(BINDS));}catch(e){}updHelp();}
+function updHelp(){const dl=$('#helpDl');if(!dl)return;const rows=[[['up','left','down','right'].map(kn).join(''),'se déplacer'],[kn2('shoot'),'maintenir pour tirer vers la souris'],[kn2('auto'),'tir automatique on/off'],[kn2('ability'),'capacité de classe (mana)'],
+  [kn2('interact'),'portail, autel, marchand, ramasser, échanger'],[kn('hp')+' / '+kn('mp'),'potion de vie / de mana'],[kn2('nexus'),'retour au Nexus (seul moyen de quitter le Royaume)'],[kn('inv')+' / '+kn('stats'),'inventaire / statistiques'],
+  [kn2('chat'),'écrire aux autres joueurs'],[kn2('opts'),'options : son, musique, curseur, touches'],[kn2('lb'),'classement des joueurs'],['Glisser','déplacer un objet (ou clic, puis clic sur une case vide)']];
+  dl.textContent='';for(const [k,t] of rows){const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=t;dl.append(dt,dd);}
+  const set=(id,a)=>{const b=document.querySelector(id+' kbd');if(b)b.textContent=kn(a);};set('#tabInvBtn','inv');set('#tabStBtn','stats');set('#lbBtn','lb');}
+// fenêtre de réglage
+const kbWin=$('#kbWin');let KB_CAP=null;
+function openKb(){kbWin.hidden=false;KB_CAP=null;renderKb();}
+function closeKb(){KB_CAP=null;kbWin.hidden=true;renderOpts();}
+function renderKb(){const box=$('#kbList');box.textContent='';
+  for(const r of KB_ACTS){if(r.length===1){const d=document.createElement('div');d.className='kbrow sep';d.textContent=r[0];box.append(d);continue;}
+    const [a,lab]=r,row=document.createElement('div');row.className='kbrow';const sp=document.createElement('span');sp.textContent=lab;row.append(sp);
+    for(let i=0;i<2;i++){const b=document.createElement('button');b.type='button';const c=BINDS[a][i];const w=KB_CAP&&KB_CAP.a===a&&KB_CAP.i===i;
+      b.textContent=w?'Appuie…':keyName(c);b.className=(w?'wait':'')+(c?'':' empty');b.dataset.a=a;b.dataset.i=i;
+      b.addEventListener('mousedown',e=>{if(KB_CAP)return;e.preventDefault();e.stopPropagation();if(e.button!==0)return;KB_CAP={a,i,t:performance.now()};renderKb();});
+      row.append(b);}
+    box.append(row);}}
+function setBind(code){const {a,i}=KB_CAP;KB_CAP=null;
+  if(code){for(const o in BINDS)for(let j=0;j<2;j++)if(BINDS[o][j]===code&&!(o===a&&j===i)){BINDS[o][j]=null;note('« '+keyName(code)+' » retiré de : '+KB_ACTS.find(r=>r[0]===o)[1]);}}
+  BINDS[a][i]=code;if(!BINDS.shoot[0]&&!BINDS.shoot[1])note('Attention : aucune touche pour tirer');saveBinds();renderKb();}
+window.addEventListener('keydown',e=>{if(!KB_CAP)return;e.preventDefault();e.stopImmediatePropagation();
+  if(e.code==='Escape'){KB_CAP=null;renderKb();return;}if(e.code==='Backspace'||e.code==='Delete'){setBind(null);return;}setBind(e.code);},true);
+window.addEventListener('mousedown',e=>{if(!KB_CAP||performance.now()-KB_CAP.t<150)return;e.preventDefault();e.stopImmediatePropagation();setBind('Mouse'+e.button);},true);
+window.addEventListener('contextmenu',e=>{if(KB_CAP||!kbWin.hidden)e.preventDefault();},true);
+updHelp();$('#kbOpen').addEventListener('click',openKb);$('#kbClose').addEventListener('click',closeKb);
+$('#kbReset').addEventListener('click',()=>{BINDS=JSON.parse(JSON.stringify(KB_DEF));saveBinds();renderKb();note('Touches par défaut rétablies');});
+// exécution d'une action (clavier ou souris)
+function doAct(a,e){
+  if(a==='shoot'){mouse.down=true;return;}
+  if(a==='ability')useAbility();
+  else if(a==='interact')interact();
+  else if(a==='nexus'){if(scene==='arena'){if(leaveArena()===false)return;}if(scene!=='nexus')enterNexus();}
+  else if(a==='inv'){setTab('inv');TU.inv=1;}
+  else if(a==='stats'){setTab(tab==='stats'?'inv':'stats');TU.inv=1;}
+  else if(a==='hp')drinkKind('pvie');
+  else if(a==='mp')drinkKind('pmana');
+  else if(a==='auto'){P.auto=!P.auto;note(P.auto?'Tir automatique activé':'Tir automatique désactivé');}
+  else if(a==='chat'){if(e)e.preventDefault();keys.clear();mouse.down=false;openChat();}
+}
+const MOVE_ACTS=['up','down','left','right'];
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
+  if(e.key==='Escape'){if(!kbWin.hidden){closeKb();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
-  if(e.code==='KeyO'){optEl.hidden?openOpts():closeOpts();return;}
-  if(e.code==='KeyL'&&deathEl.hidden&&selEl.hidden){lbEl.hidden?openLb():closeLb();return;}
+  const A=actsOf(e.code);
+  if(!kbWin.hidden)return;
+  if(A.includes('opts')){optEl.hidden?openOpts():closeOpts();return;}
+  if(A.includes('lb')&&deathEl.hidden&&selEl.hidden){lbEl.hidden?openLb():closeLb();return;}
   if(e.code==='KeyP'&&devMode){admEl.hidden?openAdmin():closeAdmin();return;}
   if(!optEl.hidden||!lbEl.hidden||!admEl.hidden||!trEl.hidden)return;
   if(paused)return;
   const c=e.code;
-  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c))e.preventDefault();
-  if(e.repeat&&!['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c))return;
+  if(A.length&&(['Space','Tab','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Quote','Slash','AltLeft','AltRight'].includes(c)||A.includes('chat')))e.preventDefault();
+  if(e.repeat&&!A.some(a=>MOVE_ACTS.includes(a)))return;
   keys.add(c);
-  if(c==='Space')useAbility();
-  else if(c==='KeyE'||c==='KeyG')interact();
-  else if(c==='KeyR'){if(scene==='arena'){if(leaveArena()===false)return;}if(scene!=='nexus')enterNexus();}
-  else if(c==='KeyI'){setTab('inv');TU.inv=1;}
-  else if(c==='KeyC'){setTab(tab==='stats'?'inv':'stats');TU.inv=1;}
-  else if(c==='KeyF')drinkKind('pvie');
-  else if(c==='KeyV')drinkKind('pmana');
-  else if(c==='KeyT'){P.auto=!P.auto;note(P.auto?'Tir automatique activé':'Tir automatique désactivé');}
-  else if(c==='Enter'||c==='NumpadEnter'){e.preventDefault();openChat();}
+  for(const a of A)doAct(a,e);
 });
-window.addEventListener('keyup',e=>keys.delete(e.code));
+window.addEventListener('keyup',e=>{keys.delete(e.code);if(actsOf(e.code).includes('shoot')&&!held('shoot'))mouse.down=false;});
+// boutons de la souris (un événement par bouton, même quand plusieurs sont enfoncés)
+cv.addEventListener('mousedown',e=>{const c='Mouse'+e.button;if(e.button>0)e.preventDefault();keys.add(c);const A=actsOf(c);
+  if(A.includes('opts')){optEl.hidden?openOpts():closeOpts();return;}if(A.includes('lb')&&deathEl.hidden&&selEl.hidden){lbEl.hidden?openLb():closeLb();return;}
+  if(A.includes('shoot'))mouse.down=true;if(paused)return;for(const a of A)if(a!=='shoot')doAct(a,e);});
+window.addEventListener('mouseup',e=>{const c='Mouse'+e.button;keys.delete(c);if(e.button>=3&&e.target===cv)e.preventDefault();if(actsOf(c).includes('shoot')&&!held('shoot'))mouse.down=false;});
+cv.addEventListener('auxclick',e=>e.preventDefault());
 window.addEventListener('blur',()=>{keys.clear();mouse.down=false;});
 const chatForm=$('#chatForm'),chatIn=$('#chatIn');
 function openChat(){keys.clear();mouse.down=false;chatForm.hidden=false;chatIn.value='';chatIn.focus();}
@@ -2617,13 +2698,13 @@ cv.addEventListener('pointerdown',e=>{
     else{aimTouch={id:e.pointerId,x:p.x,y:p.y};}
     cv.setPointerCapture(e.pointerId);return;
   }
-  mouse.x=p.x;mouse.y=p.y;if(e.button===0)mouse.down=true;
+  mouse.x=p.x;mouse.y=p.y;
   if(e.button===0&&scene==='dungeon'&&MAP.altar){const ww=screenToWorld(p.x,p.y),wx=ww.x,wy=ww.y;
     if(fight===0&&Math.hypot(wx-MAP.altar.x,wy-MAP.altar.y)<1.3&&Math.hypot(P.x-MAP.altar.x,P.y-MAP.altar.y)<4)requestStart();
     else if(fight===1&&!inArena(P.x,P.y)){for(const d of MAP.doors)if(Math.hypot(wx-(d.x+.5),wy-(d.y+.5))<1.2&&Math.hypot(P.x-(d.x+.5),P.y-(d.y+.5))<3.5){joinFight(d);break;}}}
 });
 cv.addEventListener('pointermove',e=>{const p=local(e);if(e.pointerType==='touch'){if(e.pointerId===joy.id){joy.x=p.x;joy.y=p.y;}else if(aimTouch&&aimTouch.id===e.pointerId){aimTouch.x=p.x;aimTouch.y=p.y;}return;}mouse.x=p.x;mouse.y=p.y;});
-function endPtr(e){if(e.pointerType==='touch'){if(e.pointerId===joy.id)joy.id=null;if(aimTouch&&aimTouch.id===e.pointerId)aimTouch=null;return;}if(e.button===0)mouse.down=false;}
+function endPtr(e){if(e.pointerType==='touch'){if(e.pointerId===joy.id)joy.id=null;if(aimTouch&&aimTouch.id===e.pointerId)aimTouch=null;return;}}
 cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endPtr);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 $('#tAbil').addEventListener('click',()=>{if(!paused)useAbility();});
@@ -2649,8 +2730,8 @@ function update(dt){
   const st=S();
   // déplacement
   let mx=0,my=0;
-  if(keys.has('KeyW')||keys.has('ArrowUp'))my-=1;if(keys.has('KeyS')||keys.has('ArrowDown'))my+=1;
-  if(keys.has('KeyA')||keys.has('ArrowLeft'))mx-=1;if(keys.has('KeyD')||keys.has('ArrowRight'))mx+=1;
+  if(held('up'))my-=1;if(held('down'))my+=1;
+  if(held('left'))mx-=1;if(held('right'))mx+=1;
   if(joy.id!==null){const dx=joy.x-joy.ox,dy=joy.y-joy.oy,d=Math.hypot(dx,dy);if(d>8){const k=Math.min(1,d/50);mx=dx/d*k;my=dy/d*k;}}
   const ml=Math.hypot(mx,my);if(ml>1){mx/=ml;my/=ml;}
   if(mx)P.face=mx<0?-1:1;
@@ -3570,7 +3651,7 @@ function render(){
     else if(nearSwitch())prompt='E · Actionner l\'interrupteur (éclaire la salle)';
     else if(fight===0&&Math.hypot(P.x-MAP.altar.x,P.y-MAP.altar.y)<2.2)prompt=MAP.needStars&&stars!==15?'La porte céleste est scellée : '+starCount(stars)+'/4 étoiles':'E ou clic sur l\'autel · Invoquer '+DTYPES[dungeonT].boss+' (les portes se fermeront)';
     else if(fight===1&&!inArena(P.x,P.y)&&nearDoor(2.5))prompt='E ou clic sur le mur · Rejoindre le combat (tu seras enfermé)';else if(groundBag)prompt='E · Tout ramasser';}
-  if(prompt&&!paused){ctx.font=`400 ${Math.round(TS*0.4)}px "DotGothic16", monospace`;const w=ctx.measureText(prompt).width+28,h=TS*0.8,X=W/2-w/2,Y=H-h-HUDB-12;R(X,Y,w,h,'rgba(11,10,18,.85)');ctx.strokeStyle='#e8b04a';ctx.lineWidth=2;ctx.strokeRect(X+1,Y+1,w-2,h-2);label(prompt,W/2,Y+h/2,'#e8b04a',Math.round(TS*0.4));}
+  if(prompt&&!paused){if(typeof prompt==='string'&&kn('interact')!=='E')prompt=prompt.replace(/^E( ou|\b)/,kn('interact')+'$1');ctx.font=`400 ${Math.round(TS*0.4)}px "DotGothic16", monospace`;const w=ctx.measureText(prompt).width+28,h=TS*0.8,X=W/2-w/2,Y=H-h-HUDB-12;R(X,Y,w,h,'rgba(11,10,18,.85)');ctx.strokeStyle='#e8b04a';ctx.lineWidth=2;ctx.strokeRect(X+1,Y+1,w-2,h-2);label(prompt,W/2,Y+h/2,'#e8b04a',Math.round(TS*0.4));}
   if(banner){const a=clamp(banner.life,0,1);ctx.globalAlpha=a;label(banner.t,W/2,H*0.2,banner.col,Math.round(Math.min(W/14,TS*0.95)),700);label(banner.s,W/2,H*0.2+TS*0.85,'#ebe6f6',Math.round(TS*0.4),400);ctx.globalAlpha=1;}
   if(notice){ctx.globalAlpha=clamp(notice.life*2,0,1);label(notice.t,W/2,H*0.72,'#ffd9a0',Math.round(TS*0.42));ctx.globalAlpha=1;}
   if(chatLog.length){ctx.font=`400 ${Math.round(TS*0.4)}px "DotGothic16", monospace`;ctx.textAlign='left';ctx.textBaseline='top';const lh=Math.round(TS*0.5);const tl=document.getElementById('hudTL');let y=tl.offsetTop+tl.offsetHeight+8;
