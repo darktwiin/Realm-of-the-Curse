@@ -323,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 21h15 · touches personnalisables"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 21h30 · archer renforcé"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -415,7 +415,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 21h15 · touches personnalisables</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 21h30 · archer renforcé</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -456,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 21h15 · touches personnalisables</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 21h30 · archer renforcé</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -764,7 +764,7 @@ const RING_N=['Anneau de cuivre',"Anneau d'argent","Anneau d'or",'Anneau de saph
 const RING_S={vie:'de vitalité',mana:'de sagesse',puissance:'de force',vatt:'de dextérité',vdep:'du vent'};
 const SLOT_IDX={arme:0,capa:1,armure:2,anneau:3};
 const SLOT_NOM=['Arme','Capacité','Armure','Anneau'];
-const WB={dague:{shots:1,spd:14,range:5,r:0.13,col:'#dfe8ff'},epee:{shots:1,spd:12,range:3.4,r:0.3,col:'#e6ecff'},baton:{shots:2,par:0.22,spd:11,range:7.5,r:0.15,col:'#c28bff'},arc:{shots:3,spread:0.16,spd:13,range:6.5,r:0.11,col:'#f1e3c0'},baguette:{shots:1,spd:15,range:8.5,r:0.14,col:'#ffe27a'}};
+const WB={dague:{shots:1,spd:14,range:5,r:0.13,col:'#dfe8ff'},epee:{shots:1,spd:12,range:3.4,r:0.3,col:'#e6ecff'},baton:{shots:2,par:0.22,spd:11,range:7.5,r:0.15,col:'#c28bff'},arc:{shots:3,spread:0.09,spd:15,range:13,r:0.11,col:'#f1e3c0',pierce:true},baguette:{shots:1,spd:15,range:8.5,r:0.14,col:'#ffe27a'}};
 
 function mkItem(kind,tier){
   const K=KINDS[kind];const it={kind,tier,slot:K.slot,name:K.noms?K.noms[Math.min(tier,K.noms.length-1)]:'',stats:{}};
@@ -1682,7 +1682,7 @@ function fire(st){
     let an=ang,ox=0,oy=0;
     if(spread)an+=(i-(shots-1)/2)*spread;
     if(b.par){const o=(i-(shots-1)/2)*b.par*2;ox=-Math.sin(ang)*o;oy=Math.cos(ang)*o;}
-    pb.push({x:P.x+ox,y:P.y+oy,vx:Math.cos(an)*b.spd,vy:Math.sin(an)*b.spd,life:b.range/b.spd,dmg:Math.round(rnd(w.dmg[0],w.dmg[1])*st.mult),r:b.r,col:w.tier>=7?'#3ff0ff':(fx?fx.col:b.col),kind:w.kind,hit:null,trail:w.tier>=7?'#3ff0ff':(fx?fx.trail:TRAIL[w.kind])||(fx&&fx.trail)});
+    pb.push({x:P.x+ox,y:P.y+oy,vx:Math.cos(an)*b.spd,vy:Math.sin(an)*b.spd,life:b.range/b.spd,dmg:Math.round(rnd(w.dmg[0],w.dmg[1])*st.mult),r:b.r,col:w.tier>=7?'#3ff0ff':(fx?fx.col:b.col),kind:w.kind,pierce:!!b.pierce,hit:b.pierce?new Set():null,trail:w.tier>=7?'#3ff0ff':(fx?fx.trail:TRAIL[w.kind])||(fx&&fx.trail)});
   }
   {const ch=C();ch.shots=(ch.shots||0)+shots;}
   classVfx(save.current,P.x,P.y,ang,w.tier>=7);sfx('shoot_'+save.current,0.7);
