@@ -204,7 +204,7 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .duelbox{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:8;min-width:320px;max-width:calc(100% - 340px);background:rgba(30,10,16,.92);border:2px solid #c8102e;padding:10px 14px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 .duelbox b{font-family:var(--display);font-size:16px;color:#ff8a8a}.duelbox span{font-size:13px}.duelbox .acts{gap:8px;justify-content:center;flex-wrap:wrap}
 .duelbox .act.death{border-color:#c8102e;color:#ff9aa6}.duelbox .act.on{border-color:#ffd23f;color:#ffd23f}
-#plist li .tbtn.dbtn{border-color:#c8102e;color:#ff9aa6;margin-left:3px}#plist li.hastb{grid-template-columns:22px 1fr auto auto auto}
+#plist li .tbtn.tpbtn{border-color:#3ff0ff;color:#9ff7ff;margin-left:3px}#plist li .tbtn.dbtn{border-color:#c8102e;color:#ff9aa6;margin-left:3px}#plist li.hastb{grid-template-columns:22px 1fr auto auto auto}
 .treq{position:absolute;right:10px;top:62px;z-index:8;width:260px;background:rgba(25,22,36,.95);border:2px solid var(--gold);padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 .treq span{font-size:13px;color:var(--text)}.treq .acts{gap:6px}.treq i{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:100%}
 .tradeov{background:rgba(6,5,10,.35)}.shop-inner.trade-inner{width:min(640px,94vw);max-width:none}
@@ -323,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 22h15 · soin en % et plus de donjons"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 22h40 · invitations de téléportation"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -415,7 +415,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h15 · soin en % et plus de donjons</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h40 · invitations de téléportation</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -456,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 22h15 · soin en % et plus de donjons</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 22h40 · invitations de téléportation</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1132,7 +1132,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2;
+const NETV=2,BUILD=2509252240;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1215,6 +1215,7 @@ function onPeers(peers){
     seen.add(pe.peer);
     let r=remotes.get(pe.peer);
     const p=pe.presence||{};
+    if(!newerWarned&&typeof p.bv==='number'&&p.bv>BUILD){newerWarned=true;showBanner('Nouvelle version du jeu !','Recharge la page (F5) pour jouer avec les autres','#ffd23f');setTimeout(()=>note('Une nouvelle version est en ligne : appuie sur F5'),4000);}
     if(!r){r={peer:pe.peer,p:null,x:num(p.x,0)/10,y:num(p.y,0)/10,upd:Date.now(),shT:0,lastMsg:p.m||null,lastHl:p.hl||null,lastEv:p.ev||null,walk:0};remotes.set(pe.peer,r);}
     if(r.p!==p){
       r.upd=Date.now();
@@ -1257,7 +1258,7 @@ function syncFromHost(){
       if(!m){if(handled.has(id))continue;m=addMon(k,x,y,regionAt(x,y),id,hp);}
       m.max=mx0;m.inv=f[6]==='1'?1:0;m.tx=x;m.ty=y;if(!m.pend||time-m.pend>1.2){m.hp=hp;m.pend=0;}
     }
-    monsters=monsters.filter(m=>keep.has(m.id));
+    monsters=monsters.filter(m=>keep.has(m.id)||((P.invis>0||admInv)&&m.hp>0&&Math.hypot(m.x-P.x,m.y-P.y)<14));
   }
   if(p.D!==lastHostD&&typeof p.D==='string'){
     lastHostD=p.D;
@@ -1285,7 +1286,7 @@ function sendPresence(){
   if(!room||!save.current)return;
   const st=S(),ch=C(),w=ch.equip[0];
   const sh=(!safe()&&(mouse.down||P.auto||aimTouch)&&w)?(()=>{const a=aimWorld();return Math.round(Math.atan2(a.y-P.y,a.x-P.x)*100);})():null;
-  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,dd:scene==='arena'?Math.round((st.dmg[0]+st.dmg[1])/2*0.6):null,iv:P.invis>0||admInv?1:0,hid:admInv?1:0,ti:myTitle(),mo:morphKey,as:P.invis>0&&!admInv?1:0,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null};
+  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,dd:scene==='arena'?Math.round((st.dmg[0]+st.dmg[1])/2*0.6):null,iv:P.invis>0||admInv?1:0,hid:admInv?1:0,bv:BUILD,ti:myTitle(),mo:morphKey,as:P.invis>0&&!admInv?1:0,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null};
   if(!safe()&&amHost&&othersInScene()){
     o.D=deaths.slice(-20).join(';');
     if(scene==='realm')o.G=dportals.map(d=>d.id.toString(36)+','+Math.round(d.x*10)+','+Math.round(d.y*10)+','+Math.ceil(d.life)+','+(d.t||'c')).join(';');
@@ -2397,11 +2398,11 @@ function tradeSend(o){if(TR&&room&&room.raw)room.raw(Object.assign({t:'tr',to:TR
 function requestTrade(peer){const r=remotes.get(peer);if(!canTradeWith(r)){note('Rapproche-toi du joueur pour échanger');return;}if(TR){note('Tu as déjà un échange en cours');return;}
   room.raw({t:'tr',to:peer,k:'req'});note('Demande d\'échange envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');}
 let treqKind='trade',treqKey='';
-function showTradeReq(peer,kind,key){const r=remotes.get(peer);if(!r||!r.p)return;treqFrom=peer;treqT=20;treqKind=kind||'trade';treqKey=key||'';const nm=clean(r.p.n).slice(0,16)||'Joueur';$('#treqT').textContent=treqKind==='duel'?'⚔ Défi en duel !':'Proposition d\'échange';$('#treqS').textContent=treqKind==='duel'?nm+' te défie dans l\'arène. Vous choisirez ensuite : duel entre amis ou duel à mort.':nm+' veut échanger avec toi.';treqEl.style.borderColor=treqKind==='duel'?'#c8102e':'';treqEl.hidden=false;sfx(treqKind==='duel'?'boss':'coin',0.5);}
+function showTradeReq(peer,kind,key){const r=remotes.get(peer);if(!r||!r.p)return;treqFrom=peer;treqT=20;treqKind=kind||'trade';treqKey=key||'';const nm=clean(r.p.n).slice(0,16)||'Joueur';$('#treqT').textContent=treqKind==='tp'?'↗ Invitation':treqKind==='duel'?'⚔ Défi en duel !':'Proposition d\'échange';$('#treqS').textContent=treqKind==='tp'?nm+' t\'invite à le rejoindre dans le Royaume (téléportation).':treqKind==='duel'?nm+' te défie dans l\'arène. Vous choisirez ensuite : duel entre amis ou duel à mort.':nm+' veut échanger avec toi.';treqEl.style.borderColor=treqKind==='duel'?'#c8102e':treqKind==='tp'?'#3ff0ff':'';treqEl.hidden=false;sfx(treqKind==='duel'?'boss':'coin',0.5);}
 function hideTradeReq(){treqEl.hidden=true;treqFrom=null;}
-$('#treqOk').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();if(treqKind==='duel'){acceptDuel(p,treqKey);return;}const r=remotes.get(p);if(!canTradeWith(r)){note('Le joueur est trop loin');room&&room.raw&&room.raw({t:'tr',to:p,k:'ans',ok:false});return;}if(TR){room.raw({t:'tr',to:p,k:'ans',ok:false});return;}room.raw({t:'tr',to:p,k:'ans',ok:true});openTrade(p);cv.focus();});
-$('#treqNo').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();room&&room.raw&&room.raw({t:'tr',to:p,k:treqKind==='duel'?'dans':'ans',ok:false});cv.focus();});
-$('#plist').addEventListener('click',e=>{const b=e.target.closest('[data-trade]');if(b){requestTrade(b.dataset.trade);return;}const d=e.target.closest('[data-duel]');if(d)requestDuel(d.dataset.duel);});
+$('#treqOk').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();if(treqKind==='tp'){joinPlayer(p);return;}if(treqKind==='duel'){acceptDuel(p,treqKey);return;}const r=remotes.get(p);if(!canTradeWith(r)){note('Le joueur est trop loin');room&&room.raw&&room.raw({t:'tr',to:p,k:'ans',ok:false});return;}if(TR){room.raw({t:'tr',to:p,k:'ans',ok:false});return;}room.raw({t:'tr',to:p,k:'ans',ok:true});openTrade(p);cv.focus();});
+$('#treqNo').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();room&&room.raw&&room.raw({t:'tr',to:p,k:treqKind==='duel'?'dans':treqKind==='tp'?'tpans':'ans',ok:false});cv.focus();});
+$('#plist').addEventListener('click',e=>{const tp=e.target.closest('[data-tpinv]');if(tp){inviteTp(tp.dataset.tpinv);return;}const b=e.target.closest('[data-trade]');if(b){requestTrade(b.dataset.trade);return;}const d=e.target.closest('[data-duel]');if(d)requestDuel(d.dataset.duel);});
 function openTrade(peer){const r=remotes.get(peer);TR={peer,name:clean(r&&r.p?r.p.n:'').slice(0,16)||'Joueur',mine:[],theirs:[],okMe:false,okThem:false,hThem:''};trEl.hidden=false;keys.clear();mouse.down=false;renderTrade();}
 function closeTrade(msg,send){if(!TR)return;if(send)tradeSend({k:'cancel'});TR=null;trEl.hidden=true;if(msg)note(msg);invDirty=true;cv.focus();}
 function tradeChanged(){TR.okMe=false;TR.okThem=false;tradeSend({k:'offer',items:offerItems()});renderTrade();}
@@ -2425,14 +2426,26 @@ function tryFinishTrade(){if(!TR||!TR.okMe||!TR.okThem)return;const mine=offerIt
   for(const i of TR.mine)ch.inv[i]=null;for(const it of TR.theirs){const f=ch.inv.indexOf(null);if(f>=0)ch.inv[f]=it;}
   const n=TR.theirs.length,g=mine.length,nm=TR.name;TR=null;trEl.hidden=true;persist();invDirty=true;sfx('buy');burst(P.x,P.y,'#ffd96a',20,3);
   showBanner('Échange réussi',g+' objet'+(g>1?'s':'')+' donné'+(g>1?'s':'')+' · '+n+' reçu'+(n>1?'s':'')+' · avec '+nm,'#ffd96a');cv.focus();}
-function tradeMsg(m){const from=String(m.from||'');if(String(m.k||'')[0]==='d'){duelMsg(m,from);return;}
+/* ---------- invitation de téléportation (Royaume) ---------- */
+const tpInvT={};
+function inviteTp(peer){const r=remotes.get(peer);if(!r||!r.p){note('Joueur introuvable');return;}if(scene!=='realm'){note('Tu dois être dans le Royaume pour inviter');return;}
+  if(tpInvT[peer]&&Date.now()-tpInvT[peer]<10000){note('Invitation déjà envoyée, patiente un peu');return;}tpInvT[peer]=Date.now();
+  room.raw({t:'tr',to:peer,k:'tpinv'});note('Invitation envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');}
+function joinPlayer(peer){const r=remotes.get(peer);if(!r||!r.p||r.p.s!=='r'||Date.now()-r.upd>6000){note('Le joueur n\'est plus dans le Royaume');return;}
+  if(DU||scene==='arena'||scene==='tuto'){note('Impossible pendant un duel ou le tutoriel');return;}
+  if(scene!=='realm')enterRealm();
+  let x=r.x,y=r.y;for(let k=0;k<16;k++){const a=k*TAU/16,d=k<8?0.9:1.6,nx=r.x+Math.cos(a)*d,ny=r.y+Math.sin(a)*d;if(!solidAt(nx,ny)&&!solidAt(nx-.3,ny)&&!solidAt(nx+.3,ny)&&!solidAt(nx,ny-.3)&&!solidAt(nx,ny+.3)){x=nx;y=ny;break;}}
+  P.x=x;P.y=y;P.invul=2.5;burst(P.x,P.y,'#3ff0ff',22,3);sfx('portal');room.raw({t:'tr',to:peer,k:'tpans',ok:true});sendPresence();cv.focus();}
+function tradeMsg(m){const from=String(m.from||'');
+  if(m.k==='tpinv'){if(TR||DU||scene==='arena'||!treqEl.hidden){room.raw({t:'tr',to:from,k:'tpans',ok:false});return;}showTradeReq(from,'tp');return;}
+  if(m.k==='tpans'){const r=remotes.get(from),nm=r&&r.p?clean(r.p.n).slice(0,16)||'Le joueur':'Le joueur';note(m.ok?nm+' te rejoint !':nm+' a refusé l\'invitation');return;}if(String(m.k||'')[0]==='d'){duelMsg(m,from);return;}
   if(m.k==='req'){if(TR||!canTradeWith(remotes.get(from))){room.raw({t:'tr',to:from,k:'ans',ok:false});return;}showTradeReq(from);return;}
   if(m.k==='ans'){if(m.ok){if(!TR)openTrade(from);}else{const r=remotes.get(from);note((r&&r.p?clean(r.p.n).slice(0,16):'Le joueur')+' a refusé l\'échange');}return;}
   if(!TR||TR.peer!==from)return;
   if(m.k==='offer'){TR.theirs=(Array.isArray(m.items)?m.items:[]).slice(0,8).map(sanitizeItem).filter(Boolean);TR.okMe=false;TR.okThem=false;renderTrade();}
   else if(m.k==='ok'){TR.okThem=!!m.ok;TR.hThem=String(m.h||'');renderTrade();tryFinishTrade();}
   else if(m.k==='cancel')closeTrade(TR.name+' a annulé l\'échange',false);}
-setInterval(()=>{if(!treqEl.hidden){treqT-=0.25;$('#treqBar').style.width=Math.max(0,treqT/20*100)+'%';if(treqT<=0||!remotes.get(treqFrom)){const p=treqFrom;hideTradeReq();if(p&&room&&room.raw)room.raw({t:'tr',to:p,k:treqKind==='duel'?'dans':'ans',ok:false});}}
+setInterval(()=>{if(!treqEl.hidden){treqT-=0.25;$('#treqBar').style.width=Math.max(0,treqT/20*100)+'%';if(treqT<=0||!remotes.get(treqFrom)){const p=treqFrom;hideTradeReq();if(p&&room&&room.raw)room.raw({t:'tr',to:p,k:treqKind==='duel'?'dans':treqKind==='tp'?'tpans':'ans',ok:false});}}
   if(TR){const r=remotes.get(TR.peer);if(!r||!r.p||Date.now()-r.upd>6000||!activeIn(r,sceneKey())||Math.hypot(r.x-P.x,r.y-P.y)>TRADE_R*2)closeTrade('Échange annulé : le joueur est parti',true);
     else if(TR.mine.some(i=>!C().inv[i])){TR.mine=TR.mine.filter(i=>C().inv[i]);tradeChanged();}}},250);
 /* ================= Arène : duels entre joueurs ================= */
@@ -2563,9 +2576,9 @@ let plSig='';
 function renderPlayers(){
   const on=!!room&&netOn;nsEl.textContent=!room?'Solo':on?'En ligne · salle '+salleNom:'Connexion…';nsEl.classList.toggle('on',on);
   const hk=hostKey();
-  {const sig=[save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
+  {const sig=[save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r,Math.hypot(r.x-P.x,r.y-P.y)<8].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
   plEl.textContent='';
-  const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';sn.textContent=n+(me?' (toi)':'')+' · niv. '+l;const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);if(peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄';b.title='Proposer un échange';li.append(b);const d2=document.createElement('button');d2.type='button';d2.className='tbtn dbtn';d2.dataset.duel=peer;d2.textContent='⚔';d2.title='Défier en duel';li.append(d2);}plEl.append(li);};
+  const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';sn.textContent=n+(me?' (toi)':'')+' · niv. '+l;const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);if(peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄';b.title='Proposer un échange';li.append(b);const d2=document.createElement('button');d2.type='button';d2.className='tbtn dbtn';d2.dataset.duel=peer;d2.textContent='⚔';d2.title='Défier en duel';li.append(d2);}if(peer&&scene==='realm'&&!DU){const r=remotes.get(peer);if(r&&r.p&&!(r.p.s==='r'&&Math.hypot(r.x-P.x,r.y-P.y)<8)){const t=document.createElement('button');t.type='button';t.className='tbtn tpbtn';t.dataset.tpinv=peer;t.textContent='↗';t.title='Inviter à te rejoindre (téléportation dans le Royaume)';li.append(t);}}{const nb=li.querySelectorAll('button').length;if(nb)li.style.gridTemplateColumns='22px 1fr auto'+' auto'.repeat(nb);}plEl.append(li);};
   if(save.current)add(save.current,pseudo,C().lvl,sceneLabel(sceneKey())+(!safe()&&amHost&&othersInScene()?' ★':''),true);
   let n=0;for(const r of remotes.values()){if(!r.p||r.p.v!==NETV||Date.now()-r.upd>4000||r.p.hid)continue;n++;add(CLASSES[r.p.c]?r.p.c:'',clean(r.p.n).slice(0,16)||'Joueur',clamp(num(r.p.l,1)|0,1,20),sceneLabel(r.p.s)+(hk.r===r?' ★':''),false,r.peer);}
   if(!n){const li=document.createElement('li');li.className='empty';li.textContent=!room?'Page ouverte sans serveur : tu joues en solo. Lance « npm start » et ouvre l\'adresse du serveur.':netOn?'Personne d\'autre pour l\'instant. Envoie le lien de cette page à tes amis.':'Connexion au serveur… (sur Render gratuit, le premier chargement peut prendre une minute)';plEl.append(li);}
