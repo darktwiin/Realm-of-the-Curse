@@ -108,9 +108,11 @@ Les monstres des deux dernières zones (Terres brûlées et Terres du Dieu Fou) 
 
 Mode admin : tape `/admin` suivi du mot de passe dans le chat (`/admin off` pour quitter). Un bouton bouclier apparaît à côté des options, en haut à droite (touche P). Il contient :
 - **Moi** : mode GOD (invulnérable, téléportation par clic droit ou sur la mini-carte), tuer les monstres à l'écran, salle d'essai des donjons, ajouter de la Cursite.
-- **Joueurs** : recherche par pseudo, se téléporter sur le joueur, GOD, Cursite, donner un objet, rendre muet, expulser, bannir l'adresse IP.
+- **Joueurs** : recherche par pseudo, se téléporter sur le joueur ou l'amener à soi (y compris dans la salle d'essai), GOD, Cursite, donner un objet, rendre muet, expulser, bannir l'adresse IP.
 - **Bannis** : liste des bannis, avec un bouton pour débannir.
 - **Objets** : tous les objets du jeu, un clic pour l'avoir dans ton sac.
+- **Monstres** : tous les monstres avec leur image, bouton Spawn pour les faire apparaître à côté de toi.
+- **Tuer les joueurs à l'écran** (onglet Moi) : double-clic puis confirmation.
 - **Filtre** : les mots remplacés par des étoiles dans le chat et les pseudos.
 
 Toutes ces commandes sont vérifiées par le serveur : mets toujours à jour `server.js` en même temps que `public/index.html`.

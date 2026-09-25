@@ -158,7 +158,15 @@ wss.on('connection', (ws, req) => {
       const cible = trouverJoueur(String(m.to || ''));
       if (!cible) { res(false, 'Joueur introuvable (déconnecté ?)'); return; }
       const nom = String((cible.etat && cible.etat.n) || 'Joueur').slice(0, 16);
-      if (cmd === 'item') {
+      if (cmd === 'kill') {
+        envoyer(cible.ws, { t: 'dev', cmd: 'kill', arg: 0 });
+        res(true, nom + ' a été tué par un admin');
+      } else if (cmd === 'summon') {
+        const a = m.arg || {};
+        const arg = { s: String(a.s || '').slice(0, 40), x: Number(a.x) || 0, y: Number(a.y) || 0, hs: Math.floor(Number(a.hs) || 0) };
+        envoyer(cible.ws, { t: 'dev', cmd: 'summon', arg });
+        res(true, nom + ' est téléporté vers toi');
+      } else if (cmd === 'item') {
         const it = m.arg;
         if (!it || typeof it !== 'object' || JSON.stringify(it).length > 2000) { res(false, 'Objet invalide'); return; }
         envoyer(cible.ws, { t: 'dev', cmd: 'item', arg: it });
