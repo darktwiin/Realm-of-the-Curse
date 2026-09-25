@@ -21,11 +21,11 @@ let scores = {};
 try { scores = JSON.parse(fs.readFileSync(FICHIER_SCORES, 'utf8')) || {}; } catch { scores = {}; }
 let scoresModifies = false;
 const entier = (v, max) => Math.max(0, Math.min(max, Math.floor(Number(v) || 0)));
-const CLASSES_OK = ['guerrier', 'mage', 'archer', 'pretre'];
+const CLASSES_OK = ['guerrier', 'mage', 'archer', 'pretre', 'trickster', 'assassin'];
 function enregistrerScore(m) {
   const id = String(m.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 24);
   if (id.length < 8) return;
-  const nom = String(m.n || 'Joueur').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 16) || 'Joueur';
+  const nom = filtrer(String(m.n || 'Joueur').replace(/[\u0000-\u001f\u007f]/g, '')).slice(0, 16) || 'Joueur';
   scores[id] = {
     n: nom, c: CLASSES_OK.includes(m.c) ? m.c : 'guerrier', l: entier(m.l, 20),
     gold: entier(m.gold, 1e9), pres: entier(m.pres, 1e9), kills: entier(m.kills, 1e9),
@@ -74,6 +74,34 @@ function cyrb53(str, seed = 7) { let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ s
 const DEV_HASH = '2858b4huwnf';
 function trouverJoueur(peer) { for (const s of salles.values()) { const j = s.get(peer); if (j) return j; } return null; }
 
+// ---- Modération : bannissements et sourdines par adresse IP, gardés dans moderation.json ----
+// Sur Render gratuit, ce fichier est effacé au redémarrage : les bannissements repartent alors de zéro.
+const FICHIER_MODO = path.join(__dirname, 'moderation.json');
+let modo = { bans: {}, mutes: {} };
+try { const m = JSON.parse(fs.readFileSync(FICHIER_MODO, 'utf8')); modo = { bans: m.bans || {}, mutes: m.mutes || {} }; } catch { /* pas encore de fichier */ }
+function sauverModo() { fs.writeFile(FICHIER_MODO, JSON.stringify(modo), () => {}); }
+function ipDe(req) {
+  // Derrière le proxy de Render, la vraie adresse est la dernière de x-forwarded-for
+  const xff = String(req.headers['x-forwarded-for'] || '').split(',').map(s => s.trim()).filter(Boolean);
+  return (xff.length ? xff[xff.length - 1] : req.socket.remoteAddress || '?').replace(/^::ffff:/, '');
+}
+const masquer = ip => ip.includes('.') ? ip.split('.').slice(0, 2).join('.') + '.•.•' : ip.slice(0, 9) + '…';
+
+// ---- Filtre de langage (même liste que dans le jeu) ----
+const MOTS_RACINES = ['connard', 'connass', 'salope', 'salaud', 'putain', 'encul', 'batard', 'merde', 'couill', 'tapette', 'gouine', 'negre', 'negro', 'bougnoul', 'youpin', 'bicot', 'abruti', 'cretin', 'gogol', 'attarde', 'branleu', 'suceu', 'fuck', 'shit', 'bitch', 'asshole', 'nigg', 'fagg', 'whore'];
+const MOTS_EXACTS = ['con', 'conne', 'cons', 'pute', 'putes', 'fdp', 'ntm', 'tg', 'pd', 'pede', 'pedes', 'bite', 'chier', 'debile', 'mongol', 'nique', 'niquer', 'niquez', 'nik', 'salop', 'retard', 'dick', 'cunt'];
+const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '€': 'e' };
+function normaliser(m) { return m.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[013457@$€]/g, c => LEET[c]).replace(/[^a-z]/g, '').replace(/(.)\1+/g, '$1'); }
+const RACINES_N = MOTS_RACINES.map(normaliser), EXACTS_N = MOTS_EXACTS.map(normaliser);
+function filtrer(txt) {
+  return String(txt).replace(/[^\s.,;:!?'"()|\-_/]+/g, mot => {
+    const n = normaliser(mot);
+    if (!n) return mot;
+    if (EXACTS_N.includes(n) || RACINES_N.some(r => n.includes(r))) return '*'.repeat(mot.length);
+    return mot;
+  });
+}
+
 function envoyer(ws, msg) {
   if (ws.readyState === 1) ws.send(JSON.stringify(msg));
 }
@@ -83,6 +111,8 @@ function diffuser(salle, msg, sauf) {
 }
 
 wss.on('connection', (ws, req) => {
+  const ip = ipDe(req);
+  if (modo.bans[ip]) { ws.close(4003, 'Banni'); return; }
   const params = new URL(req.url, 'http://local').searchParams;
   const nom = (params.get('salle') || 'principal').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 32) || 'principal';
   let salle = salles.get(nom);
@@ -90,7 +120,7 @@ wss.on('connection', (ws, req) => {
   if (salle.size >= MAX_JOUEURS_PAR_SALLE) { ws.close(4001, 'Salle pleine'); return; }
 
   const peer = crypto.randomBytes(6).toString('hex');
-  const moi = { ws, peer, etat: {}, vivant: true, msgs: 0 };
+  const moi = { ws, peer, ip, etat: {}, vivant: true, msgs: 0 };
   salle.set(peer, moi);
   console.log(`[${nom}] connexion ${peer} (${salle.size} joueur(s))`);
 
@@ -107,22 +137,45 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (m && m.t === 'dev') {
-      if (cyrb53(String(m.pw || '')) !== DEV_HASH) { envoyer(ws, { t: 'devres', ok: false, msg: 'Mot de passe refusé par le serveur' }); return; }
+      const res = (ok, msg, extra) => envoyer(ws, Object.assign({ t: 'devres', ok, msg }, extra || {}));
+      if (cyrb53(String(m.pw || '')) !== DEV_HASH) { res(false, 'Mot de passe refusé par le serveur'); return; }
+      const cmd = String(m.cmd || '');
+      if (cmd === 'bans') { res(true, '', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); return; }
+      if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
+      if (cmd === 'infos') { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push({ peer: j.peer, muet: !!modo.mutes[j.ip] }); res(true, '', { infos: out }); return; }
       const cible = trouverJoueur(String(m.to || ''));
-      const cmd = m.cmd === 'god' ? 'god' : m.cmd === 'cursite' ? 'cursite' : null;
-      if (!cible || !cmd) { envoyer(ws, { t: 'devres', ok: false, msg: 'Joueur introuvable (déconnecté ?)' }); return; }
-      const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(1000000, Math.floor(Number(m.arg) || 0)));
-      envoyer(cible.ws, { t: 'dev', cmd, arg });
-      envoyer(ws, { t: 'devres', ok: true, msg: cmd === 'god' ? (arg ? 'GOD donné' : 'GOD retiré') : arg + ' Cursite envoyée' });
-      console.log(`[dev] ${cmd} ${arg} -> ${cible.peer}`);
+      if (!cible) { res(false, 'Joueur introuvable (déconnecté ?)'); return; }
+      const nom = String((cible.etat && cible.etat.n) || 'Joueur').slice(0, 16);
+      if (cmd === 'god' || cmd === 'cursite') {
+        const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(1000000, Math.floor(Number(m.arg) || 0)));
+        envoyer(cible.ws, { t: 'dev', cmd, arg });
+        res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + ' Cursite envoyée à ' + nom);
+      } else if (cmd === 'mute' || cmd === 'unmute') {
+        if (cmd === 'mute') modo.mutes[cible.ip] = { n: nom, t: Date.now() }; else delete modo.mutes[cible.ip];
+        sauverModo(); envoyer(cible.ws, { t: 'dev', cmd, arg: 0 });
+        res(true, nom + (cmd === 'mute' ? ' ne peut plus écrire dans le chat' : ' peut de nouveau écrire'));
+      } else if (cmd === 'kick' || cmd === 'ban') {
+        if (cible.ws === ws) { res(false, 'Tu ne peux pas te viser toi-même'); return; }
+        if (cmd === 'ban') {
+          if (cible.ip === moi.ip) { res(false, 'Ce joueur a la même adresse IP que toi : bannissement annulé'); return; }
+          modo.bans[cible.ip] = { n: nom, t: Date.now() }; sauverModo();
+          // tous les joueurs connectés depuis cette adresse partent
+          for (const s of salles.values()) for (const j of s.values()) if (j.ip === cible.ip) { envoyer(j.ws, { t: 'dev', cmd: 'ban', arg: 0 }); setTimeout(() => j.ws.close(4003, 'Banni'), 150); }
+        } else { envoyer(cible.ws, { t: 'dev', cmd: 'kick', arg: 0 }); setTimeout(() => cible.ws.close(4002, 'Expulsé'), 150); }
+        res(true, nom + (cmd === 'ban' ? ' est banni' : ' est expulsé'));
+      } else { res(false, 'Commande inconnue'); return; }
+      console.log(`[admin] ${cmd} -> ${nom}`);
       return;
     }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
     for (const k of Object.keys(m.patch).slice(0, 40)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
-      const v = m.patch[k];
+      let v = m.patch[k];
+      if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
+      if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
       if (v === null) delete moi.etat[k]; else moi.etat[k] = v;
     }
+    if (!modo.mutes[moi.ip]) moi.averti = false;
     if (JSON.stringify(moi.etat).length > MAX_OCTETS_ETAT) moi.etat = {};
     diffuser(salle, { t: 'p', peer, presence: moi.etat }, moi);
   });
