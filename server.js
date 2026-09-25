@@ -14,6 +14,44 @@ const MAX_OCTETS_ETAT = 8192;
 
 const INDEX = fs.readFileSync(path.join(__dirname, 'public', 'index.html'));
 
+// ---- Classement : scores des joueurs, sauvegardés dans classement.json ----
+// Sur Render gratuit, ce fichier est effacé à chaque redémarrage du serveur (disque non permanent).
+const FICHIER_SCORES = path.join(__dirname, 'classement.json');
+let scores = {};
+try { scores = JSON.parse(fs.readFileSync(FICHIER_SCORES, 'utf8')) || {}; } catch { scores = {}; }
+let scoresModifies = false;
+const entier = (v, max) => Math.max(0, Math.min(max, Math.floor(Number(v) || 0)));
+const CLASSES_OK = ['guerrier', 'mage', 'archer', 'pretre'];
+function enregistrerScore(m) {
+  const id = String(m.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 24);
+  if (id.length < 8) return;
+  const nom = String(m.n || 'Joueur').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 16) || 'Joueur';
+  scores[id] = {
+    n: nom, c: CLASSES_OK.includes(m.c) ? m.c : 'guerrier', l: entier(m.l, 20),
+    gold: entier(m.gold, 1e9), pres: entier(m.pres, 1e9), kills: entier(m.kills, 1e9),
+    shots: entier(m.shots, 1e10), hits: Math.min(entier(m.hits, 1e10), entier(m.shots, 1e10)),
+    t: Date.now()
+  };
+  scoresModifies = true;
+}
+function top(demandeur) {
+  const liste = Object.entries(scores);
+  const ligne = (id, s, v) => ({ n: s.n, c: s.c, l: s.l, v, moi: id === demandeur });
+  const tri = (f, filtre) => liste.filter(([, s]) => !filtre || filtre(s)).map(([id, s]) => ligne(id, s, f(s))).sort((a, b) => b.v - a.v).slice(0, 20);
+  return {
+    t: 'top',
+    or: tri(s => s.gold),
+    prestige: tri(s => s.pres),
+    precision: tri(s => Math.round(s.hits / s.shots * 1000) / 10, s => s.shots >= 300),
+    kills: tri(s => s.kills)
+  };
+}
+setInterval(() => {
+  if (!scoresModifies) return;
+  scoresModifies = false;
+  fs.writeFile(FICHIER_SCORES, JSON.stringify(scores), () => {});
+}, 30000);
+
 const server = http.createServer((req, res) => {
   const url = req.url.split('?')[0];
   if (url === '/' || url === '/index.html') {
@@ -61,6 +99,8 @@ wss.on('connection', (ws, req) => {
     if (++moi.msgs > 60) return; // plus de 60 messages/seconde : ignorés
     let m;
     try { m = JSON.parse(data); } catch { return; }
+    if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
+    if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
     for (const k of Object.keys(m.patch).slice(0, 40)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
