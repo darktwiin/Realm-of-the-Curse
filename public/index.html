@@ -323,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 21h30 · archer renforcé"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 22h00 · monstres visibles pour l'assassin"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -415,7 +415,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 21h30 · archer renforcé</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h00 · monstres visibles pour l'assassin</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -456,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 21h30 · archer renforcé</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 22h00 · monstres visibles pour l'assassin</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1149,6 +1149,8 @@ function activeIn(r,s){return r.p&&r.p.v===NETV&&r.p.s===s&&Date.now()-r.upd<400
 let scaleT=0;
 function scenePlayersAll(){const a=[{x:P.x,y:P.y}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k))a.push({x:r.x,y:r.y});return a;}
 let admInv=false,morphKey=null;
+// tous les joueurs de la scène, y compris invisibles (pour savoir quels monstres envoyer et où ne pas en faire apparaître)
+function sceneAll(){const a=[{x:P.x,y:P.y}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k))a.push({x:r.x,y:r.y});return a;}
 function scenePlayers(){const a=P.invis>0||admInv?[]:[{x:P.x,y:P.y,vx:P.vx||0,vy:P.vy||0,me:true}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k)&&!r.p.iv)a.push({x:r.x,y:r.y,vx:r.vx||0,vy:r.vy||0,me:false});return a;}
 function hostKey(){const k=sceneKey();if(safe())return{me:false,r:null};let best={rt:sceneT,peer:myPeer||'',me:true};for(const r of remotes.values()){if(!activeIn(r,k))continue;const rt=num(r.p.rt,Infinity);if(rt<best.rt||(rt===best.rt&&r.peer<best.peer))best={rt,peer:r.peer,me:false,r};}return best;}
 function computeHostIsMe(){return !safe()&&hostKey().me;}
@@ -1271,7 +1273,7 @@ function syncFromHost(){
   }
 }
 function encMonsters(budget){
-  const pl=scenePlayers();const list=[];
+  const pl=sceneAll();const list=[];
   for(const m of monsters){if(m.hp<=0)continue;let d=1e9;for(const p of pl)d=Math.min(d,Math.hypot(m.x-p.x,m.y-p.y));if(d<15||(m.d.boss&&d<40))list.push([d,m]);}
   list.sort((a,b)=>a[0]-b[0]);
   let s='';for(const [,m] of list){const e=m.id.toString(36)+','+MKEYS.indexOf(m.key)+','+Math.round(m.x*10)+','+Math.round(m.y*10)+','+Math.round(clamp(m.hp/m.max,0,1)*1000)+(m.max!==m.d.hp||m.inv?','+Math.round(m.max).toString(36)+','+(m.inv?1:0):'');if(s.length+e.length+1>budget)break;s+=(s?';':'')+e;}
@@ -1527,8 +1529,15 @@ function classVfx(cls,x,y,ang,rel){
 function resetScene(){INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;}
 function enterNexus(){setTimeout(dailyAuto,700);if(scene==='arena'&&DU&&DU.state!=='fight'){duelSend({k:'dleave'});DU=null;$('#duelBox').hidden=true;}if(scene==='tuto'&&!save.tutoDone){save.tutoDone=true;persist();}if(scene!=='nexus')sfx('portal');scene='nexus';MAP=nexusMap;P.x=NSPAWN.x;P.y=NSPAWN.y;resetScene();curZone=-2;amHost=false;updZone();showBanner('Nexus','Zone sûre · la fontaine soigne');sendPresence();}
 // point d'arrivée tiré au hasard sur la plage, loin des monstres connus
-function beachSpot(){let best=null;for(let k=0;k<400;k++){const tx=ri(1,RN-2),ty=ri(1,RN-2),i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]!==0)continue;if(realm.deco&&realm.deco[i])continue;const x=tx+.5,y=ty+.5;
-  if(monsters.some(m=>Math.hypot(m.x-x,m.y-y)<9))continue;best={x,y};if(Math.random()<0.5)break;}return best||{x:SPAWN.x,y:SPAWN.y};}
+// même point pour tous les joueurs pendant une minute (tiré selon l'heure), puis il change de place
+// horloge du serveur (en-tête Date) pour que tous les joueurs changent de minute en même temps
+let CLK=0;try{fetch(location.href,{method:'HEAD',cache:'no-store'}).then(r=>{const d=Date.parse(r.headers.get('date'));if(d)CLK=d+500-Date.now();}).catch(()=>{});}catch(e){}
+function beachSpot(){const slot=Math.floor((Date.now()+CLK)/60000),R=mulberry(slot*7919+17);let best=null;
+  for(let k=0;k<400;k++){const tx=1+Math.floor(R()*(RN-2)),ty=1+Math.floor(R()*(RN-2)),i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]!==0)continue;if(realm.deco&&realm.deco[i])continue;best={x:tx+.5,y:ty+.5};break;}
+  if(!best)return{x:SPAWN.x,y:SPAWN.y};
+  // petit décalage pour ne pas être empilés, sur une case libre voisine
+  for(let k=0;k<12;k++){const x=best.x+(Math.random()*2-1)*1.2,y=best.y+(Math.random()*2-1)*1.2;if(!solidAt(x,y)&&!solidAt(x-.3,y)&&!solidAt(x+.3,y)&&!solidAt(x,y-.3)&&!solidAt(x,y+.3))return{x,y};}
+  return best;}
 function enterRealm(){
   if(!realm)realm=genRealm();sfx('portal');
   scene='realm';MAP=realm;{const b=beachSpot();P.x=b.x;P.y=b.y;}P.invul=2.5;resetScene();curZone=-2;sceneT=Date.now();
@@ -1666,7 +1675,7 @@ function populateDungeon(){
 const zoneCapCache={};
 function zoneCap(r){if(zoneCapCache[r]!=null)return zoneCapCache[r];let n=0;for(let i=0;i<RN*RN;i++)if(realm.reg[i]===r&&!realm.sol[i])n++;return zoneCapCache[r]=Math.round(n/(r===6?55:70));}
 function spawnIn(r){
-  const pl=scenePlayers();
+  const pl=sceneAll();
   for(let k=0;k<40;k++){const tx=ri(0,RN-1),ty=ri(0,RN-1),i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]!==r)continue;const x=tx+.5,y=ty+.5;if(pl.some(p=>Math.hypot(x-p.x,y-p.y)<14)||Math.hypot(x-SPAWN.x,y-SPAWN.y)<10||ARENAS.some(a=>Math.hypot(x-a.x,y-a.y)<12))continue;addMon(pick(ZONES[r].pool),x,y,r);return;}
 }
 function addMon(key,x,y,r,id,hp){const d=MON[key];const m={id:id||(++monId),key,d,x,y,tx:x,ty:y,hx:x,hy:y,r,hp:hp==null?d.hp:hp,max:d.hp,cd:rnd(0.5,1.5),wt:0,wx:0,wy:0,dir:Math.random()<.5?1:-1,flash:0,spin:0,phase:0,pend:0,bq:0,bt:0,ba:0,dash:0,dcd:rnd(1,3),seed:Math.random()*10};monsters.push(m);return m;}
