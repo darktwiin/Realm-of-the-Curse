@@ -69,6 +69,11 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 16 * 1024 });
 const salles = new Map(); // nom de salle -> Map(peer -> joueur)
 
+// ---- Commandes développeur : vérifiées ici, jamais par le navigateur du joueur visé ----
+function cyrb53(str, seed = 7) { let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed; for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); } h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909); return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36); }
+const DEV_HASH = '2858b4huwnf';
+function trouverJoueur(peer) { for (const s of salles.values()) { const j = s.get(peer); if (j) return j; } return null; }
+
 function envoyer(ws, msg) {
   if (ws.readyState === 1) ws.send(JSON.stringify(msg));
 }
@@ -101,6 +106,17 @@ wss.on('connection', (ws, req) => {
     try { m = JSON.parse(data); } catch { return; }
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
+    if (m && m.t === 'dev') {
+      if (cyrb53(String(m.pw || '')) !== DEV_HASH) { envoyer(ws, { t: 'devres', ok: false, msg: 'Mot de passe refusé par le serveur' }); return; }
+      const cible = trouverJoueur(String(m.to || ''));
+      const cmd = m.cmd === 'god' ? 'god' : m.cmd === 'cursite' ? 'cursite' : null;
+      if (!cible || !cmd) { envoyer(ws, { t: 'devres', ok: false, msg: 'Joueur introuvable (déconnecté ?)' }); return; }
+      const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(1000000, Math.floor(Number(m.arg) || 0)));
+      envoyer(cible.ws, { t: 'dev', cmd, arg });
+      envoyer(ws, { t: 'devres', ok: true, msg: cmd === 'god' ? (arg ? 'GOD donné' : 'GOD retiré') : arg + ' Cursite envoyée' });
+      console.log(`[dev] ${cmd} ${arg} -> ${cible.peer}`);
+      return;
+    }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
     for (const k of Object.keys(m.patch).slice(0, 40)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
