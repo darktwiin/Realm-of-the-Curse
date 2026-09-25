@@ -323,7 +323,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="Version 25/09 · 22h40 · invitations de téléportation"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="Version 25/09 · 22h55 · mort -20 % de niveaux"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -415,7 +415,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h40 · invitations de téléportation</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · Version 25/09 · 22h55 · mort -20 % de niveaux</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -456,7 +456,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">Version 25/09 · 22h40 · invitations de téléportation</p>
+        <p class="hint" style="color:#7ed957">Version 25/09 · 22h55 · mort -20 % de niveaux</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -493,7 +493,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <h2>Tu es mort</h2>
         <p id="deathWhy">Tué par un monstre</p>
         <div class="dchoice">
-          <button type="button" class="dopt" id="dContinue"><b>Continuer</b><span id="dContTxt">Ton héros redescend au niveau 1. Tu gardes ton équipement, tes sacs et tes potions de caractéristiques.</span></button>
+          <button type="button" class="dopt" id="dContinue"><b>Continuer</b><span id="dContTxt">Ton héros perd 20 % de ses niveaux. Tu gardes ton équipement, tes sacs et tes potions de caractéristiques.</span></button>
           <button type="button" class="dopt perma" id="dPerma"><b>Mort définitive</b><span id="dPermaTxt">Gagne du prestige</span></button>
         </div>
         <p class="hint">La mort définitive remet ce héros à zéro : niveau, objets équipés, sacs, potions de caractéristiques et précision. Tes coffres, leur contenu et tes pièces sont conservés.</p>
@@ -1132,7 +1132,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2509252240;let newerWarned=false;
+const NETV=2,BUILD=2509252255;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1731,19 +1731,18 @@ function abilityInfo(it){const t=it.tier,rel=t>=7,m=S().mult;return{
   casque:`Berserk ${3+0.5*t} s : +50 % vitesse d'attaque, +${20+5*t} % dégâts${rel?' · invulnérable 2 s':''}`,
   sort:`Explosion : 16 × ${Math.round((35+22*t)*m)} dégâts${rel?' · lancée 3 fois au même endroit':''}`,
   carquois:rel?`Flèches dans toutes les directions : ${Math.round((110+65*6)*m)} dégâts + 50 % de la vie du monstre (15 % pour un boss)`:`Flèche perçante : ${Math.round((110+65*t)*m)} dégâts`,
-  tome:`Soigne ${tomePct(t)} % de la vie max (toi et les alliés) dans un rayon de ${(t>=7?8.5:3+0.7*t).toFixed(1)} cases · recharge ${tomeCd(t)} s${rel?' · les monstres à l\'écran subissent +50 % de dégâts pendant 6 s':''}`,
+  tome:`Soigne ${70+35*t} PV dans un rayon de ${(3+0.7*t).toFixed(1)} cases${rel?' · les monstres à l\'écran subissent +50 % de dégâts pendant 6 s':''}`,
   prisme:`Téléportation jusqu'à ${(7+t*0.4).toFixed(1)} cases · recharge ${Math.max(0.8,3.5-0.4*t).toFixed(1)} s${rel?' · laisse une bombe au départ':''}`,
   voile:`Invisible pour les monstres pendant ${(rel?7:2.5+0.6*t).toFixed(1)} s${rel?' · invulnérable pendant ce temps':''}`}[it.kind]||'';}
-// soin du prêtre : pourcentage de la vie max de chaque joueur soigné, selon le tier du tome ; recharge de quelques secondes
-function tomePct(t){return t>=7?60:20+5*t;}
-function tomeCd(t){return t>=7?4:Math.max(4.5,6-0.25*t);}
-// chance qu'un monstre du Royaume ouvre un portail de donjon (toutes les zones)
+// chance qu'un monstre du Royaume ouvre un portail de donjon (seulement les deux dernières zones ; le Terrier des Gobelins tombe à part sur la plage et les plaines)
 const DUN_RATE=[1/25,1/22,1/20,1/18,1/16,1/14,1/12];
-function dunChance(m){const r=m.r!=null&&m.r>=0&&m.r<7?m.r:6;return DUN_RATE[r];}
+function dunChance(m){const r=m.r!=null&&m.r>=0&&m.r<7?m.r:(ZONES[5].pool.includes(m.key)?5:ZONES[6].pool.includes(m.key)?6:0);return r>=5?DUN_RATE[r]:0;}
+// mort (« Continuer ») : on perd 20 % de ses niveaux (au moins 1), jamais sous le niveau 1
+function deathLvl(l){return l<=1?1:Math.max(1,l-Math.max(1,Math.round(l*0.2)));}
 function useAbility(){
   const it=C().equip[1];if(!it){note('Aucune capacité équipée');return;}
   if(safe()&&it.kind!=='tome'){note('Pas de capacités ici');return;}
-  if(P.acd>0)return;if(it.kind==='tome'&&P.healcd>0){note('Soin disponible dans '+P.healcd.toFixed(1)+' s');return;}if(it.kind==='prisme'&&P.tpcd>0){note('Téléportation dans '+P.tpcd.toFixed(1)+' s');return;}
+  if(P.acd>0)return;if(it.kind==='prisme'&&P.tpcd>0){note('Téléportation dans '+P.tpcd.toFixed(1)+' s');return;}
   if(P.mp<it.cost){note('Pas assez de mana');return;}
   const st=S(),t=it.tier,rel=t>=7;
   if(it.kind==='prisme'){const g=tpTarget();if(!g){note('Impossible de se téléporter ici');return;}
@@ -1757,8 +1756,8 @@ function useAbility(){
   else if(it.kind==='carquois'){const a=aimWorld(),an=Math.atan2(a.y-P.y,a.x-P.x);
     if(rel){const dm=Math.round((110+65*6)*st.mult),vol=new Set();for(let i=0;i<24;i++){const aa=an+i*TAU/24;pb.push({x:P.x,y:P.y,vx:Math.cos(aa)*16,vy:Math.sin(aa)*16,life:10/16,dmg:dm,pct:true,vol,r:0.22,col:'#3ff0ff',kind:'fleche',pierce:true,hit:new Set(),trail:'#3ff0ff'});}burst(P.x,P.y,'#3ff0ff',24,5);}
     else pb.push({x:P.x,y:P.y,vx:Math.cos(an)*16,vy:Math.sin(an)*16,life:10/16,dmg:Math.round((110+65*t)*st.mult),r:0.22,col:'#ffd23f',kind:'fleche',pierce:true,hit:new Set()});}
-  else if(it.kind==='tome'){const pc=tomePct(t),R0=rel?8.5:3+0.7*t,max=st.tot.vie,h=Math.round(max*pc/100);const got=Math.min(h,max-P.hp);P.hp=Math.min(max,P.hp+h);P.healcd=tomeCd(t);ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);burst(P.x,P.y,'#bff5a0',22,2.5);
-    vfx.push({k:'healring',x:P.x,y:P.y,r:R0,t:0,life:0.6,col:'#bff5a0'});myHeal=(++healSeq)+'|p'+pc+'|'+R0.toFixed(1);
+  else if(it.kind==='tome'){const h=70+35*t,R0=rel?8.5:3+0.7*t,max=st.tot.vie;const got=Math.min(h,max-P.hp);P.hp=Math.min(max,P.hp+h);ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957',true);burst(P.x,P.y,'#bff5a0',22,2.5);
+    vfx.push({k:'healring',x:P.x,y:P.y,r:R0,t:0,life:0.6,col:'#bff5a0'});myHeal=(++healSeq)+'|'+h+'|'+R0.toFixed(1);
     if(rel&&!safe()){const n=markVuln(P.x,P.y);vfx.push({k:'healring',x:P.x,y:P.y,r:10,t:0,life:0.8,col:'#ffd23f'});ft(P.x,P.y-1.3,'Jugement divin · '+n+' monstre'+(n>1?'s':''),'#ffd23f',true);myEv=(++evSeq)+'|v|'+Math.round(P.x*10)+'|'+Math.round(P.y*10);}
     sendPresence();}
   else if(it.kind==='voile'){P.invis=rel?7:2.5+0.6*t;if(rel)P.invul=7;ft(P.x,P.y-0.8,rel?'Invisible et invulnérable':'Invisible','#b46aff',true);burst(P.x,P.y,'#2a2a3a',26,3);burst(P.x,P.y,'#b46aff',14,2);sendPresence();}
@@ -1768,7 +1767,7 @@ function strikeTick(dt){for(const k of strikes){k.t-=dt;if(k.t<=0&&!k.hit){k.hit
   strikes=strikes.filter(k=>k.t>-0.4);}
 function abilityTick(dt){strikeTick(dt);
   if(P.invis>0){P.invis-=dt;if(Math.random()<dt*10)parts.push({x:P.x+rnd(-.3,.3),y:P.y+rnd(-.1,.4),vx:0,vy:-0.6,life:.5,col:Math.random()<.5?'#2a2a3a':'#6a3a9a',s:.09});if(P.invis<=0){note('Tu redeviens visible');sendPresence();}}
-  if(P.invul>0)P.invul-=dt;if(P.tpcd>0)P.tpcd-=dt;if(P.healcd>0)P.healcd-=dt;
+  if(P.invul>0)P.invul-=dt;if(P.tpcd>0)P.tpcd-=dt;
   for(const q of P.castQ){q.t-=dt;if(q.t<=0){q.done=true;castSort(q.x,q.y,q.dm);}}P.castQ=P.castQ.filter(q=>!q.done);
   for(const b of bombs){b.t-=dt;if(b.t<=0){b.done=true;boomFx(b.x,b.y,4.5);if(b.own&&!safe())for(const m of monsters)if(m.hp>0&&!m.pend&&Math.hypot(m.x-b.x,m.y-b.y)<4.5+m.d.sz*0.4)hitMon(m,b.dm,'#ff9ae8');}}bombs=bombs.filter(b=>!b.done);
 }
@@ -1902,11 +1901,11 @@ function die(src){
   enterNexus();const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;paused=true;keys.clear();mouse.down=false;
   const ch=C(),g=prestigeGain(ch),sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];
   $('#deathWhy').textContent='Tué par '+src+' · '+CLASSES[save.current].nom+' niveau '+ch.lvl;
-  $('#dContTxt').textContent=(ch.lvl>1?'Ton héros redescend du niveau '+ch.lvl+' au niveau 1. ':'Ton héros reste au niveau 1. ')+'Tu gardes ton équipement, tes sacs et tes potions de caractéristiques.';
+  {const nl=deathLvl(ch.lvl);$('#dContTxt').textContent=(nl<ch.lvl?'Ton héros perd 20 % de ses niveaux : niveau '+ch.lvl+' → niveau '+nl+'. ':'Ton héros reste au niveau '+ch.lvl+'. ')}$('#dContTxt').textContent+=''+'Tu gardes ton équipement, tes sacs et tes potions de caractéristiques.';
   $('#dPermaTxt').textContent='Ce héros repart de zéro. Tu gagnes '+g+' prestige (niveau '+ch.lvl+' + '+Math.floor((ch.kills||0)/25)+' pour les monstres + '+2*spT+' pour les potions + '+3*(ch.bosses||0)+' pour les boss).';
   permaArm=0;$('#dPerma').classList.remove('arm');deathEl.hidden=false;sfx('boss');
 }
-$('#dContinue').addEventListener('click',()=>{const ch=C(),old=ch.lvl;ch.lvl=1;ch.xp=0;persist();statsDirty=true;invDirty=true;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;deathEl.hidden=true;paused=false;showBanner('Retour au Nexus',old>1?'Niveau '+old+' → niveau 1 · équipement et potions conservés':'Équipement et potions conservés','#ff5a6a');cv.focus();});
+$('#dContinue').addEventListener('click',()=>{const ch=C(),old=ch.lvl;ch.lvl=deathLvl(old);ch.xp=0;persist();statsDirty=true;invDirty=true;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;deathEl.hidden=true;paused=false;showBanner('Retour au Nexus',ch.lvl<old?'Niveau '+old+' → niveau '+ch.lvl+' · équipement et potions conservés':'Équipement et potions conservés','#ff5a6a');cv.focus();});
 $('#dPerma').addEventListener('click',()=>{
   const b=$('#dPerma');if(Date.now()-permaArm>4000){permaArm=Date.now();b.classList.add('arm');b.querySelector('b').textContent='Clique encore pour confirmer';return;}
   const g=prestigeGain(C());save.prestige+=g;save.chars[save.current]=newChar(save.current);persist();
