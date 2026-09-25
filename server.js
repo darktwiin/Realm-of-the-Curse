@@ -136,6 +136,18 @@ wss.on('connection', (ws, req) => {
     try { m = JSON.parse(data); } catch { return; }
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
+    // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
+    if (m && m.t === 'tr') {
+      const cible = salle.get(String(m.to || ''));
+      if (!cible || cible === moi) return;
+      const out = { t: 'tr', from: peer, k: String(m.k || '').slice(0, 10) };
+      if (m.ok !== undefined) out.ok = !!m.ok;
+      if (typeof m.h === 'string') out.h = m.h.slice(0, 64);
+      if (Array.isArray(m.items)) out.items = m.items.slice(0, 8);
+      if (JSON.stringify(out).length > 8000) return;
+      envoyer(cible.ws, out);
+      return;
+    }
     if (m && m.t === 'dev') {
       const res = (ok, msg, extra) => envoyer(ws, Object.assign({ t: 'devres', ok, msg }, extra || {}));
       if (cyrb53(String(m.pw || '')) !== DEV_HASH) { res(false, 'Mot de passe refusé par le serveur'); return; }
@@ -146,7 +158,12 @@ wss.on('connection', (ws, req) => {
       const cible = trouverJoueur(String(m.to || ''));
       if (!cible) { res(false, 'Joueur introuvable (déconnecté ?)'); return; }
       const nom = String((cible.etat && cible.etat.n) || 'Joueur').slice(0, 16);
-      if (cmd === 'god' || cmd === 'cursite') {
+      if (cmd === 'item') {
+        const it = m.arg;
+        if (!it || typeof it !== 'object' || JSON.stringify(it).length > 2000) { res(false, 'Objet invalide'); return; }
+        envoyer(cible.ws, { t: 'dev', cmd: 'item', arg: it });
+        res(true, String(it.name || 'Objet').slice(0, 40) + ' envoyé à ' + nom);
+      } else if (cmd === 'god' || cmd === 'cursite') {
         const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(1000000, Math.floor(Number(m.arg) || 0)));
         envoyer(cible.ws, { t: 'dev', cmd, arg });
         res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + ' Cursite envoyée à ' + nom);

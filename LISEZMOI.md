@@ -77,6 +77,45 @@ Compte environ 15 minutes la première fois.
 - **La sauvegarde** (niveau, équipement) reste dans le navigateur de chaque joueur.
 - Jusqu'à 16 joueurs par salle.
 
+## Classement des joueurs
+
+Le serveur garde les scores dans un fichier `classement.json` (créé automatiquement).
+- Sur ton PC, ce fichier est conservé.
+- Sur Render gratuit, le disque n'est pas permanent : le classement repart de zéro à chaque redéploiement ou redémarrage du serveur. Les joueurs réapparaissent dès qu'ils se reconnectent (leur progression, elle, reste dans leur navigateur).
+
+## Commandes du jeu
+
+ZQSD : se déplacer · clic : tirer · T : tir automatique · Espace : capacité · E (ou G) : interagir / ramasser · F / V : potions · I / C : inventaire / statistiques · R : retour au Nexus (seul moyen de quitter le Royaume) · O : options · L : classement · Entrée : chat.
+
+Les nouveaux joueurs commencent par un tutoriel. On peut le refaire avec `/tuto` dans le chat ou en parlant au guide du Nexus.
+
+## Échanges
+
+Quand un joueur est à moins de 6 cases, un bouton « ⇄ Échanger » apparaît à côté de son nom dans la liste des joueurs (ou tape `/echange pseudo` dans le chat). Il reçoit la proposition sur la droite de l'écran. S'il accepte, une fenêtre s'ouvre : chacun choisit jusqu'à 8 objets, puis les deux valident. Changer son offre annule les validations.
+
+## Donjons
+
+Les monstres des deux dernières zones (Terres brûlées et Terres du Dieu Fou) peuvent laisser un portail de donjon pendant 60 secondes. Le type est tiré au hasard :
+
+| Donjon | Mécanique | Boss |
+|---|---|---|
+| Manoir Hanté | Obscurité : seules les chandelles et ton entourage éclairent | Le Comte Maudit |
+| Tombeau des Sables | Sables mouvants : jusqu'à 60 % de vitesse en moins | Le Pharaon Éternel |
+| Abysses Engloutis | 15 s d'oxygène, recharge dans les bulles | Le Léviathan |
+| Jardins Célestes | Courants célestes qui te repoussent | L'Archange Déchu |
+| Fournaise Infernale | Cases de lave qui brûlent | Le Seigneur des Abysses |
+| Caverne Gelée | Glace glissante | La Reine des Glaces |
+
+Mode admin : tape `/admin` suivi du mot de passe dans le chat (`/admin off` pour quitter). Un bouton bouclier apparaît à côté des options, en haut à droite (touche P). Il contient :
+- **Moi** : mode GOD (invulnérable, téléportation par clic droit ou sur la mini-carte), tuer les monstres à l'écran, salle d'essai des donjons, ajouter de la Cursite.
+- **Joueurs** : recherche par pseudo, se téléporter sur le joueur, GOD, Cursite, donner un objet, rendre muet, expulser, bannir l'adresse IP.
+- **Bannis** : liste des bannis, avec un bouton pour débannir.
+- **Objets** : tous les objets du jeu, un clic pour l'avoir dans ton sac.
+- **Filtre** : les mots remplacés par des étoiles dans le chat et les pseudos.
+
+Toutes ces commandes sont vérifiées par le serveur : mets toujours à jour `server.js` en même temps que `public/index.html`.
+Les bannissements et les joueurs muets sont gardés dans `moderation.json`. Sur Render gratuit, ce fichier est effacé à chaque redémarrage ou redéploiement (comme le classement).
+
 ## Problèmes fréquents
 
 | Ce que tu vois | Solution |

@@ -179,6 +179,15 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .devrow .muet{color:#ff9a3c}.devrow .act.danger{border-color:#c83a4a;color:#ff9aa6}
 .auraform input[type=color]{width:44px;height:28px;padding:0;border:2px solid var(--line2);background:none;cursor:pointer}
 .auraform label{display:flex;align-items:center;gap:5px;font-size:13px}.auraform select{background:var(--panel2);border:2px solid var(--line2);color:var(--text);font:inherit;padding:3px 6px}
+.treq{position:absolute;right:10px;top:62px;z-index:8;width:260px;background:rgba(25,22,36,.95);border:2px solid var(--gold);padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.treq span{font-size:13px;color:var(--text)}.treq .acts{gap:6px}.treq i{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:100%}
+.tradeov{background:rgba(6,5,10,.35)}.shop-inner.trade-inner{width:min(640px,94vw);max-width:none}
+.trcols{display:grid;grid-template-columns:1fr 1fr;gap:14px}.trgrid{display:grid;grid-template-columns:repeat(4,52px);gap:5px;min-height:52px}.trinv{grid-template-columns:repeat(8,52px)}
+.tslot{width:52px;height:52px;padding:3px;background:var(--panel2);border:2px solid var(--line);cursor:pointer;position:relative}.tslot img{width:100%;height:100%;image-rendering:pixelated}.tslot.off{border-color:var(--gold);opacity:.45}.tslot.empty{cursor:default;opacity:.35}
+.tslot em{position:absolute;right:2px;bottom:0;font-style:normal;font-size:10px;color:#fff;text-shadow:0 0 2px #000}.trok{color:#7ed957;font-size:13px;margin-left:6px}
+#plist li .tbtn{padding:0 6px;font-size:12px;background:var(--panel);border:1px solid var(--gold);color:var(--gold);cursor:pointer;font-family:inherit}
+#plist li.hastb{grid-template-columns:22px 1fr auto auto}
+@media (max-width:640px){.trinv{grid-template-columns:repeat(4,52px)}}
 .devsearch{width:100%;background:var(--panel2);border:2px solid var(--line2);color:var(--text);font:inherit;padding:5px 8px}
 .devplayers{display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto}
 .devrow{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;background:var(--panel2);border:1px solid var(--line);padding:5px 7px;font-size:13px}
@@ -263,7 +272,8 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <h2>Administration</h2>
         <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="filtre">Filtre</button></div>
         <div class="admpane" data-ap="moi">
-          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button></div>
+          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devInv">👻 Invisible : non</button></div>
+          <p class="hint">Invisible : les monstres t'ignorent et les autres joueurs ne te voient plus (ni sur la carte, ni dans la liste).</p>
           <p class="hint">GOD : invulnérable. Clic droit dans le jeu ou clic sur la mini-carte pour te téléporter.</p>
           <h3>Mes ressources</h3>
           <div class="acts"><input type="number" id="devSelfAmt" class="admnum" value="1000" min="1" aria-label="Quantité"><button type="button" class="act" id="devCurs">+ Cursite</button><button type="button" class="act" id="devGold">+ Pièces</button><button type="button" class="act" id="devPres">+ Prestige</button><button type="button" class="act" id="devCurs0">Cursite à 0</button></div>
@@ -278,9 +288,23 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
           <p class="hint">Expulser : le joueur est déconnecté (il peut revenir en rechargeant). Bannir : son adresse IP ne peut plus se connecter du tout.</p>
         </div>
         <div class="admpane" data-ap="bans" hidden><div id="devBans" class="devplayers"></div></div>
-        <div class="admpane" data-ap="objets" hidden><p class="hint">Clic sur un objet : il arrive dans ton sac à dos.</p><div id="itGrid" class="itgrid"></div></div>
+        <div class="admpane" data-ap="objets" hidden><p class="hint" id="itTarget">Clic sur un objet : il arrive dans ton sac à dos.</p><div id="itGrid" class="itgrid"></div></div>
         <div class="admpane" data-ap="filtre" hidden><p class="hint">Ces mots sont remplacés par des étoiles dans le chat et les pseudos. Le serveur applique le même filtre. Les variantes (majuscules, accents, lettres répétées, 0 pour o, 4 pour a…) sont reconnues.</p><div id="filtList" class="filt"></div></div>
         <div class="shop-foot"><span class="hint" id="devMsg">Tape /admin off dans le chat pour quitter le mode admin</span><button type="button" class="act" id="admClose">Fermer · Échap</button></div>
+      </div>
+    </div>
+    <div class="treq" id="tradeReq" hidden><b id="treqT">Échange</b><span id="treqS"></span><div class="acts"><button type="button" class="act main" id="treqOk">Accepter</button><button type="button" class="act" id="treqNo">Refuser</button></div><i id="treqBar"></i></div>
+    <div class="overlay tradeov" id="trade" hidden>
+      <div class="shop-inner trade-inner" role="dialog" aria-label="Échange">
+        <h2 id="trTitle">Échange</h2>
+        <div class="trcols">
+          <div><h3>Ton offre <span id="trOkMe" class="trok"></span></h3><div class="trgrid" id="trMine"></div></div>
+          <div><h3 id="trThemT">Son offre <span id="trOkThem" class="trok"></span></h3><div class="trgrid" id="trTheirs"></div></div>
+        </div>
+        <h3>Ton sac · clic sur un objet pour l'ajouter ou le retirer de ton offre</h3>
+        <div class="trgrid trinv" id="trInv"></div>
+        <p class="hint" id="trInfo">Survole un objet pour voir son nom. Quand vous avez tous les deux validé, l'échange se fait.</p>
+        <div class="shop-foot"><span class="hint" id="trState"></span><span class="acts"><button type="button" class="act" id="trCancel">Annuler</button><button type="button" class="act main" id="trOk">Valider l'échange</button></span></div>
       </div>
     </div>
     <div class="overlay" id="kicked" hidden><div class="shop-inner" role="alertdialog"><h2 id="kickT">Déconnecté</h2><p id="kickS"></p></div></div>
@@ -430,8 +454,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <dt>Clic</dt><dd>maintenir pour tirer vers la souris</dd>
         <dt>T</dt><dd>tir automatique on/off</dd>
         <dt>Espace</dt><dd>capacité de classe (mana)</dd>
-        <dt>A / E</dt><dd>tourner la vue (X : remettre droite)</dd>
-        <dt>G</dt><dd>portail, autel, marchand, ramasser</dd>
+        <dt>E</dt><dd>portail, autel, marchand, ramasser, échanger</dd>
         <dt>F / V</dt><dd>potion de vie / de mana</dd>
         <dt>R</dt><dd>retour au Nexus (seul moyen de quitter le Royaume)</dd>
         <dt>I / C</dt><dd>inventaire / statistiques</dd>
@@ -843,7 +866,7 @@ function genNexus(){
     if((x===14||x===17)&&(y===2||y===3||y===29||y===30))s=true; // piliers des portes
     for(const q of NSTATUES)if((x===q.x||x===q.x+1)&&y===q.y)s=true; // socles des statues
     if(x>=35&&x<=40&&y===12)s=true;                          // comptoir
-    if((x===32||x===42)&&y>=14&&y<=20)s=true;                // étals
+    if((x===32&&y>=19&&y<=21)||(x===42&&y>=14&&y<=20))s=true; // étals (la porte x=31, y=15–17 reste libre)
     if(y===10&&x>=32)s=true;if(y===11&&(x<35||x>40)&&x>=32)s=true;
     if(((x===5||x===4)&&(y===13||y===17||y===21)))s=true;    // autel, pupitre, statue des skins
     sol[y*NW+x]=s?1:0;}
@@ -1021,7 +1044,8 @@ const num=(v,d)=>typeof v==='number'&&isFinite(v)?v:d;
 function activeIn(r,s){return r.p&&r.p.v===NETV&&r.p.s===s&&Date.now()-r.upd<4000;}
 let scaleT=0;
 function scenePlayersAll(){const a=[{x:P.x,y:P.y}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k))a.push({x:r.x,y:r.y});return a;}
-function scenePlayers(){const a=P.invis>0?[]:[{x:P.x,y:P.y,vx:P.vx||0,vy:P.vy||0,me:true}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k)&&!r.p.iv)a.push({x:r.x,y:r.y,vx:r.vx||0,vy:r.vy||0,me:false});return a;}
+let admInv=false;
+function scenePlayers(){const a=P.invis>0||admInv?[]:[{x:P.x,y:P.y,vx:P.vx||0,vy:P.vy||0,me:true}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k)&&!r.p.iv)a.push({x:r.x,y:r.y,vx:r.vx||0,vy:r.vy||0,me:false});return a;}
 function hostKey(){const k=sceneKey();if(safe())return{me:false,r:null};let best={rt:sceneT,peer:myPeer||'',me:true};for(const r of remotes.values()){if(!activeIn(r,k))continue;const rt=num(r.p.rt,Infinity);if(rt<best.rt||(rt===best.rt&&r.peer<best.peer))best={rt,peer:r.peer,me:false,r};}return best;}
 function computeHostIsMe(){return !safe()&&hostKey().me;}
 function hostName(){const h=hostKey();return h.me?'Toi':clean(h.r.p.n).slice(0,16)||'Un joueur';}
@@ -1044,7 +1068,7 @@ function makeNetRoom(){
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'){for(const f of rawH)f(m);}};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'){for(const f of rawH)f(m);}};
     ws.onclose=e=>{if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
@@ -1062,6 +1086,8 @@ async function initRoom(){
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
   if(room.onRaw)room.onRaw(m=>{
+    if(m.t==='tr'){tradeMsg(m);return;}
+    if(m.t==='dev'&&m.cmd==='item'){const it=sanitizeItem(m.arg);if(!it)return;giveItem(it);showBanner('Cadeau d\'un admin',it.name,TIER_COL[it.tier]||'#ffd23f');sfx('relic');return;}
     if(m.t==='dev'&&m.cmd==='mute'){muted=true;showBanner('Tu es muet','Un modérateur t\'a retiré la parole dans le chat','#ff9a3c');return;}
     if(m.t==='dev'&&m.cmd==='unmute'){muted=false;showBanner('Tu peux de nouveau écrire','Un modérateur t\'a rendu la parole','#7ed957');return;}
     if(m.t==='dev'&&(m.cmd==='kick'||m.cmd==='ban')){kickedScreen(m.cmd==='ban'?4003:4002);return;}
@@ -1150,7 +1176,7 @@ function sendPresence(){
   if(!room||!save.current)return;
   const st=S(),ch=C(),w=ch.equip[0];
   const sh=(!safe()&&(mouse.down||P.auto||aimTouch)&&w)?(()=>{const a=aimWorld();return Math.round(Math.atan2(a.y-P.y,a.x-P.x)*100);})():null;
-  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,iv:P.invis>0?1:0,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null};
+  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,iv:P.invis>0||admInv?1:0,hid:admInv?1:0,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null};
   if(!safe()&&amHost&&othersInScene()){
     o.D=deaths.slice(-20).join(';');
     if(scene==='realm')o.G=dportals.map(d=>d.id.toString(36)+','+Math.round(d.x*10)+','+Math.round(d.y*10)+','+Math.ceil(d.life)+','+(d.t||'c')).join(';');
@@ -1164,6 +1190,7 @@ function cyrb53(str,seed=7){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=
 const DEV_HASH='2858b4huwnf';let devPw='';
 function chatCommand(t){
   const m=/^\/(\w+)\s*(.*)$/.exec(t);if(!m)return false;const cmd=m[1].toLowerCase(),arg=m[2].trim();
+  if(cmd==='echange'||cmd==='échange'){const q=arg.toLowerCase();const r=[...remotes.values()].find(r=>r.p&&clean(r.p.n).toLowerCase()===q)||[...remotes.values()].find(r=>r.p&&q&&clean(r.p.n).toLowerCase().startsWith(q));if(!r){note('Joueur introuvable : /echange pseudo');return true;}requestTrade(r.peer);return true;}
   if(cmd==='tuto'){if(!save.current){note('Choisis d\'abord un héros');return true;}enterTuto();return true;}
   if(cmd==='admin'){if(arg.toLowerCase()==='off'){setDevMode(false);devPw='';return true;}if(cyrb53(arg)===DEV_HASH){devPw=arg;setDevMode(true);}else{note('Mot de passe incorrect');sfx('deny');}return true;}
   note('Commande inconnue : /'+cmd);return true;
@@ -1385,11 +1412,11 @@ let hubMap=null;
 function genTuto(){const w=66,h=17,sol=new Uint8Array(w*h).fill(1);const carve=(x0,y0,x1,y1)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)sol[y*w+x]=0;};
   carve(2,3,13,13);carve(14,7,17,9);carve(18,3,31,13);carve(32,7,35,9);carve(36,4,45,12);carve(46,7,49,9);carve(50,2,63,14);
   return{kind:'tuto',w,h,sol,start:{x:5.5,y:8.5},bagAt:{x:40.5,y:8.5},boss:{x:58.5,y:8.5},dummies:[{x:27.5,y:5.5},{x:28.5,y:8.5},{x:27.5,y:11.5}],
-    signs:[{x:8,y:5.2,l:['Bienvenue, héros !','Z Q S D : se déplacer (ou les flèches)','A / E : tourner la vue · X : la remettre droite']},
+    signs:[{x:8,y:5.2,l:['Bienvenue, héros !','Z Q S D : se déplacer (ou les flèches)','R : retour au Nexus à tout moment']},
       {x:8,y:11.6,l:['O : options (son, musique, curseur)','Entrée : écrire dans le chat','L : classement des joueurs']},
       {x:22,y:4.9,l:['Clic gauche maintenu : tirer vers la souris','T : tir automatique','Espace : capacité de classe (coûte du mana)']},
       {x:22,y:12,l:['Les mannequins ne ripostent pas.','Tes tirs réussis comptent pour la précision.']},
-      {x:40.5,y:5.2,l:['G : ramasser un sac, prendre un portail, parler','I : inventaire · C : statistiques','F : potion de vie · V : potion de mana']},
+      {x:40.5,y:5.2,l:['E : ramasser un sac, prendre un portail, parler','I : inventaire · C : statistiques','F : potion de vie · V : potion de mana']},
       {x:40.5,y:11.4,l:['Glisse un objet sur ton équipement pour l\'équiper','R : retour au Nexus (seul moyen de quitter le Royaume)']},
       {x:56.5,y:3.3,l:['Le Gardien d\'entraînement','Ses invocations ne font rien : bats le Gardien !']}]};}
 function enterTuto(){
@@ -1423,7 +1450,7 @@ function tryUnlock(i){
   const price=VAULT_PRICES[i];
   if(i!==save.vault.n){note('Débloque d\'abord le coffre '+(save.vault.n+1));return;}
   if(save.gold<price){note('Il te faut '+price+' pièces (tu en as '+save.gold+')');sfx('deny');return;}
-  if(unlockArm!==i||time-unlockT>3){unlockArm=i;unlockT=time;note('Appuie encore sur G pour payer '+price+' pièces');return;}
+  if(unlockArm!==i||time-unlockT>3){unlockArm=i;unlockT=time;note('Appuie encore sur E pour payer '+price+' pièces');return;}
   save.gold-=price;save.vault.n++;unlockArm=-1;persist();sfx('buy');
   const c=CHESTS[i];burst(c.x+.5,c.y+.5,'#ffd96a',30,3);showBanner('Coffre '+(i+1)+' débloqué !',(10-save.vault.n)+' restant'+(10-save.vault.n>1?'s':''),'#ffd96a');invDirty=true;
 }
@@ -1960,7 +1987,7 @@ $('#devCurs0').addEventListener('click',()=>{save.cursite=0;persist();note('Curs
 // ----- outils GOD (développeur) -----
 let godMode=false;
 let devMode=false;
-function setDevMode(on){devMode=on;if(!on&&scene==='hub')setTimeout(enterNexus,0);$('#adminBtn').hidden=!on;$('#devKill2').hidden=!on;if(!on)closeAdmin();
+function setDevMode(on){devMode=on;if(!on&&admInv)setAdmInv(false);if(!on&&scene==='hub')setTimeout(enterNexus,0);$('#adminBtn').hidden=!on;$('#devKill2').hidden=!on;if(!on)closeAdmin();
   if(!on&&godMode){godMode=false;P.god=false;$('#devGod').textContent='Mode GOD : désactivé';$('#devGod').classList.remove('godon');}
   if(on)installDebug();
   showBanner(on?'Mode admin activé':'Mode admin désactivé',on?'Bouton bouclier en haut à droite (touche P)':'Tape /admin suivi du mot de passe pour le réactiver',on?'#ffd23f':'#9e96b8');sfx(on?'relic':'deny');}
@@ -1972,7 +1999,7 @@ mini.addEventListener('click',e=>{if(!godMode)return;e.stopImmediatePropagation(
   if(scene==='realm'){const v=miniView(RN,RN);godTeleport(v.ox+px/v.k,v.oy+py/v.k);}
   else if(scene==='dungeon'){const v=miniView(MAP.w,MAP.h);godTeleport(v.ox+px/v.k,v.oy+py/v.k);}
   else{const w=scene==='vault'?VW:NW,h=scene==='vault'?VH:NH,k=Wm/w,oy=(Wm-h*k)/2;godTeleport(px/k,(py-oy)/k);}},true);
-const admEl=$('#admin');let admTab='moi',muteSet=new Set(),banArm='',banList=null;
+const admEl=$('#admin');let admGiveTo=null,admTab='moi',muteSet=new Set(),banArm='',banList=null;
 $('#adminImg').src=makeSprite(['.XXXXXX.','XWWXXXXX','XWXXXXDX','XXXYYXDX','XXYYYYDX','.XXYYXD.','..XXDD..','...DD...'],{X:'#3a5aa8',W:'#9fc0ff',D:'#233a70',Y:'#ffd23f'},3).toDataURL();
 function syncAuraForm(){const a=save.aura||{};$('#auraK').value=a.k||'';$('#auraS').value=a.s||1;$('#auraC').value=a.c||'#ff4fd8';$('#auraOrig').checked=!!a.o;}
 function auraFromForm(){const k=$('#auraK').value;save.aura=k?{k,s:+$('#auraS').value||1,c:$('#auraC').value,o:$('#auraOrig').checked}:null;persist();sendPresence();}
@@ -1980,12 +2007,22 @@ for(const id of ['#auraK','#auraS','#auraC','#auraOrig'])$(id).addEventListener(
 function openAdmin(){if(!devMode)return;syncAuraForm();admEl.hidden=false;keys.clear();mouse.down=false;setAdmTab(admTab);}
 function closeAdmin(){if(admEl.hidden)return;admEl.hidden=true;cv.focus();}
 function setAdmTab(t){admTab=t;document.querySelectorAll('#admTabs button').forEach(b=>b.classList.toggle('on',b.dataset.at===t));document.querySelectorAll('.admpane').forEach(p=>p.hidden=p.dataset.ap!==t);
-  if(t==='joueurs'){adminReq('infos');renderDevPlayers();}if(t==='bans'){adminReq('bans');renderBans();}if(t==='objets')renderItems();if(t==='filtre')$('#filtList').innerHTML=[...MOTS_EXACTS,...MOTS_RACINES.map(r=>r+'…')].map(w=>`<span>${w}</span>`).join('');}
+  if(t==='joueurs'){adminReq('infos');renderDevPlayers();}if(t==='bans'){adminReq('bans');renderBans();}if(t==='objets'){renderItems();updItTarget();}if(t!=='objets'&&t!=='joueurs')admGiveTo=null;if(t==='filtre')$('#filtList').innerHTML=[...MOTS_EXACTS,...MOTS_RACINES.map(r=>r+'…')].map(w=>`<span>${w}</span>`).join('');}
 document.querySelectorAll('#admTabs button').forEach(b=>b.addEventListener('click',()=>setAdmTab(b.dataset.at)));
 $('#adminBtn').addEventListener('click',()=>admEl.hidden?openAdmin():closeAdmin());
 $('#admClose').addEventListener('click',closeAdmin);
 admEl.addEventListener('click',e=>{if(e.target===admEl)closeAdmin();});
 $('#devHub').addEventListener('click',()=>{closeAdmin();enterHub();});
+function setAdmInv(on){admInv=on;$('#devInv').textContent='👻 Invisible : '+(on?'oui':'non');$('#devInv').classList.toggle('godon',on);sendPresence();plSig='';}
+$('#devInv').addEventListener('click',()=>{setAdmInv(!admInv);note(admInv?'Tu es invisible':'Tu es de nouveau visible');});
+// se téléporter sur un joueur (change de zone si besoin)
+function tpToPlayer(peer){const r=remotes.get(peer);if(!r||!r.p){note('Joueur introuvable');return;}const k=String(r.p.s||'');
+  const go=()=>{const q=remotes.get(peer);if(!q)return;P.x=q.x+0.8;P.y=q.y;if(blocked(P.x,P.y,0.3)){P.x=q.x;P.y=q.y;}burst(P.x,P.y,'#ffd23f',16,3);sfx('portal');sendPresence();};
+  if(k===sceneKey()){go();return;}
+  if(k==='n')enterNexus();else if(k==='r')enterRealm();
+  else if(k[0]==='d'&&k.length>2){const t=k[1],id=parseInt(k.slice(2),36);if(!DTYPES[t]||!(id>0)){note('Zone inconnue');return;}enterDungeon(id,t);}
+  else{note('Ce joueur est dans une salle personnelle ('+sceneLabel(k)+')');return;}
+  closeAdmin();setTimeout(go,150);}
 function adminReq(cmd,to,arg){if(!devPw||!room||!room.raw)return false;room.raw({t:'dev',pw:devPw,to:to||'',cmd,arg});return true;}
 function renderDevPlayers(){
   if(!devMode||admEl.hidden||admTab!=='joueurs')return;const box=$('#devPlayers'),q=clean($('#devSearch').value).toLowerCase();box.textContent='';
@@ -2000,6 +2037,7 @@ function renderDevPlayers(){
     const armed=banArm===r.peer;
     acts.append(mk('GOD ✓',()=>devSend(r.peer,'god',1)),mk('GOD ✗',()=>devSend(r.peer,'god',0)),inp,mk('Cursite',()=>devSend(r.peer,'cursite',+inp.value||0)),
       mk(mu?'Rendre la parole':'Muet',()=>{devSend(r.peer,mu?'unmute':'mute');if(mu)muteSet.delete(r.peer);else muteSet.add(r.peer);setTimeout(renderDevPlayers,50);}),
+      mk('Aller vers',()=>tpToPlayer(r.peer)),mk('Donner un objet',()=>{admGiveTo=r.peer;setAdmTab('objets');}),
       mk('Expulser',()=>devSend(r.peer,'kick'),'danger'),
       mk(armed?'Confirmer le ban':'Bannir IP',()=>{if(banArm!==r.peer){banArm=r.peer;setTimeout(()=>{if(banArm===r.peer){banArm='';renderDevPlayers();}},4000);renderDevPlayers();return;}banArm='';devSend(r.peer,'ban');},'danger'));
     row.append(nm,acts);box.append(row);}
@@ -2009,14 +2047,70 @@ function renderBans(){const box=$('#devBans');box.textContent='';
   if(!banList.length){box.innerHTML='<p class="hint">Aucun joueur banni.</p>';return;}
   for(const b of banList){const row=document.createElement('div');row.className='devrow';const nm=document.createElement('span');nm.textContent=clean(String(b.n||'?')).slice(0,16)+' · IP '+b.ip+' · depuis le '+new Date(b.t).toLocaleDateString('fr-FR');
     const bt=document.createElement('button');bt.type='button';bt.className='act';bt.textContent='Débannir';bt.onclick=()=>adminReq('unban',b.id);row.append(nm,bt);box.append(row);}}
+function updItTarget(){const el=$('#itTarget');const r=admGiveTo&&remotes.get(admGiveTo);if(r&&r.p){el.innerHTML='';const b=document.createElement('b');b.textContent='Envoi à '+(clean(r.p.n).slice(0,16)||'Joueur')+' : clic sur un objet pour le lui donner. ';const c=document.createElement('button');c.type='button';c.className='act';c.textContent='Revenir à mon sac';c.onclick=()=>{admGiveTo=null;updItTarget();};el.append(b,c);}else{admGiveTo=null;el.textContent='Clic sur un objet : il arrive dans ton sac à dos.';}}
 function renderItems(){const box=$('#itGrid');if(box.childElementCount)return;
   const kinds=Object.keys(KINDS).filter(k=>KINDS[k].slot!=='conso');
   const row=(label,items)=>{const r=document.createElement('div');r.className='itrow';const l=document.createElement('span');l.textContent=label;const d=document.createElement('div');
     for(const [k,t] of items){const it=mkItem(k,t);const b=document.createElement('button');b.type='button';b.title=it.name+(KINDS[k].slot!=='conso'?' · '+TIER_NOM[t]:'');const im=document.createElement('img');im.src=icon(it);im.alt='';b.append(im);
-      b.onclick=()=>{const f=freeInv();if(f<0){note('Sac à dos plein');sfx('deny');return;}C().inv[f]=mkItem(k,t);invDirty=true;persist();sfx('item');$('#devMsg').textContent=it.name+' ajouté au sac';};d.append(b);}
+      b.onclick=()=>{if(admGiveTo){const it2=mkItem(k,t);devSend(admGiveTo,'item',it2);return;}const f=freeInv();if(f<0){note('Sac à dos plein');sfx('deny');return;}C().inv[f]=mkItem(k,t);invDirty=true;persist();sfx('item');$('#devMsg').textContent=it.name+' ajouté au sac';};d.append(b);}
     r.append(l,d);box.append(r);};
   for(const k of kinds){const K=KINDS[k];row(K.type+(K.cls&&K.slot!=='anneau'?' · '+K.cls.map(c=>CLASSES[c].nom).join(', '):''),[0,1,2,3,4,5,6,7].map(t=>[k,t]));}
   row('Consommables',Object.keys(KINDS).filter(k=>KINDS[k].slot==='conso').map(k=>[k,0]));}
+/* ================= échanges entre joueurs ================= */
+// Le serveur relaie les messages ; chaque navigateur vérifie les objets reçus et fait l'échange quand les deux ont validé la même offre.
+const TRADE_R=6;
+let TR=null,treqFrom=null,treqT=0;
+const treqEl=$('#tradeReq'),trEl=$('#trade');
+function canTradeWith(r){return !!(r&&r.p&&!r.p.hid&&!admInv&&room&&save.current&&activeIn(r,sceneKey())&&Math.hypot(r.x-P.x,r.y-P.y)<TRADE_R);}
+function sanitizeItem(o){
+  if(!o||typeof o!=='object'||!KINDS[o.kind])return null;const tier=clamp(Math.floor(+o.tier)||0,0,7),it=mkItem(o.kind,tier);
+  if(it.slot==='anneau'&&o.stats&&typeof o.stats==='object'){const st={};for(const k of SK){const v=Math.floor(+o.stats[k]||0);if(v>0)st[k]=Math.min(v,(k==='vie'||k==='mana')?160:14);}if(Object.keys(st).length){it.stats=st;it.name=String(o.name||it.name).slice(0,40);}}
+  return it;}
+function giveItem(it){const f=freeInv();if(f>=0)C().inv[f]=it;else{addToBag(P.x,P.y,[it],true);note('Sac plein : l\'objet est à tes pieds');}invDirty=true;persist();}
+const itemKey=it=>it?it.kind+'|'+it.tier+'|'+it.name+'|'+JSON.stringify(it.stats||{}):'';
+function offerItems(){return TR?TR.mine.map(i=>C().inv[i]).filter(Boolean):[];}
+function offerHash(list){return cyrb53(list.map(itemKey).join(';'));}
+function tradeSend(o){if(TR&&room&&room.raw)room.raw(Object.assign({t:'tr',to:TR.peer},o));}
+function requestTrade(peer){const r=remotes.get(peer);if(!canTradeWith(r)){note('Rapproche-toi du joueur pour échanger');return;}if(TR){note('Tu as déjà un échange en cours');return;}
+  room.raw({t:'tr',to:peer,k:'req'});note('Demande d\'échange envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');}
+function showTradeReq(peer){const r=remotes.get(peer);if(!r||!r.p)return;treqFrom=peer;treqT=20;$('#treqT').textContent='Proposition d\'échange';$('#treqS').textContent=(clean(r.p.n).slice(0,16)||'Joueur')+' veut échanger avec toi.';treqEl.hidden=false;sfx('coin');}
+function hideTradeReq(){treqEl.hidden=true;treqFrom=null;}
+$('#treqOk').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();const r=remotes.get(p);if(!canTradeWith(r)){note('Le joueur est trop loin');room&&room.raw&&room.raw({t:'tr',to:p,k:'ans',ok:false});return;}if(TR){room.raw({t:'tr',to:p,k:'ans',ok:false});return;}room.raw({t:'tr',to:p,k:'ans',ok:true});openTrade(p);cv.focus();});
+$('#treqNo').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();room&&room.raw&&room.raw({t:'tr',to:p,k:'ans',ok:false});cv.focus();});
+$('#plist').addEventListener('click',e=>{const b=e.target.closest('[data-trade]');if(b)requestTrade(b.dataset.trade);});
+function openTrade(peer){const r=remotes.get(peer);TR={peer,name:clean(r&&r.p?r.p.n:'').slice(0,16)||'Joueur',mine:[],theirs:[],okMe:false,okThem:false,hThem:''};trEl.hidden=false;keys.clear();mouse.down=false;renderTrade();}
+function closeTrade(msg,send){if(!TR)return;if(send)tradeSend({k:'cancel'});TR=null;trEl.hidden=true;if(msg)note(msg);invDirty=true;cv.focus();}
+function tradeChanged(){TR.okMe=false;TR.okThem=false;tradeSend({k:'offer',items:offerItems()});renderTrade();}
+function slotBtn(it,extra,attr){return `<button type="button" class="tslot ${extra||''}" ${attr||''} ${it?`title="${it.name.replace(/"/g,'')}${it.slot!=='conso'?' · '+TIER_NOM[it.tier]:''}"`:''}>${it?`<img src="${icon(it)}" alt=""><em style="color:${it.slot==='conso'?'#fff':TIER_COL[it.tier]}">${it.slot==='conso'?'':it.tier>=7?'R':'T'+it.tier}</em>`:''}</button>`;}
+function renderTrade(){if(!TR)return;const ch=C();
+  $('#trTitle').textContent='Échange avec '+TR.name;$('#trThemT').firstChild.textContent='Offre de '+TR.name+' ';
+  const mine=offerItems();let h='';for(let i=0;i<8;i++)h+=mine[i]?slotBtn(mine[i],'',`data-rm="${TR.mine[i]}"`):slotBtn(null,'empty');$('#trMine').innerHTML=h;
+  h='';for(let i=0;i<8;i++)h+=slotBtn(TR.theirs[i]||null,TR.theirs[i]?'':'empty');$('#trTheirs').innerHTML=h;
+  h='';ch.inv.forEach((it,i)=>{h+=it?slotBtn(it,TR.mine.includes(i)?'off':'',`data-add="${i}"`):slotBtn(null,'empty');});$('#trInv').innerHTML=h;
+  $('#trOkMe').textContent=TR.okMe?'✓ validé':'';$('#trOkThem').textContent=TR.okThem?'✓ validé':'';
+  const need=TR.theirs.length-mine.length,free=ch.inv.filter(x=>!x).length;const room2=free>=need;
+  $('#trOk').disabled=!room2||(!mine.length&&!TR.theirs.length);$('#trOk').textContent=TR.okMe?'Annuler ma validation':'Valider l\'échange';
+  $('#trState').textContent=!room2?'Pas assez de place dans ton sac':TR.okMe&&!TR.okThem?'En attente de '+TR.name+'…':TR.okThem&&!TR.okMe?TR.name+' a validé':'';}
+$('#trInv').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||!TR)return;const i=+b.dataset.add;const k=TR.mine.indexOf(i);if(k>=0)TR.mine.splice(k,1);else{if(TR.mine.length>=8){note('8 objets maximum');return;}TR.mine.push(i);}sfx('item');tradeChanged();});
+$('#trMine').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b||!TR)return;const i=+b.dataset.rm;TR.mine=TR.mine.filter(x=>x!==i);tradeChanged();});
+$('#trCancel').addEventListener('click',()=>closeTrade('Échange annulé',true));
+$('#trOk').addEventListener('click',()=>{if(!TR)return;TR.okMe=!TR.okMe;tradeSend({k:'ok',ok:TR.okMe,h:offerHash(offerItems())+'/'+offerHash(TR.theirs)});renderTrade();tryFinishTrade();});
+function tryFinishTrade(){if(!TR||!TR.okMe||!TR.okThem)return;const mine=offerItems();
+  if(TR.hThem!==offerHash(TR.theirs)+'/'+offerHash(mine))return; // l'autre a validé une offre différente
+  const ch=C(),free=ch.inv.filter(x=>!x).length;if(free+mine.length<TR.theirs.length){closeTrade('Pas assez de place : échange annulé',true);return;}
+  for(const i of TR.mine)ch.inv[i]=null;for(const it of TR.theirs){const f=ch.inv.indexOf(null);if(f>=0)ch.inv[f]=it;}
+  const n=TR.theirs.length,g=mine.length,nm=TR.name;TR=null;trEl.hidden=true;persist();invDirty=true;sfx('buy');burst(P.x,P.y,'#ffd96a',20,3);
+  showBanner('Échange réussi',g+' objet'+(g>1?'s':'')+' donné'+(g>1?'s':'')+' · '+n+' reçu'+(n>1?'s':'')+' · avec '+nm,'#ffd96a');cv.focus();}
+function tradeMsg(m){const from=String(m.from||'');
+  if(m.k==='req'){if(TR||!canTradeWith(remotes.get(from))){room.raw({t:'tr',to:from,k:'ans',ok:false});return;}showTradeReq(from);return;}
+  if(m.k==='ans'){if(m.ok){if(!TR)openTrade(from);}else{const r=remotes.get(from);note((r&&r.p?clean(r.p.n).slice(0,16):'Le joueur')+' a refusé l\'échange');}return;}
+  if(!TR||TR.peer!==from)return;
+  if(m.k==='offer'){TR.theirs=(Array.isArray(m.items)?m.items:[]).slice(0,8).map(sanitizeItem).filter(Boolean);TR.okMe=false;TR.okThem=false;renderTrade();}
+  else if(m.k==='ok'){TR.okThem=!!m.ok;TR.hThem=String(m.h||'');renderTrade();tryFinishTrade();}
+  else if(m.k==='cancel')closeTrade(TR.name+' a annulé l\'échange',false);}
+setInterval(()=>{if(!treqEl.hidden){treqT-=0.25;$('#treqBar').style.width=Math.max(0,treqT/20*100)+'%';if(treqT<=0||!remotes.get(treqFrom)){const p=treqFrom;hideTradeReq();if(p&&room&&room.raw)room.raw({t:'tr',to:p,k:'ans',ok:false});}}
+  if(TR){const r=remotes.get(TR.peer);if(!r||!r.p||Date.now()-r.upd>6000||!activeIn(r,sceneKey())||Math.hypot(r.x-P.x,r.y-P.y)>TRADE_R*2)closeTrade('Échange annulé : le joueur est parti',true);
+    else if(TR.mine.some(i=>!C().inv[i])){TR.mine=TR.mine.filter(i=>C().inv[i]);tradeChanged();}}},250);
 function kickedScreen(code){const k=$('#kicked');if(!k.hidden)return;k.hidden=false;paused=true;keys.clear();mouse.down=false;$('#kickT').textContent=code===4003?'Tu es banni':'Tu as été expulsé';$('#kickS').textContent=code===4003?'Un modérateur a banni ton adresse de ce serveur.':'Un modérateur t\'a déconnecté. Recharge la page pour revenir.';}
 function devSend(peer,cmd,arg){if(!adminReq(cmd,peer,arg)){note('Active d\'abord le mode admin avec /admin');return;}$('#devMsg').textContent='Envoi…';}
 $('#devSearch').addEventListener('input',renderDevPlayers);
@@ -2080,13 +2174,15 @@ let resetArm=0;
 $('#resetBtn').addEventListener('click',()=>{const b=$('#resetBtn');if(Date.now()-resetArm<4000){save={current:null,chars:{},gold:0};persist();b.textContent='Sauvegarde effacée';openSelect();resetArm=0;}else{resetArm=Date.now();b.textContent='Clique encore pour confirmer';setTimeout(()=>{b.textContent='Effacer la sauvegarde';},4000);}});
 const plEl=$('#plist'),nsEl=$('#netState');
 function sceneLabel(s){return s==='n'?'Nexus':s==='r'?'Royaume':typeof s==='string'&&s[0]==='d'?'Donjon':typeof s==='string'&&s[0]==='v'?'Coffres':typeof s==='string'&&s[0]==='h'?'Salle d\'essai':typeof s==='string'&&s[0]==='u'?'Tutoriel':'?';}
+let plSig='';
 function renderPlayers(){
   const on=!!room&&netOn;nsEl.textContent=!room?'Solo':on?'En ligne · salle '+salleNom:'Connexion…';nsEl.classList.toggle('on',on);
-  plEl.textContent='';
   const hk=hostKey();
-  const add=(c,n,l,z,me)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';sn.textContent=n+(me?' (toi)':'')+' · niv. '+l;const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);plEl.append(li);};
+  {const sig=[save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
+  plEl.textContent='';
+  const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';sn.textContent=n+(me?' (toi)':'')+' · niv. '+l;const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);if(peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄ Échanger';b.title='Proposer un échange';li.append(b);}plEl.append(li);};
   if(save.current)add(save.current,pseudo,C().lvl,sceneLabel(sceneKey())+(!safe()&&amHost&&othersInScene()?' ★':''),true);
-  let n=0;for(const r of remotes.values()){if(!r.p||r.p.v!==NETV||Date.now()-r.upd>4000)continue;n++;add(CLASSES[r.p.c]?r.p.c:'',clean(r.p.n).slice(0,16)||'Joueur',clamp(num(r.p.l,1)|0,1,20),sceneLabel(r.p.s)+(hk.r===r?' ★':''),false);}
+  let n=0;for(const r of remotes.values()){if(!r.p||r.p.v!==NETV||Date.now()-r.upd>4000||r.p.hid)continue;n++;add(CLASSES[r.p.c]?r.p.c:'',clean(r.p.n).slice(0,16)||'Joueur',clamp(num(r.p.l,1)|0,1,20),sceneLabel(r.p.s)+(hk.r===r?' ★':''),false,r.peer);}
   if(!n){const li=document.createElement('li');li.className='empty';li.textContent=!room?'Page ouverte sans serveur : tu joues en solo. Lance « npm start » et ouvre l\'adresse du serveur.':netOn?'Personne d\'autre pour l\'instant. Envoie le lien de cette page à tes amis.':'Connexion au serveur… (sur Render gratuit, le premier chargement peut prendre une minute)';plEl.append(li);}
 }
 function updWho(){if(!save.current)return;$('#avatar').src=heroURL[save.current];$('#cname').textContent=CLASSES[save.current].nom;}
@@ -2129,20 +2225,19 @@ function interact(){
   if(groundBag)takeAll();
 }
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
+  if(e.key==='Escape'){if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
   if(e.code==='KeyO'){optEl.hidden?openOpts():closeOpts();return;}
   if(e.code==='KeyL'&&deathEl.hidden&&selEl.hidden){lbEl.hidden?openLb():closeLb();return;}
   if(e.code==='KeyP'&&devMode){admEl.hidden?openAdmin():closeAdmin();return;}
-  if(!optEl.hidden||!lbEl.hidden||!admEl.hidden)return;
+  if(!optEl.hidden||!lbEl.hidden||!admEl.hidden||!trEl.hidden)return;
   if(paused)return;
   const c=e.code;
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c))e.preventDefault();
   if(e.repeat&&!['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c))return;
   keys.add(c);
   if(c==='Space')useAbility();
-  else if(c==='KeyG')interact();
-  else if(c==='KeyX'){camA=0;note('Vue remise droite');}
+  else if(c==='KeyE'||c==='KeyG')interact();
   else if(c==='KeyR'){if(scene!=='nexus')enterNexus();}
   else if(c==='KeyI'){setTab('inv');TU.inv=1;}
   else if(c==='KeyC'){setTab(tab==='stats'?'inv':'stats');TU.inv=1;}
@@ -2204,7 +2299,7 @@ function update(dt){
   const ml=Math.hypot(mx,my);if(ml>1){mx/=ml;my/=ml;}
   if(mx)P.face=mx<0?-1:1;
   P.moving=ml>0.05;if(P.moving)P.walk+=dt*st.spd*2.2;
-  if(keys.has('KeyQ'))camA-=dt*1.9;if(keys.has('KeyE'))camA+=dt*1.9;camA=((camA+Math.PI)%TAU+TAU)%TAU-Math.PI;if(Math.abs(camA)<1e-4)camA=0;
+  camA=0; // rotation de la vue désactivée pour l'instant
   if(camA){const c=Math.cos(camA),s=Math.sin(camA),wx=mx*c+my*s,wy=-mx*s+my*c;mx=wx;my=wy;}
   {const ox=P.x,oy=P.y,T=scene==='dungeon'&&MAP.mech?dungeonT:null,mv=T?MAP.mech[Math.floor(P.y)*MAP.w+Math.floor(P.x)]:0;let vx=mx*st.spd,vy=my*st.spd;
     if(T==='s'){P.sink=mv?Math.min(0.75,(P.sink||0)+dt*0.38):Math.max(0,(P.sink||0)-dt*0.9);vx*=1-P.sink;vy*=1-P.sink;if(mv&&P.moving&&Math.random()<dt*10)parts.push({x:P.x+rnd(-.3,.3),y:P.y+.3,vx:rnd(-.5,.5),vy:rnd(-.8,-.2),life:.4,col:'#c8a060',s:.08});}else P.sink=0;
@@ -2625,7 +2720,7 @@ function drawSign(x,y,lines){up(x,y,()=>{const X=sx(x),Y=sy(y),fs=Math.round(TS*
   R(X-w/2-4,Y-h/2-4,w+8,h+8,'#4a2e18');R(X-w/2,Y-h/2,w,h,'#f0e2c0');R(X-w/2,Y-h/2,w,3,'#fff6dc');R(X-w/2,Y+h/2-3,w,3,'#c8b088');
   ctx.textAlign='center';ctx.textBaseline='middle';lines.forEach((l,i)=>{ctx.fillStyle=i===0&&lines.length>2?'#8a1a2a':'#2a1a0e';ctx.fillText(l,X,Y-h/2+fs*0.4+lh*(i+0.5));});});}
 function drawTutoHud(){
-  const items=[['mv','Se déplacer : Z Q S D'],['rot','Tourner la vue : A / E'],['hit','Toucher un mannequin : clic gauche'],['abil','Capacité de classe : Espace'],['pick','Ramasser le sac : G'],['inv','Inventaire / stats : I ou C'],['pot','Boire une potion : F ou V'],['opt','Ouvrir les options : O'],['boss','Vaincre le Gardien']];
+  const items=[['mv','Se déplacer : Z Q S D'],['hit','Toucher un mannequin : clic gauche'],['abil','Capacité de classe : Espace'],['pick','Ramasser le sac : E'],['inv','Inventaire / stats : I ou C'],['pot','Boire une potion : F ou V'],['opt','Ouvrir les options : O'],['boss','Vaincre le Gardien']];
   const fs=Math.round(Math.max(12,TS*0.28)),lh=fs*1.5,w=Math.min(330,W*0.42),h=lh*(items.length+2.4)+10,X=W-w-12,Y=62;
   R(X,Y,w,h,'rgba(11,10,18,.82)');ctx.strokeStyle='#7ed957';ctx.lineWidth=2;ctx.strokeRect(X+1,Y+1,w-2,h-2);
   ctx.font=`400 ${fs}px "DotGothic16", monospace`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle='#7ed957';ctx.fillText('Tutoriel · '+items.filter(i=>TU[i[0]]).length+'/'+items.length,X+10,Y+lh*0.6+4);
@@ -2662,9 +2757,10 @@ function drawNexus(x0,x1,y0,y1){
   for(const tx of [34,41])drawTorch(sx(tx+.5),sy(10.75),tx);
   // grandes statues de héros
   for(const q of NSTATUES){const X=sx(q.x+1),Y=sy(q.y+1);
-    R(X-TS,Y-TS*0.35,TS*2,TS*0.35,'#5a5670');R(X-TS,Y-TS*0.35,TS*2,u,'#8a86a0');R(X-TS*0.85,Y-TS*0.75,TS*1.7,TS*0.42,'#6d6a84');R(X-TS*0.85,Y-TS*0.75,TS*1.7,u,'#a8a4c0');R(X-TS*0.7,Y-TS*0.2,TS*1.4,u*2,'#c9a54a');
-    const w=CLASSES[q.c].arme,img=heroSprite(q.c,null,w,5,'idle'),kk=TS*2.1/52;ctx.save();ctx.filter='grayscale(1) sepia(0.25) brightness(0.85) contrast(1.15)';ctx.drawImage(img,X-26*kk,Y-TS*0.75-40*kk,img.width*kk,img.height*kk);ctx.restore();
-    label(CLASSES[q.c].nom,X,Y-TS*0.05,'#c9a54a',Math.round(TS*0.24));}
+    R(X-TS,Y-TS*0.35,TS*2,TS*0.35,'#c8c4d4');R(X-TS,Y-TS*0.35,TS*2,u,'#f4f2f8');R(X-TS,Y-u*1.5,TS*2,u*1.5,'#9a96aa');R(X-TS*0.85,Y-TS*0.75,TS*1.7,TS*0.42,'#e2dfea');R(X-TS*0.85,Y-TS*0.75,TS*1.7,u,'#ffffff');
+    for(let k=0;k<5;k++)R(X-TS*0.8+h2(k,q.x)*TS*1.5,Y-TS*0.7+h2(q.y,k)*TS*0.3,u*2.5,u*0.6,'#b8b4c8');
+    const w=CLASSES[q.c].arme,img=heroSprite(q.c,null,w,5,'idle'),kk=TS*2.1/52;ctx.save();ctx.filter='grayscale(1) brightness(1.75) contrast(0.8)';ctx.drawImage(img,X-26*kk,Y-TS*0.75-40*kk,img.width*kk,img.height*kk);ctx.restore();
+  }
   // fontaine monumentale : bassin octogonal, trois vasques, jets et zone de soin visible
   {const X=sx(FONT.x),Y=sy(FONT.y),pulse=0.5+0.5*Math.sin(time*2.5);
     ctx.globalAlpha=0.16+0.1*pulse;ctx.fillStyle='#7ed957';ctx.beginPath();ctx.ellipse(X,Y+TS*0.2,TS*3.6,TS*3.4,0,0,TAU);ctx.fill();ctx.globalAlpha=0.55;ctx.strokeStyle='#7ed957';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.lineDashOffset=-time*20;ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
@@ -2695,9 +2791,9 @@ function drawNexus(x0,x1,y0,y1){
     const MX=sx(37.5),MY=sy(11.3),ms=TS*1.05,bob=Math.abs(Math.sin(time*2.2))*u2*1.2;ctx.drawImage(MERCHANT,MX-ms/2,MY-ms*0.6-bob,ms,ms);
     const bs=TS*0.62,bb=Math.sin(time*3)*u2*1.6;ctx.drawImage(BACKPACK,sx(39.2)-bs/2,sy(12.1)-bs+bb,bs,bs);const gp=dspr('gold',DPAL.gold),gk=TS/64;ctx.drawImage(gp,sx(35.4),sy(12.2)-gp.height*gk*0.75,gp.width*gk,gp.height*gk);
     for(let i=0;i<24;i++){const X=sx(34)+i*TS/4,Y=sy(10.2);R(X,Y,TS/4+1,TS*0.45,i%2?'#e8b04a':'#b3363a');R(X,Y+TS*0.45,TS/4+1,2*u2,i%2?'#c9973c':'#8a2a2e');}
-    const shelf=(tx,items)=>{for(let k=0;k<7;k++){const X=sx(tx),Y=sy(14+k);R(X,Y,TS+1,TS,'#4a2e18');R(X+u2,Y+u2,TS-2*u2,TS-2*u2,'#6a4424');R(X,Y+TS*0.55,TS+1,u2*1.5,'#8a5a2b');const it=items[k%items.length];if(it){const im=ICON_IMG[it]||(ICON_IMG[it]=(()=>{const i=new Image();i.src=icon(mkItem(it.split(':')[0],+(it.split(':')[1]||0)));return i;})());if(im.complete)ctx.drawImage(im,X+TS*0.18,Y+TS*0.05,TS*0.62,TS*0.62);}}};
-    shelf(32,['pvie','pmana','sp_vie','pvie','sp_mana','pmana','sp_vatt']);shelf(42,['epee:3','baton:3','arc:3','baguette:3','dague:3','casque:2','tome:2']);
-    for(const [tx,ty,c] of [[33.3,21.3,'lourde:4'],[40.7,21.3,'robe:4']]){const X=sx(tx),Y=sy(ty);R(X-u2,Y-TS*0.2,2*u2,TS*0.7,'#5a3a22');R(X-TS*0.3,Y+TS*0.45,TS*0.6,u2*1.5,'#3a2414');const im=ICON_IMG[c]||(ICON_IMG[c]=(()=>{const i=new Image();i.src=icon(mkItem(c.split(':')[0],+c.split(':')[1]));return i;})());if(im.complete)ctx.drawImage(im,X-TS*0.4,Y-TS*0.75,TS*0.8,TS*0.8);}
+    const shelf=(tx,items,y0=14,n=7)=>{for(let k=0;k<n;k++){const X=sx(tx),Y=sy(y0+k);R(X,Y,TS+1,TS,'#4a2e18');R(X+u2,Y+u2,TS-2*u2,TS-2*u2,'#6a4424');R(X,Y+TS*0.55,TS+1,u2*1.5,'#8a5a2b');const it=items[k%items.length];if(it){const im=ICON_IMG[it]||(ICON_IMG[it]=(()=>{const i=new Image();i.src=icon(mkItem(it.split(':')[0],+(it.split(':')[1]||0)));return i;})());if(im.complete)ctx.drawImage(im,X+TS*0.18,Y+TS*0.05,TS*0.62,TS*0.62);}}};
+    shelf(32,['pvie','pmana','sp_vie'],19,3);shelf(42,['epee:3','baton:3','arc:3','baguette:3','dague:3','casque:2','tome:2']);
+    for(const [tx,ty,c] of [[34.3,21.3,'lourde:4'],[40.7,21.3,'robe:4']]){const X=sx(tx),Y=sy(ty);R(X-u2,Y-TS*0.2,2*u2,TS*0.7,'#5a3a22');R(X-TS*0.3,Y+TS*0.45,TS*0.6,u2*1.5,'#3a2414');const im=ICON_IMG[c]||(ICON_IMG[c]=(()=>{const i=new Image();i.src=icon(mkItem(c.split(':')[0],+c.split(':')[1]));return i;})());if(im.complete)ctx.drawImage(im,X-TS*0.4,Y-TS*0.75,TS*0.8,TS*0.8);}
     for(const [tx,ty] of [[33,11.6],[41.4,11.6]]){const X=sx(tx),Y=sy(ty);R(X,Y,TS*0.8,TS*0.9,'#6a4424');R(X,Y+TS*0.2,TS*0.8,u2*1.2,'#3a2414');R(X,Y+TS*0.6,TS*0.8,u2*1.2,'#3a2414');R(X+u2,Y,TS*0.8-2*u2,u2,'#a86a3a');}
     label('Échoppe',sx(31.5),sy(14.3),'#ffd96a',Math.round(TS*0.32));label('Marchand',sx(37.5),sy(9.9),'#ffd96a',Math.round(TS*0.33));}
   // portes monumentales autour des deux portails
@@ -2924,14 +3020,14 @@ function render(){
   for(const k of strikes){if(k.hit)continue;const X=sx(k.x),Y=sy(k.y),bl=Math.sin(time*(14+(1.1-k.t)*25))>0;ctx.globalAlpha=bl?0.55:0.25;ctx.fillStyle='#ff2a2a';ctx.beginPath();ctx.arc(X,Y,TS*k.r*(1-Math.max(0,k.t)/2.2),0,TAU);ctx.fill();ctx.globalAlpha=0.9;ctx.strokeStyle='#ff5a5a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,TS*k.r,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
   const sk=sceneKey();
   const cA=Math.cos(camA),sA=Math.sin(camA),ry=(x,y)=>(x-P.x)*sA+(y-P.y)*cA;const ents=monsters.filter(m=>m.hp>0&&!m.pend&&Math.abs(m.x-P.x)<rw+3&&Math.abs(m.y-P.y)<rh+3).map(m=>({y:ry(m.x,m.y),m}));if(save.current)ents.push({y:0,p:true});
-  for(const r of remotes.values())if(activeIn(r,sk)&&CLASSES[r.p.c])ents.push({y:ry(r.x,r.y),o:r});
+  for(const r of remotes.values())if(activeIn(r,sk)&&CLASSES[r.p.c]&&!r.p.hid)ents.push({y:ry(r.x,r.y),o:r});
   ents.sort((a,b)=>a.y-b.y);
   for(const e of ents){const ex=e.p?P.x:e.o?e.o.x:e.m.x,ey=e.p?P.y:e.o?e.o.y:e.m.y;up(ex,ey,()=>{
     if(e.p){
       const spr=HERO_SPR[save.current];const hit=time-P.hitT<0.12;
       if(P.berserk>0){ctx.fillStyle='rgba(255,120,40,.25)';ctx.beginPath();ctx.arc(sx(P.x),sy(P.y),TS*0.7,0,TAU);ctx.fill();}
       {const w=C().equip[0],bob=P.moving?Math.abs(Math.sin(P.walk))*TS*0.05:Math.sin(time*2.4)*TS*0.015;if(P.invul>0){ctx.strokeStyle='#ffd23f';ctx.globalAlpha=0.5+0.4*Math.sin(time*12);ctx.lineWidth=3;ctx.beginPath();ctx.arc(sx(P.x),sy(P.y),TS*0.62,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
-      drawHero(save.current,mySkin(),P.x,P.y,P.face,hit?1:0,bob,w?w.kind:null,w?w.tier:0,heroAim(true,null),P.thrust,P.moving,P.walk,P.invis>0?0.4:1,myAura());}
+      drawHero(save.current,mySkin(),P.x,P.y,P.face,hit?1:0,bob,w?w.kind:null,w?w.tier:0,heroAim(true,null),P.thrust,P.moving,P.walk,P.invis>0||admInv?0.4:1,myAura());}
       const st=S();drawBar(P.x,P.y+0.55,TS*0.8,P.hp/st.tot.vie,'#6fd04a');
       if(remotes.size)label(pseudo,sx(P.x),sy(P.y-0.72),'#e8b04a',Math.round(TS*0.3));
       if(P.bubble)bubble(P.bubble.t,P.x,P.y);
@@ -3005,15 +3101,15 @@ function render(){
   if(scene==='dungeon'&&dungeonT!=='a'){drawThemeFx();drawThemeHud();}
   if(scene==='tuto')drawTutoHud();
   let prompt=null;
-  if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='G · Entrer dans le Royaume';else if(nearAltarObj())prompt={pup:'G · Changer de pseudo',statue:'G · Choisir un skin',altar:'G · Changement de classe',guide:'G · Parler au guide (refaire le tutoriel)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='G · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='G · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='vault'){const c=nearChest();if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='G · Retour au Nexus';else if(c>=save.vault.n)prompt=c===save.vault.n?'G · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='G · Nexus (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='hub'){const p=nearHubPort();if(Math.hypot(P.x-HBACK.x,P.y-HBACK.y)<1.4)prompt='G · Retour au Nexus';else if(p)prompt='G · Tester : '+DTYPES[p.t].nom;}
-  else if(scene==='realm'){const d=nearDPortal();if(d)prompt='G · Entrer : '+DTYPES[d.t||'c'].nom+(d.t==='a'?' (très difficile)':'');else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='dungeon'){if(Math.hypot(P.x-MAP.exitPortal.x,P.y-MAP.exitPortal.y)<1.4||(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6))prompt='G · Retour au Nexus';
-    else if(nearSwitch())prompt='G · Actionner l\'interrupteur (éclaire la salle)';
-    else if(fight===0&&Math.hypot(P.x-MAP.altar.x,P.y-MAP.altar.y)<2.2)prompt=MAP.needStars&&stars!==15?'La porte céleste est scellée : '+starCount(stars)+'/4 étoiles':'G ou clic sur l\'autel · Invoquer '+DTYPES[dungeonT].boss+' (les portes se fermeront)';
-    else if(fight===1&&!inArena(P.x,P.y)&&nearDoor(2.5))prompt='G ou clic sur le mur · Rejoindre le combat (tu seras enfermé)';else if(groundBag)prompt='G · Tout ramasser';}
+  if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans le Royaume';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='E · Tout ramasser';}
+  else if(scene==='vault'){const c=nearChest();if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Nexus';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='E · Tout ramasser';}
+  else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Nexus (terminer le tutoriel)';else if(groundBag)prompt='E · Tout ramasser';}
+  else if(scene==='hub'){const p=nearHubPort();if(Math.hypot(P.x-HBACK.x,P.y-HBACK.y)<1.4)prompt='E · Retour au Nexus';else if(p)prompt='E · Tester : '+DTYPES[p.t].nom;}
+  else if(scene==='realm'){const d=nearDPortal();if(d)prompt='E · Entrer : '+DTYPES[d.t||'c'].nom+(d.t==='a'?' (très difficile)':'');else if(groundBag)prompt='E · Tout ramasser';}
+  else if(scene==='dungeon'){if(Math.hypot(P.x-MAP.exitPortal.x,P.y-MAP.exitPortal.y)<1.4||(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6))prompt='E · Retour au Nexus';
+    else if(nearSwitch())prompt='E · Actionner l\'interrupteur (éclaire la salle)';
+    else if(fight===0&&Math.hypot(P.x-MAP.altar.x,P.y-MAP.altar.y)<2.2)prompt=MAP.needStars&&stars!==15?'La porte céleste est scellée : '+starCount(stars)+'/4 étoiles':'E ou clic sur l\'autel · Invoquer '+DTYPES[dungeonT].boss+' (les portes se fermeront)';
+    else if(fight===1&&!inArena(P.x,P.y)&&nearDoor(2.5))prompt='E ou clic sur le mur · Rejoindre le combat (tu seras enfermé)';else if(groundBag)prompt='E · Tout ramasser';}
   if(prompt&&!paused){ctx.font=`400 ${Math.round(TS*0.4)}px "DotGothic16", monospace`;const w=ctx.measureText(prompt).width+28,h=TS*0.8,X=W/2-w/2,Y=H-h-TS*0.6;R(X,Y,w,h,'rgba(11,10,18,.85)');ctx.strokeStyle='#e8b04a';ctx.lineWidth=2;ctx.strokeRect(X+1,Y+1,w-2,h-2);label(prompt,W/2,Y+h/2,'#e8b04a',Math.round(TS*0.4));}
   if(banner){const a=clamp(banner.life,0,1);ctx.globalAlpha=a;label(banner.t,W/2,H*0.2,banner.col,Math.round(Math.min(W/14,TS*0.95)),700);label(banner.s,W/2,H*0.2+TS*0.85,'#ebe6f6',Math.round(TS*0.4),400);ctx.globalAlpha=1;}
   if(notice){ctx.globalAlpha=clamp(notice.life*2,0,1);label(notice.t,W/2,H*0.72,'#ffd9a0',Math.round(TS*0.42));ctx.globalAlpha=1;}
@@ -3030,7 +3126,7 @@ mini.addEventListener('click',()=>{if(scene!=='realm'&&scene!=='dungeon')return;
 mini.title='Molette : zoomer sur la carte (clic : zoom suivant)';
 function drawMini(){
   const Wm=mini.width,sk=sceneKey();mctx.imageSmoothingEnabled=false;mctx.fillStyle='#0b0a12';mctx.fillRect(0,0,Wm,Wm);
-  const others=[...remotes.values()].filter(r=>activeIn(r,sk));
+  const others=[...remotes.values()].filter(r=>activeIn(r,sk)&&!r.p.hid);
   if(scene==='realm'&&realmImg){
     const {ox,oy,k}=miniView(RN,RN),mx=x=>(x-ox)*k,my=y=>(y-oy)*k,ms=miniZoom>=4?2:1;
     mctx.drawImage(realmImg,ox,oy,RN/miniZoom,RN/miniZoom,0,0,Wm,Wm);
