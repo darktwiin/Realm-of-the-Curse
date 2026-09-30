@@ -1,5 +1,12 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.7 (server.js modifié)
+- Nouveau Dragon de Guilde : grand dragon rouge aux ailes battantes, gueule qui crache le feu quand il attaque.
+- Le portail s'ouvre au lancement du raid, le Dragon arrive 30 secondes plus tard : grondements, écran qui tremble, rugissement et flash à son apparition.
+- Musique épique : tambours de guerre pendant l'attente, puis thème du Dragon (galop de batterie, taikos, chœurs et cuivres).
+- Nouvelles attaques de feu : souffle qui balaie l'arène, lignes de flammes qui jaillissent du sol, anneaux de braises, pluie de météores, boules de feu qui explosent. Tout traverse les murs.
+- Antre du Dragon : arène bien plus grande, entourée de lave, avec des brasiers et des tas d'or.
+
 ## ver.0.0.6 (server.js modifié)
 - Le raid de guilde devient un événement de 10 minutes lancé par un admin (bouton dans le panneau admin).
 - Nouveau boss : le Dragon de Guilde, 2 fois plus grand, pixels doublés, animation d'attaque (ailes et souffle).

@@ -111,7 +111,7 @@ setInterval(() => { if (!guildesModif) return; guildesModif = false; fs.writeFil
 const invitesGuilde = new Map(); // peer invité -> { gid, t }
 // ---- Raid de guilde : le Dragon apparaît 10 minutes (lancé par un admin), il est invulnérable et compte les dégâts de chaque guilde ----
 const FICHIER_RAID = path.join(__dirname, 'raid.json');
-const RAID_DUREE = 10 * 60 * 1000;
+const RAID_DUREE = 10 * 60 * 1000, RAID_ATTENTE = 30 * 1000; // le portail s'ouvre, le Dragon arrive 30 s plus tard
 let raidEv = null; // { id, actif, fin, g: { gid: { dmg, c: { pid: dmg } } }, res: [...], recu: { pid: true } }
 try { raidEv = JSON.parse(fs.readFileSync(FICHIER_RAID, 'utf8')); } catch { raidEv = null; }
 const sauverRaid = () => fs.writeFile(FICHIER_RAID, JSON.stringify(raidEv), () => {});
@@ -123,8 +123,9 @@ function classementRaid() {
 }
 function tousLesSockets() { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push(j); return out; }
 function lancerRaid() {
-  raidEv = { id: Date.now(), actif: true, fin: Date.now() + RAID_DUREE, g: {}, res: null, recu: {} }; sauverRaid();
-  for (const j of tousLesSockets()) envoyer(j.ws, { t: 'g', a: 'raidstart', reste: RAID_DUREE });
+  const spawn = Date.now() + RAID_ATTENTE;
+  raidEv = { id: Date.now(), actif: true, spawn, fin: spawn + RAID_DUREE, g: {}, res: null, recu: {} }; sauverRaid();
+  for (const j of tousLesSockets()) envoyer(j.ws, { t: 'g', a: 'raidstart', reste: RAID_ATTENTE + RAID_DUREE, spawn: RAID_ATTENTE });
   for (const gid of Object.keys(guildes)) diffuserGuilde(gid, true);
 }
 function finirRaid() {
@@ -143,7 +144,7 @@ function vueRaid(gid, pid) {
   const top = cl.slice(0, 5).map(({ tag, nom, dmg }) => ({ tag, nom, dmg }));
   let dernier = null;
   if (!raidEv.actif && raidEv.res) { const i = raidEv.res.findIndex(r => r.gid === gid); dernier = { rang: i >= 0 ? i + 1 : 0, nb: raidEv.res.length, part: x.c[pid] || 0, recu: !!raidEv.recu[pid], gain: i >= 0 ? gainRang(i + 1) : null, top }; }
-  return { actif: !!raidEv.actif, reste: raidEv.actif ? Math.max(0, raidEv.fin - Date.now()) : 0, top, guilde: x.dmg, part: x.c[pid] || 0, dernier };
+  return { actif: !!raidEv.actif, reste: raidEv.actif ? Math.max(0, raidEv.fin - Date.now()) : 0, spawn: raidEv.actif ? Math.max(0, (raidEv.spawn || 0) - Date.now()) : 0, top, guilde: x.dmg, part: x.c[pid] || 0, dernier };
 }
 const cle = pid => cyrb53('m' + pid).slice(0, 8);
 function guildeDe(pid) { for (const [gid, g] of Object.entries(guildes)) if (g.membres[pid]) return [gid, g]; return [null, null]; }
@@ -213,7 +214,7 @@ function actionGuilde(moi, salle, m) {
     diffuserGuilde(gid, true); return;
   }
   if (a === 'raid') {
-    if (!raidEv || !raidEv.actif || Date.now() > raidEv.fin) return;
+    if (!raidEv || !raidEv.actif || Date.now() > raidEv.fin || Date.now() < (raidEv.spawn || 0)) return;
     const dmg = Math.max(0, Math.min(40000, Math.floor(Number(m.dmg) || 0))); if (!dmg) return;
     const x = raidEv.g[gid] || (raidEv.g[gid] = { dmg: 0, c: {} });
     x.dmg += dmg; x.c[pid] = (x.c[pid] || 0) + dmg;
@@ -282,7 +283,7 @@ wss.on('connection', (ws, req) => {
       const cmd = String(m.cmd || '');
       if (cmd === 'bans') { res(true, '', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); return; }
       if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
-      if (cmd === 'raid') { lancerRaid(); res(true, 'Raid de guilde lancé : le Dragon est là pour 10 minutes'); console.log('[raid] lancé'); return; }
+      if (cmd === 'raid') { lancerRaid(); res(true, 'Raid lancé : portail ouvert, le Dragon arrive dans 30 secondes (10 minutes de combat)'); console.log('[raid] lancé'); return; }
       if (cmd === 'raidstop') { if (!raidEv || !raidEv.actif) { res(false, 'Aucun raid en cours'); return; } finirRaid(); res(true, 'Raid terminé, classement envoyé'); return; }
       if (cmd === 'infos') { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push({ peer: j.peer, muet: !!modo.mutes[j.ip] }); res(true, '', { infos: out }); return; }
       const cible = trouverJoueur(String(m.to || ''));
