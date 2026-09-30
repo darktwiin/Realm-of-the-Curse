@@ -1,5 +1,20 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.9 (server.js modifié)
+- Raid de guilde : mourir face au Dragon ne coûte plus rien (ni niveau, ni XP, ni objet). Retour direct au hall de guilde, 45 secondes d'attente avant de pouvoir y retourner.
+- 4 donjons intermédiaires (entre le Terrier des Gobelins et les donjons de fin), qui s'ouvrent rarement sur les monstres de la Forêt des Murmures et du Canyon de Rouille :
+  - Bosquet des Ronces (la Mère des Ronces) : les ronces ralentissent et piquent.
+  - Sanctuaire des Lucioles (le Gardien Luciole) : autels à activer avec E, +30 % de dégâts pendant 20 s.
+  - Mine Effondrée (le Contremaître de Pierre) : éboulements annoncés au sol.
+  - Forge Rouillée (l'Automate Forgeron) : grilles qui crachent de la vapeur par intermittence.
+  - Chaque boss donne à coup sûr une potion de caractéristique aléatoire.
+- Royaume 3 fois plus grand, généré au hasard à chaque redémarrage du serveur (même carte pour tous les joueurs).
+- Chemins de terre à travers le royaume : +30 % de vitesse dessus.
+- Brouillard de guerre sur la minimap : elle se dévoile en explorant (carte entière visible en admin).
+- Nouveaux boss centraux, nouveaux sprites et nouvelles attaques : ils n'existent plus au départ. Tous les 20 monstres tués, l'un des deux apparaît au hasard, signalé par un marqueur et une flèche.
+- Familiers renommés et redessinés : Rat des brumes, Tortue rouge, Fourmi noire, Lion… Leur sprite évolue à chaque rang au lieu de simplement grossir.
+- Correctif : certaines infos envoyées par les joueurs étaient coupées par le serveur (boss, compteur de monstres, donjons).
+
 ## ver.0.0.8 (server.js modifié)
 - Le Dragon baisse et secoue la tête quand il attaque.
 - Nouvelle musique du Dragon, plus posée et orchestrale (taikos, gong, chœurs, cor).

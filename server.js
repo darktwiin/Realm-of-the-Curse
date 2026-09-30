@@ -13,6 +13,8 @@ const MAX_JOUEURS_PAR_SALLE = 16;
 const MAX_OCTETS_ETAT = 8192;
 
 const INDEX = fs.readFileSync(path.join(__dirname, 'public', 'index.html'));
+// graine du Royaume : une nouvelle carte à chaque lancement du serveur, la même pour tous les joueurs
+const REALM_SEED = 1 + Math.floor(Math.random() * 999999999);
 
 // ---- Classement : scores des joueurs, sauvegardés dans classement.json ----
 // Sur Render gratuit, ce fichier est effacé à chaque redémarrage du serveur (disque non permanent).
@@ -253,7 +255,7 @@ wss.on('connection', (ws, req) => {
   console.log(`[${nom}] connexion ${peer} (${salle.size} joueur(s))`);
 
   envoyer(ws, {
-    t: 'hello', peer, salle: nom,
+    t: 'hello', peer, salle: nom, seed: REALM_SEED,
     peers: [...salle.values()].filter(j => j !== moi).map(j => ({ peer: j.peer, presence: j.etat }))
   });
   diffuser(salle, { t: 'join', peer }, moi);
@@ -329,7 +331,7 @@ wss.on('connection', (ws, req) => {
       return;
     }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
-    for (const k of Object.keys(m.patch).slice(0, 40)) {
+    for (const k of Object.keys(m.patch).slice(0, 96)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
       let v = m.patch[k];
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
