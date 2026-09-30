@@ -227,6 +227,7 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 #caseWin{z-index:9}.case-inner{max-width:720px;width:100%}.casebox{position:relative;overflow:hidden;height:150px;background:#0b0a12;border:2px solid var(--line2);margin:10px 0}
 .casestrip{display:flex;gap:8px;padding:12px 0;will-change:transform}.ccard{flex:0 0 104px;height:122px;background:linear-gradient(#1c1828,#141020);border:2px solid #2a2438;border-bottom:6px solid var(--tc);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 -30px 30px -24px var(--tc)}
 .ccard img{width:60px;height:60px;image-rendering:pixelated}.ccard b{font-family:var(--display);font-size:13px;color:var(--tc)}.ccard.win{border-color:var(--tc);box-shadow:0 0 22px var(--tc),inset 0 -30px 30px -20px var(--tc);transform:scale(1.04)}
+.caseevo{display:flex;align-items:center;justify-content:center;gap:24px;margin:10px 0;min-height:150px}.caseevo img{width:128px;height:128px;image-rendering:pixelated}.caseevo span{font-size:36px;color:#ffd23f}.caseevo img.pop{animation:evopop .9s ease-out}@keyframes evopop{0%{transform:scale(.3);filter:brightness(4)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
 .casemark{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1px;background:#ffd23f;box-shadow:0 0 8px #ffd23f}.caseres{font-family:var(--display);font-size:20px;text-align:center;min-height:28px;margin:4px 0}
 .pcard .tier{font-family:var(--display);font-size:12px}.plist2{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px;margin:4px 0 8px}
 .pcard{display:grid;grid-template-columns:44px 1fr;gap:4px 8px;align-items:center;background:var(--panel2);border:2px solid var(--line);padding:6px}.pcard.on{border-color:#7df0e0;box-shadow:0 0 10px rgba(125,240,224,.35)}
@@ -338,7 +339,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.3"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.4"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -352,7 +353,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.3</div>
+    <div class="verTag" id="verTag">ver.0.0.4</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -423,9 +424,10 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     </div>
     <div class="overlay" id="pets" hidden>
       <div class="shop-inner pets-inner" role="dialog" aria-label="Familiers">
-        <h2>Familiers</h2>
+        <h2 id="petTitle">Familiers</h2>
         <p class="hint">Un familier équipé te suit et augmente une statistique <b>au-delà du maximum</b> (niveau, potions et plafonds). Les autres vivent dans le parc de ta maison.</p>
         <h3>Œufs dans ton sac</h3><div class="plist2" id="petEggs"></div>
+        <h3>Évolutions</h3><div class="plist2" id="petEvo"></div>
         <h3>Tes familiers</h3><div class="plist2" id="petList"></div>
         <div class="shop-foot"><span class="hint" id="petFoot"></span><button type="button" class="act" id="petClose">Fermer · Échap</button></div>
       </div>
@@ -435,7 +437,8 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <h2 id="caseTitle">Éclosion</h2>
         <div class="casebox" id="caseBox"><div class="casestrip" id="caseStrip"></div><i class="casemark"></i></div>
         <p class="caseres" id="caseRes"></p>
-        <p class="hint">Commun 65 % · <span style="color:#4aa3ff">Rare 28 %</span> · <span style="color:#b16cff">Épique 7 %</span> · <span style="color:#3ff0ff">Ultime : bientôt</span></p>
+        <div class="caseevo" id="caseEvo" hidden><img id="evoA" alt=""><span>➜</span><img id="evoB" alt=""></div>
+        <p class="hint" id="caseHint">6 familiers, même chance pour chacun. Ils éclosent au tier Commun : 3 identiques + 1 croquette = tier supérieur (dans ta maison).</p>
         <div class="shop-foot"><button type="button" class="act" id="caseSkip">Passer l'animation</button><button type="button" class="act main" id="caseOk" hidden>Super !</button></div>
       </div>
     </div>
@@ -462,10 +465,11 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label for="volMus">Musique</label><input type="range" id="volMus" min="0" max="100" step="5"><span class="val" id="volMusV">50 %</span></div>
         <div class="opt"><label for="volSfx">Effets sonores</label><input type="range" id="volSfx" min="0" max="100" step="5"><span class="val" id="volSfxV">60 %</span></div>
         <label class="chk"><input type="checkbox" id="muteAll"> Couper tout le son</label>
+        <label class="chk"><input type="checkbox" id="hidePets"> Masquer les familiers des autres joueurs</label>
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.3</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.4</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -506,7 +510,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.3</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.4</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -736,6 +740,7 @@ const MON_SPR={
   devoreur:[['..VVVVVVVVVV..','.VVSVVVVVVSVV.','VVVVVVVVVVVVVV','VVWWVVVVVVWWVV','VVWKVVVVVVWKVV','VVVVVVVVVVVVVV','VV.YYYYYYYY.VV','VV.Y.Y.Y.YY.VV','VVVYYYYYYYYVVV','.VVVVVVVVVVVV.','..VV.VVVV.VV..','.VV...VV...VV.'],{V:'#241c6a',S:'#ffffff',W:'#ffd23f',K:'#ff4fd8',Y:'#3ff0ff'}],
 };
 const ICONS={
+  croquette:['........','.XX..XX.','XWXXXXDX','XXXXXXXX','XXXXXXXX','XDXXXXDX','.XX..XX.','........'],
   oeuf:['...WW...','..WXXW..','.WXXDXX.','.XXXXXX.','.XDXXDX.','.XXXXXX.','..XXXX..','...DD...'],
   epee:['......WX','.....WX.','....WX..','.D.WX...','..DX....','..HD....','.H..D...','H.......'],
   baton:['.....XX.','....XWX.','.....XX.','....H...','...H....','..H.....','.H......','H.......'],
@@ -830,7 +835,10 @@ function armorOf(it){if(!it||it.slot!=='armure')return 0;const t=it.tier,f={lour
 const SP_DEF={vie:{step:5,n:16,col:'#ff4a6a'},mana:{step:5,n:10,col:'#4a8fe8'},puissance:{step:1,n:10,col:'#ff9a3c'},vatt:{step:1,n:10,col:'#b16cff'},vdep:{step:1,n:8,col:'#3ff0ff'}};
 // Plafonds absolus (niveau + objets + potions) pour que le héros ne devienne jamais trop fort
 const HARD_CAP={vatt:70,vdep:60};
-for(const k in PET_DEF)KINDS['egg_'+k]={slot:'conso',type:'Œuf de familier',egg:k,noms:['Œuf de '+PET_DEF[k].nom]};
+// un seul type d'œuf (les anciens œufs par espèce restent valables et deviennent des œufs normaux)
+KINDS.egg={slot:'conso',type:'Œuf de familier',egg:true,noms:['Œuf de familier']};
+for(const k in PET_DEF)KINDS['egg_'+k]={slot:'conso',type:'Œuf de familier',egg:true,legacy:true,noms:['Œuf de familier']};
+KINDS.croquette={slot:'conso',type:'Nourriture de familier',food:true,noms:['Croquette de familier']};
 const RING_N=['Anneau de cuivre',"Anneau d'argent","Anneau d'or",'Anneau de saphir',"Anneau d'améthyste",'Anneau solaire','Anneau du Dieu Fou',"Anneau de l'Infini"];
 const RING_S={vie:'de vitalité',mana:'de sagesse',puissance:'de force',vatt:'de dextérité',vdep:'du vent'};
 const SLOT_IDX={arme:0,capa:1,armure:2,anneau:3};
@@ -1210,7 +1218,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000003;let newerWarned=false;
+const NETV=2,BUILD=2600000004;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1424,7 +1432,7 @@ function note(t){notice={t,life:2.2};}
 
 /* ================= options ================= */
 const OPT_KEY='royaume-maudit-options';
-const opts={mus:0.5,sfx:0.6,mute:false,cursor:'viseur',csize:32,ccol:'#ffd23f'};
+const opts={mus:0.5,sfx:0.6,mute:false,hidePets:false,cursor:'viseur',csize:32,ccol:'#ffd23f'};
 try{Object.assign(opts,JSON.parse(localStorage.getItem(OPT_KEY))||{});}catch(e){}
 function saveOpts(){try{localStorage.setItem(OPT_KEY,JSON.stringify(opts));}catch(e){}}
 
@@ -1947,7 +1955,7 @@ function handleDeath(id,key,x,y){
   if(Math.random()<d.drop){const n=d.n&&d.boss?d.n:1;for(let i=0;i<n;i++){let t=ri(d.loot[0],d.loot[1]);if(Math.random()<0.08)t=Math.min(6,t+1);items.push(randomItem(t));}}
   if(d.rel&&(key==='devoreur'||Math.random()<d.rel)){const it=randomItem(7);items.push(it);showBanner('RELIQUE !',it.name,'#3ff0ff');burst(x,y,'#3ff0ff',50,5);burst(x,y,'#ff4fd8',40,4);sfx('relic');sendChat('✦ a trouvé une Relique : '+it.name+' !');}
   if(Math.random()<(d.boss?1:0.12))items.push(mkItem(Math.random()<0.6?'pvie':'pmana',0));
-  if(Math.random()<0.001){const ek=pick(PET_KEYS);items.push(mkItem('egg_'+ek,0));showBanner('Un œuf !','Œuf de '+PET_DEF[ek].nom+' · va voir l\'éleveur au Nexus',PET_DEF[ek].col);sfx('relic');sendChat('🥚 a trouvé un Œuf de '+PET_DEF[ek].nom+' !');}
+  if(Math.random()<0.001){items.push(mkItem('egg',0));showBanner('Un œuf de familier !','Va le faire éclore chez l\'éleveur du Nexus','#f0dca0');sfx('relic');sendChat('🥚 a trouvé un Œuf de familier !');}
   {const sp=statDrops(key,d);if(sp.length){addToBag(x+0.7,y+0.3,sp.map(k=>mkItem('sp_'+k,0)),false);ft(x,y-1.4,'Potion de caractéristique !','#ff9a3c',true);sfx('relic',0.5);}}
   if(items.length){addToBag(x,y,items,false);sfx('loot',0.8);}
   if(d.or&&Math.random()<d.or[0]){const g=ri(d.or[1],d.or[2]);save.gold+=g;for(let i=0;i<Math.min(g,8);i++)coinsFx.push({x:x+rnd(-.3,.3),y:y+rnd(-.3,.3),vx:rnd(-2,2),vy:rnd(-3,-1),t:0});sfx('coin');ft(x,y-1,'+'+g+' pièce'+(g>1?'s':''),'#ffd96a');}
@@ -2055,7 +2063,7 @@ function dropLoc(l){
   lset(l,null);addToBag(P.x,P.y,[it],true);SEL=null;done();
 }
 function drink(i){
-  const ch=C(),it=ch.inv[i];if(!it||it.slot!=='conso')return;if(KINDS[it.kind].egg){note('Apporte cet œuf à l\'éleveur du Nexus pour le faire éclore');return;}const st=S();
+  const ch=C(),it=ch.inv[i];if(!it||it.slot!=='conso')return;if(KINDS[it.kind].egg){note('Apporte cet œuf à l\'éleveur du Nexus pour le faire éclore');return;}if(KINDS[it.kind].food){note('La croquette sert à faire évoluer un familier, dans le parc de ta maison');return;}const st=S();
   const spk=KINDS[it.kind].sp;
   if(spk){ch.sp=ch.sp||{};const d=SP_DEF[spk];if((ch.sp[spk]||0)>=d.n){note(SL[spk]+' : maximum atteint ('+d.n+' potions)');sfx('deny');return;}ch.sp[spk]=(ch.sp[spk]||0)+1;ft(P.x,P.y-0.9,'+'+d.step+' '+SL[spk]+' (définitif)',d.col,true);burst(P.x,P.y,d.col,26,3);sfx('level');const s2=S();if(spk==='vie')P.hp=Math.min(s2.tot.vie,P.hp+d.step);if(spk==='mana')P.mp=Math.min(s2.tot.mana,P.mp+d.step);}
   else if(it.kind==='pvie'){if(P.hp>=st.tot.vie){note('Vie déjà pleine');return;}P.hp=Math.min(st.tot.vie,P.hp+120);ft(P.x,P.y-0.8,'+120','#ff6b74',true);}
@@ -2070,9 +2078,9 @@ function done(){clampBars();invDirty=true;statsDirty=true;persist();}
 const iconCache={};
 function icon(it){
   const key=it.kind+it.tier;if(iconCache[key])return iconCache[key];
-  let col=TIER_COL[it.tier];if(it.kind==='pvie')col='#e0404c';if(it.kind==='pmana')col='#3f7fe0';const spk=KINDS[it.kind]&&KINDS[it.kind].sp;if(spk)col=SP_DEF[spk].col;const egk=KINDS[it.kind]&&KINDS[it.kind].egg;if(egk)col=PET_DEF[egk].col;
+  let col=TIER_COL[it.tier];if(it.kind==='pvie')col='#e0404c';if(it.kind==='pmana')col='#3f7fe0';const spk=KINDS[it.kind]&&KINDS[it.kind].sp;if(spk)col=SP_DEF[spk].col;const egk=KINDS[it.kind]&&KINDS[it.kind].egg;if(egk)col='#f0dca0';if(it.kind==='croquette')col='#b0703a';
   const pal={X:col,D:shade(col,0.6),W:'#ffffff',H:it.tier>=7?'#ff4fd8':spk?'#f2c14e':'#8a5a2b'};
-  const c=makeSprite(ICONS[egk?'oeuf':spk?'sp':it.kind],pal,4);
+  if(egk)pal.D='#d08a3a';const c=makeSprite(ICONS[egk?'oeuf':spk?'sp':it.kind],pal,4);
   return iconCache[key]=c.toDataURL();
 }
 const heroURL={};for(const k in HERO_SPR)heroURL[k]=HERO_SPR[k].toDataURL();
@@ -2101,14 +2109,15 @@ function renderDetail(){
   if(it.slot==='arme'){const avg=(it.dmg[0]+it.dmg[1])/2,e=eqd&&eqd.dmg?(eqd.dmg[0]+eqd.dmg[1])/2:null,d=e!=null?Math.round(avg-e):0;h+=`<li><span>Dégâts</span><span>${it.dmg[0]}–${it.dmg[1]}${e!=null&&d?` <em class="${d>0?'up':'down'}">(${d>0?'+':''}${d})</em>`:''}</span></li>`;h+=`<li><span>Projectiles</span><span>${WB[it.kind].shots+(it.extra||0)}${it.extra?' <em class="up">(+1 relique)</em>':''}</span></li>`;}
   if(it.slot==='armure'){const a=armorOf(it),e=eqd?armorOf(eqd):null,d=e!=null?a-e:0;h+=`<li><span>Armure</span><span>+${a}${e!=null&&d?` <em class="${d>0?'up':'down'}">(${d>0?'+':''}${d})</em>`:''}</span></li>`;}
   if(it.slot==='capa'){const desc=abilityInfo(it);if(it.stats.mreg)h+=`<li><span>Régénération de mana</span><span>+${it.stats.mreg}/s</span></li>`;h+=`<li><span>${desc}</span></li><li><span>Coût</span><span>${it.cost} mana</span></li>`;}
-  if(it.slot==='conso'&&K.egg){h+=`<li><span>Fais-le éclore chez l'éleveur du Nexus : ${PET_DEF[K.egg].nom} (${PET_TXT(K.egg)}, au-delà du maximum)</span></li>`;}
+  if(it.slot==='conso'&&K.egg){h+=`<li><span>Fais-le éclore chez l'éleveur du Nexus : un des 6 familiers, au hasard (même chance pour tous)</span></li>`;}
+  else if(it.slot==='conso'&&K.food){h+=`<li><span>Fais évoluer un familier dans le parc de ta maison : 3 familiers identiques + 1 croquette = 1 familier du tier supérieur</span></li>`;}
   else if(it.slot==='conso'){const spk=K.sp;if(spk){const d=SP_DEF[spk],n=(ch.sp&&ch.sp[spk])||0;h+=`<li><span>+${d.step} ${SL[spk]} définitif</span></li><li><span>Déjà bues</span><span class="${n>=d.n?'down':''}">${n} / ${d.n}</span></li>`;}else h+=`<li><span>${it.kind==='pvie'?'Rend 120 points de vie':'Rend 120 points de mana'}</span></li>`;}
   const ks=new Set([...Object.keys(it.stats),...(eqd?Object.keys(eqd.stats):[])]);
   for(const k of SK)if(ks.has(k)){if(it.stats[k])h+=statLine(k,it.stats[k],eqd?(eqd.stats[k]||0):null);else h+=`<li><span>${SL[k]}</span><span class="down">(−${eqd.stats[k]})</span></li>`;}
   h+='</ul>';
   if(!usable(it))h+=`<p class="hint warn">Ta classe ne peut pas l'équiper.</p>`;
   h+='<div class="acts">';
-  if(SEL.w==='inv'){if(it.slot==='conso'&&!K.egg)h+=`<button type="button" class="act main" data-act="use">Boire</button>`;else if(usable(it))h+=`<button type="button" class="act main" data-act="use">Équiper</button>`;if(openChest!=null)h+=`<button type="button" class="act" data-act="dep">Ranger au coffre</button>`;h+=`<button type="button" class="act" data-act="drop">Jeter</button>`;}
+  if(SEL.w==='inv'){if(it.slot==='conso'&&!K.egg&&!K.food)h+=`<button type="button" class="act main" data-act="use">Boire</button>`;else if(usable(it))h+=`<button type="button" class="act main" data-act="use">Équiper</button>`;if(openChest!=null)h+=`<button type="button" class="act" data-act="dep">Ranger au coffre</button>`;h+=`<button type="button" class="act" data-act="drop">Jeter</button>`;}
   else if(SEL.w==='eq'){h+=`<button type="button" class="act main" data-act="use">Retirer</button><button type="button" class="act" data-act="drop">Jeter</button>`;}
   else if(SEL.w==='vault'){h+=`<button type="button" class="act main" data-act="use">Prendre</button><button type="button" class="act" data-act="drop">Jeter</button>`;}
   else h+=`<button type="button" class="act main" data-act="use">Ramasser</button>`;
@@ -2181,6 +2190,7 @@ function buyPotion(k){const f=freeInv();if(f<0){note('Sac à dos plein');return 
 const SHOP_ITEMS=[
   {id:'pvie',nom:'Potion de vie',desc:'Rend 120 points de vie. Touche F pour la boire.',prix:10,img:icon(mkItem('pvie',0)),owned:()=>false,buy:()=>buyPotion('pvie')},
   {id:'pmana',nom:'Potion de mana',desc:'Rend 120 points de mana. Touche V pour la boire.',prix:10,img:icon(mkItem('pmana',0)),owned:()=>false,buy:()=>buyPotion('pmana')},
+  {id:'croquette',nom:'Croquette de familier',desc:'Fait évoluer un familier : 3 familiers identiques + 1 croquette = 1 familier du tier supérieur (dans le parc de ta maison).',prix:500,img:icon(mkItem('croquette',0)),owned:()=>false,buy:()=>buyPotion('croquette')},
   {id:'sac2',nom:'Sac à dos supplémentaire',desc:'Ajoute un onglet « Sac 2 » de 8 emplacements à ce héros.',prix:250,img:backpackURL,owned:()=>C().inv.length>8,buy:()=>{const ch=C();while(ch.inv.length<16)ch.inv.push(null);bagTab=1;return true;}},
   {id:'sac3',nom:'Troisième sac à dos',desc:'Ajoute un onglet « Sac 3 » de 8 emplacements. Il faut d\'abord le 2e sac.',prix:1500,img:backpackURL,owned:()=>C().inv.length>16,buy:()=>{const ch=C();if(ch.inv.length<=8){note('Achète d\'abord le 2e sac');return false;}while(ch.inv.length<24)ch.inv.push(null);bagTab=2;return true;}},
 ];
@@ -2390,22 +2400,31 @@ setInterval(dailyTick,500);
 function dailyAuto(){if(!save.current||scene!=='nexus')return;const L=loginState();if(L.seen!==dayNum()&&dailyIdx()>=0&&dlEl.hidden)openDaily();}
 function myTitle(){return save.title&&TITLES[save.title]&&(save.titles||[]).includes(save.title)?save.title:null;}
 /* ================= familiers ================= */
-function petSpr(k){return PET_SPR[k]||(PET_SPR[k]=makeSprite(PET_DEF[k].spr,PET_DEF[k].pal,4));}
-function petURL(k){const c=petSpr(k);return c._u||(c._u=c.toDataURL());}
+function petBase(k){return PET_SPR[k]||(PET_SPR[k]=makeSprite(PET_DEF[k].spr,PET_DEF[k].pal,4));}
+// image du familier selon son tier : plus grand, contour lumineux de la couleur du tier, couronne au tier Épique
+const PET_SIZE=[1.04,1.2,1.35,1.45];
+function petSpr(k,t){t=PET_TIERS[t]?t:0;const key=k+t;if(PET_SPR[key])return PET_SPR[key];const b=petBase(k),S=64,c=document.createElement('canvas');c.width=S;c.height=S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+  const sz=Math.round([34,42,50,56][t]),x0=Math.round((S-sz)/2),y0=S-sz-2;
+  if(t>=1){const tt=document.createElement('canvas');tt.width=b.width;tt.height=b.height;const tg=tt.getContext('2d');tg.drawImage(b,0,0);tg.globalCompositeOperation='source-in';tg.fillStyle=PET_TIERS[t].col;tg.fillRect(0,0,tt.width,tt.height);
+    const o=t>=2?3:2;for(const [dx,dy] of [[-o,0],[o,0],[0,-o],[0,o],[-o+1,-o+1],[o-1,o-1],[-o+1,o-1],[o-1,-o+1]])g.drawImage(tt,x0+dx,y0+dy,sz,sz);}
+  g.drawImage(b,x0,y0,sz,sz);
+  if(t>=2){const cx=S/2,cy=y0-1,u=3;g.fillStyle='#0b0a12';g.fillRect(cx-4*u-1,cy-3*u-1,8*u+2,3*u+2);g.fillStyle='#ffd23f';g.fillRect(cx-4*u,cy-u,8*u,u);g.fillRect(cx-4*u,cy-3*u,u,2*u);g.fillRect(cx-u/2,cy-3*u,u,2*u);g.fillRect(cx+3*u,cy-3*u,u,2*u);g.fillStyle=t>=3?'#3ff0ff':'#ff4a6a';g.fillRect(cx-u/2,cy-u,u,u);}
+  return PET_SPR[key]=c;}
+function petURL(k,t){const c=petSpr(k,t);return c._u||(c._u=c.toDataURL());}
 function eqPet(){if(!save.pets||save.petEq==null)return null;return save.pets.find(p=>p.id===save.petEq)||null;}
 const petsEl=$('#pets');
 function openPets(){petsEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderPets();sfx('item');}
 function closePets(){petsEl.hidden=true;paused=false;cv.focus();}
-function hatch(i){if(CASE)return;const it=C().inv[i];if(!it||!KINDS[it.kind]||!KINDS[it.kind].egg)return;const k=KINDS[it.kind].egg;C().inv[i]=null;save.pets=save.pets||[];
-  const t=rollPetTier(),p={id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),k,t};save.pets.push(p);if(save.petEq==null)save.petEq=p.id;
+function hatch(i){if(CASE)return;const it=C().inv[i];if(!it||!KINDS[it.kind]||!KINDS[it.kind].egg)return;C().inv[i]=null;save.pets=save.pets||[];
+  const p={id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),k:pick(PET_KEYS),t:0};save.pets.push(p);if(save.petEq==null)save.petEq=p.id;
   persist();invDirty=true;statsDirty=true;renderPets();openCase(p);}
 /* ---------- ouverture façon « caisse » : une bande de cartes défile et ralentit sur la rareté obtenue ---------- */
 var CASE=null;
 const caseEl=$('#caseWin');
 function openCase(p){const strip=$('#caseStrip'),N=56,WIN=48;strip.textContent='';strip.style.transition='none';strip.style.transform='translateX(0)';
-  $('#caseTitle').textContent='Éclosion : '+PET_DEF[p.k].nom;$('#caseRes').textContent='';$('#caseRes').style.color='';$('#caseOk').hidden=true;$('#caseSkip').hidden=false;
-  for(let i=0;i<N;i++){const t=i===WIN?p.t:rollPetTier(),c=document.createElement('div');c.className='ccard';c.style.setProperty('--tc',PET_TIERS[t].col);
-    const im=document.createElement('img');im.src=petURL(p.k);const b=document.createElement('b');b.textContent=PET_TIERS[t].nom;c.append(im,b);strip.append(c);}
+  $('#caseTitle').textContent='Éclosion d\'un œuf';$('#caseBox').hidden=false;$('#caseEvo').hidden=true;$('#caseRes').textContent='';$('#caseRes').style.color='';$('#caseOk').hidden=true;$('#caseSkip').hidden=false;
+  for(let i=0;i<N;i++){const k=i===WIN?p.k:pick(PET_KEYS),c=document.createElement('div');c.className='ccard';c.style.setProperty('--tc',PET_DEF[k].col);
+    const im=document.createElement('img');im.src=petURL(k,0);const b=document.createElement('b');b.textContent=PET_DEF[k].nom;c.append(im,b);strip.append(c);}
   caseEl.hidden=false;paused=true;keys.clear();mouse.down=false;
   const box=$('#caseBox'),cw=strip.children[0].offsetWidth+8,target=WIN*cw-box.clientWidth/2+cw/2+(Math.random()*0.6-0.3)*cw;
   CASE={p,target,cw,last:-1,done:false,t0:performance.now(),dur:5600};
@@ -2413,26 +2432,46 @@ function openCase(p){const strip=$('#caseStrip'),N=56,WIN=48;strip.textContent='
   const tick=()=>{if(!CASE||CASE.done)return;const tr=getComputedStyle(strip).transform,x=tr&&tr!=='none'?-new DOMMatrixReadOnly(tr).m41:0,idx=Math.floor((x+box.clientWidth/2)/cw);if(idx!==CASE.last){CASE.last=idx;sfx('item',0.6);}
     if(performance.now()-CASE.t0>=CASE.dur+80)finishCase();else requestAnimationFrame(tick);};requestAnimationFrame(tick);}
 function finishCase(){if(!CASE||CASE.done)return;CASE.done=true;const p=CASE.p,strip=$('#caseStrip');strip.style.transition='none';strip.style.transform='translateX('+(-CASE.target)+'px)';
-  const card=strip.children[48];if(card)card.classList.add('win');const T=PET_TIERS[p.t];
-  $('#caseRes').textContent=T.nom+' ! '+PET_DEF[p.k].nom+' · '+PET_TXT(p.k,p.t);$('#caseRes').style.color=T.col;$('#caseOk').hidden=false;$('#caseSkip').hidden=true;
-  sfx(p.t>=2?'relic':p.t===1?'level':'buy');burst(P.x,P.y,T.col,p.t>=2?60:30,4);if(p.t>=2)sendChat('🥚 a fait éclore un familier Épique : '+PET_DEF[p.k].nom+' !');sendPresence();}
+  const card=strip.children[48];if(card)card.classList.add('win');const T=PET_DEF[p.k];
+  $('#caseRes').textContent=T.nom+' ! '+PET_TXT(p.k,p.t);$('#caseRes').style.color=T.col;$('#caseOk').hidden=false;$('#caseSkip').hidden=true;
+  sfx('relic');burst(P.x,P.y,T.col,40,4);sendPresence();}
 function closeCase(){if(CASE&&!CASE.done){finishCase();return;}CASE=null;caseEl.hidden=true;renderPets();if(petsEl.hidden)paused=false;}
 $('#caseOk').addEventListener('click',closeCase);$('#caseSkip').addEventListener('click',finishCase);
-function renderPets(){const eggs=$('#petEggs'),list=$('#petList');eggs.textContent='';list.textContent='';
-  const card=(k,title,sub,btn,on,fn,btn2,fn2,tier)=>{const c=document.createElement('div');c.className='pcard'+(on?' on':'');if(tier!=null)c.style.borderColor=on?'':PET_TIERS[tier].col;const im=document.createElement('img');im.src=petURL(k);const b=document.createElement('b');b.textContent=title;if(tier!=null){const tg=document.createElement('span');tg.className='tier';tg.style.color=PET_TIERS[tier].col;tg.textContent=' · '+PET_TIERS[tier].nom;b.append(tg);}const sp=document.createElement('span');sp.textContent=sub;c.append(im,b,sp);
-    if(btn){const bt=document.createElement('button');bt.type='button';bt.className='act'+(on?'':' main');bt.textContent=btn;bt.onclick=fn;c.append(bt);}if(btn2){const bt=document.createElement('button');bt.type='button';bt.className='act';bt.textContent=btn2;bt.onclick=fn2;c.append(bt);}return c;};
-  let ne=0;C().inv.forEach((it,i)=>{if(!it||!KINDS[it.kind]||!KINDS[it.kind].egg)return;ne++;const k=KINDS[it.kind].egg;eggs.append(card(k,it.name,'Donne : '+PET_DEF[k].nom+' · rareté aléatoire (Commun, Rare ou Épique)','Faire éclore',false,()=>hatch(i)));});
-  if(!ne){const p=document.createElement('p');p.className='hint';p.textContent='Aucun œuf. Les œufs tombent très rarement (0,1 %) sur tous les monstres du jeu.';eggs.append(p);}
-  const pets=save.pets||[];pets.forEach(p=>{const on=p.id===save.petEq;list.append(card(p.k,PET_DEF[p.k].nom,PET_TXT(p.k,p.t)+' (au-delà du maximum)'+(on?' · te suit':' · dans le parc'),on?'Renvoyer au parc':'Équiper',on,()=>{save.petEq=on?null:p.id;persist();statsDirty=true;renderPets();sendPresence();note(on?PET_DEF[p.k].nom+' retourne au parc':PET_DEF[p.k].nom+' te suit !');},null,null,p.t||0));});
+function renderPets(){const eggs=$('#petEggs'),list=$('#petList'),evo=$('#petEvo');eggs.textContent='';list.textContent='';evo.textContent='';const home=scene==='vault',atBreeder=scene==='nexus';
+  $('#petTitle').textContent=home?'Parc des familiers':'Éleveur de familiers';
+  const card=(k,t,title,sub,btns,on)=>{const c=document.createElement('div');c.className='pcard'+(on?' on':'');if(!on)c.style.borderColor=t?PET_TIERS[t].col:'';const im=document.createElement('img');im.src=petURL(k,t);const b=document.createElement('b');b.textContent=title;
+    if(t!=null){const tg=document.createElement('span');tg.className='tier';tg.style.color=PET_TIERS[t].col;tg.textContent=' · '+PET_TIERS[t].nom;b.append(tg);}const sp=document.createElement('span');sp.textContent=sub;c.append(im,b,sp);
+    for(const [txt,fn,main,dis] of btns){const bt=document.createElement('button');bt.type='button';bt.className='act'+(main?' main':'');bt.textContent=txt;bt.disabled=!!dis;bt.onclick=fn;c.append(bt);}return c;};
+  // œufs
+  const eggIdx=[];C().inv.forEach((it,i)=>{if(it&&KINDS[it.kind]&&KINDS[it.kind].egg)eggIdx.push(i);});
+  if(eggIdx.length){const c=document.createElement('div');c.className='pcard';const im=document.createElement('img');im.src=icon(mkItem('egg',0));const b=document.createElement('b');b.textContent='Œuf de familier ×'+eggIdx.length;const sp=document.createElement('span');sp.textContent=atBreeder?'Un des 6 familiers au hasard':'Fais-les éclore chez l\'éleveur du Nexus';c.append(im,b,sp);
+    if(atBreeder){const bt=document.createElement('button');bt.type='button';bt.className='act main';bt.textContent='Faire éclore';bt.onclick=()=>hatch(eggIdx[0]);c.append(bt);}eggs.append(c);}
+  else{const p=document.createElement('p');p.className='hint';p.textContent='Aucun œuf. Les œufs tombent très rarement (0,1 %) sur tous les monstres du jeu.';eggs.append(p);}
+  // évolutions (3 identiques + 1 croquette)
+  const pets=save.pets||[],groups={};for(const p of pets){const g=p.k+':'+(p.t||0);(groups[g]=groups[g]||[]).push(p);}
+  const cro=C().inv.filter(it=>it&&it.kind==='croquette').length;let ne=0;
+  for(const g in groups){const [k,ts]=g.split(':'),t=+ts,arr=groups[g];if(arr.length<3||t>=2)continue;ne++;
+    evo.append(card(k,t+1,PET_DEF[k].nom,'3 × '+PET_TIERS[t].nom+' ('+arr.length+' en tout) + 1 croquette → '+PET_TIERS[t+1].nom+' · '+PET_TXT(k,t+1),[[home?(cro?'Faire évoluer':'Il faut une croquette (marchand)'):'Dans le parc de ta maison',()=>evolvePet(k,t),true,!home||!cro]],false));}
+  if(!ne){const p=document.createElement('p');p.className='hint';p.textContent='Réunis 3 familiers identiques (même espèce, même tier) et une croquette (marchand, 500 pièces) pour les faire évoluer.';evo.append(p);}
+  // liste
+  [...pets].sort((a,b)=>a.k.localeCompare(b.k)||(b.t||0)-(a.t||0)).forEach(p=>{const on=p.id===save.petEq;list.append(card(p.k,p.t||0,PET_DEF[p.k].nom,PET_TXT(p.k,p.t)+' (au-delà du maximum)'+(on?' · te suit':' · dans le parc'),[[on?'Renvoyer au parc':'Équiper',()=>{save.petEq=on?null:p.id;persist();statsDirty=true;renderPets();sendPresence();note(on?PET_DEF[p.k].nom+' retourne au parc':PET_DEF[p.k].nom+' te suit !');},!on]],on));});
   if(!pets.length){const p=document.createElement('p');p.className='hint';p.textContent='Tu n\'as pas encore de familier.';list.append(p);}
-  $('#petFoot').textContent=pets.length+' familier'+(pets.length>1?'s':'')+' · 1 seul équipé à la fois';}
+  $('#petFoot').textContent=pets.length+' familier'+(pets.length>1?'s':'')+' · '+cro+' croquette'+(cro>1?'s':'')+' · 1 seul équipé à la fois';}
+function evolvePet(k,t){if(scene!=='vault'||CASE)return;const pets=save.pets||[],same=pets.filter(p=>p.k===k&&(p.t||0)===t);if(same.length<3||t>=2)return;const ci=C().inv.findIndex(it=>it&&it.kind==='croquette');if(ci<0){note('Il faut une croquette (marchand du Nexus, 500 pièces)');sfx('deny');return;}
+  same.sort((a,b)=>(a.id===save.petEq)-(b.id===save.petEq));const used=same.slice(0,3),wasEq=used.some(p=>p.id===save.petEq);
+  save.pets=pets.filter(p=>!used.includes(p));C().inv[ci]=null;const np={id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),k,t:t+1};save.pets.push(np);{const cur=eqPet();if(wasEq||!cur||(cur.k===k&&(cur.t||0)<np.t))save.petEq=np.id;}
+  persist();invDirty=true;statsDirty=true;renderPets();sendPresence();
+  // petite scène d'évolution
+  const T=PET_TIERS[t+1];$('#caseTitle').textContent='Évolution : '+PET_DEF[k].nom;$('#caseBox').hidden=true;$('#caseEvo').hidden=false;$('#evoA').src=petURL(k,t);const eb=$('#evoB');eb.src=petURL(k,t+1);eb.classList.remove('pop');void eb.offsetWidth;eb.classList.add('pop');
+  $('#caseRes').textContent=T.nom+' ! '+PET_TXT(k,t+1);$('#caseRes').style.color=T.col;$('#caseOk').hidden=false;$('#caseSkip').hidden=true;caseEl.hidden=false;CASE={done:true};
+  sfx('relic');burst(P.x,P.y,T.col,60,5);if(t+1>=2)sendChat('✨ a fait évoluer un familier Épique : '+PET_DEF[k].nom+' !');}
 $('#petClose').addEventListener('click',closePets);petsEl.addEventListener('click',e=>{if(e.target===petsEl)closePets();});
 // familier qui suit le joueur (et ceux des autres joueurs)
 function petFollow(o,tx,ty,dt){if(o.px==null){o.px=tx;o.py=ty;}const k=1-Math.exp(-dt*5);o.px+=(tx-o.px)*k;o.py+=(ty-o.py)*k;}
-function petTick(dt){const pe=eqPet();if(pe){petFollow(P,P.x-(P.face||1)*0.75,P.y+0.2,dt);}
+function petTick(dt){const pe=eqPet();if(pe){const d=0.7+0.25*(pe.t||0);petFollow(P,P.x-(P.face||1)*d,P.y+0.25,dt);}
   for(const r of remotes.values())if(r.p&&typeof r.p.pe==='string'&&PET_DEF[r.p.pe])petFollow(r,r.x-(r.p.f||1)*0.75,r.y+0.2,dt);
   if(scene==='vault')parkTick(dt);}
-function drawPet(k,x,y,seed,t){t=PET_TIERS[t]?t:0;if(!PET_DEF[k])return;const s=TS*0.55,b=Math.abs(Math.sin(time*5+seed))*TS*0.08;if(t){ctx.fillStyle=PET_TIERS[t].col;ctx.globalAlpha=0.18+0.1*Math.sin(time*4+seed);ctx.beginPath();ctx.arc(sx(x),sy(y)-b,s*0.62,0,TAU);ctx.fill();ctx.globalAlpha=1;if(t>=2&&Math.random()<0.1)parts.push({x:x+rnd(-.25,.25),y:y+rnd(-.3,.1),vx:0,vy:-0.5,life:.6,col:PET_TIERS[t].col,s:.06});}ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(sx(x),sy(y)+s*0.42,s*0.3,s*0.08,0,0,TAU);ctx.fill();ctx.drawImage(petSpr(k),sx(x)-s/2,sy(y)-s/2-b,s,s);}
+function drawPet(k,x,y,seed,t){t=PET_TIERS[t]?t:0;if(!PET_DEF[k])return;const s=TS*PET_SIZE[t],b=Math.abs(Math.sin(time*5+seed))*TS*0.08;if(t){ctx.fillStyle=PET_TIERS[t].col;ctx.globalAlpha=0.18+0.1*Math.sin(time*4+seed);ctx.beginPath();ctx.arc(sx(x),sy(y)-s*0.3-b,s*0.42,0,TAU);ctx.fill();ctx.globalAlpha=1;if(t>=2&&Math.random()<0.1)parts.push({x:x+rnd(-.25,.25),y:y+rnd(-.3,.1),vx:0,vy:-0.5,life:.6,col:PET_TIERS[t].col,s:.06});}ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(sx(x),sy(y)+s*0.18,s*0.24,s*0.06,0,0,TAU);ctx.fill();ctx.drawImage(petSpr(k,t),sx(x)-s/2,sy(y)-s*0.78-b,s,s);}
 // parc : les familiers non équipés se promènent sans sortir de la clôture
 let parkPets=[];
 function parkTick(dt){const want=(save.pets||[]).filter(p=>p.id!==save.petEq);parkPets=parkPets.filter(q=>want.some(p=>p.id===q.id));
@@ -2595,7 +2634,7 @@ function renderItems(){const box=$('#itGrid');if(box.childElementCount)return;
       b.onclick=()=>{if(admGiveTo){const it2=mkItem(k,t);devSend(admGiveTo,'item',it2);return;}const f=freeInv();if(f<0){note('Sac à dos plein');sfx('deny');return;}C().inv[f]=mkItem(k,t);invDirty=true;persist();sfx('item');$('#devMsg').textContent=it.name+' ajouté au sac';};d.append(b);}
     r.append(l,d);box.append(r);};
   for(const k of kinds){const K=KINDS[k];row(K.type+(K.cls&&K.slot!=='anneau'?' · '+K.cls.map(c=>CLASSES[c].nom).join(', '):''),[0,1,2,3,4,5,6,7].map(t=>[k,t]));}
-  row('Consommables',Object.keys(KINDS).filter(k=>KINDS[k].slot==='conso').map(k=>[k,0]));}
+  row('Consommables',Object.keys(KINDS).filter(k=>KINDS[k].slot==='conso'&&!KINDS[k].legacy).map(k=>[k,0]));}
 /* ================= échanges entre joueurs ================= */
 // Le serveur relaie les messages ; chaque navigateur vérifie les objets reçus et fait l'échange quand les deux ont validé la même offre.
 const TRADE_R=6;
@@ -2739,7 +2778,7 @@ const curWin=$('#curWin');
 function renderOpts(){
   $('#volMus').value=Math.round(opts.mus*100);$('#volMusV').textContent=Math.round(opts.mus*100)+' %';
   $('#volSfx').value=Math.round(opts.sfx*100);$('#volSfxV').textContent=Math.round(opts.sfx*100)+' %';
-  $('#muteAll').checked=!!opts.mute;
+  $('#muteAll').checked=!!opts.mute;$('#hidePets').checked=!!opts.hidePets;
   const pi=cursorImg(opts.cursor,32);$('#curPrev').src=pi?pi.toDataURL():'';$('#curPrev').style.visibility=pi?'visible':'hidden';
 }
 function renderCurWin(){
@@ -2764,6 +2803,7 @@ $('#volMus').addEventListener('input',e=>{opts.mus=+e.target.value/100;$('#volMu
 $('#volSfx').addEventListener('input',e=>{opts.sfx=+e.target.value/100;$('#volSfxV').textContent=e.target.value+' %';applyVol();saveOpts();});
 $('#volSfx').addEventListener('change',()=>sfx('coin'));
 $('#muteAll').addEventListener('change',e=>{opts.mute=e.target.checked;applyVol();saveOpts();});
+$('#hidePets').addEventListener('change',e=>{opts.hidePets=e.target.checked;saveOpts();});
 $('#curList').addEventListener('click',e=>{const b=e.target.closest('[data-cur]');if(!b)return;opts.cursor=b.dataset.cur;applyCursor();saveOpts();renderCurWin();});
 $('#curSw').addEventListener('click',e=>{const b=e.target.closest('[data-col]');if(b)setCurCol(b.dataset.col);});
 $('#curCol').addEventListener('input',e=>{opts.ccol=e.target.value;$('#curColV').textContent=e.target.value;applyCursor();saveOpts();});
@@ -3852,7 +3892,7 @@ function render(){
       if(P.bubble)bubble(P.bubble.t,P.x,P.y);
     }else if(e.o){
       const r=e.o,p=r.p;
-      if(typeof p.pe==='string'&&PET_DEF[p.pe]&&r.px!=null&&!p.iv)drawPet(p.pe,r.px,r.py,r.x,clamp(num(p.pt,0)|0,0,3));
+      if(!opts.hidePets&&typeof p.pe==='string'&&PET_DEF[p.pe]&&r.px!=null&&!p.iv)drawPet(p.pe,r.px,r.py,r.x,clamp(num(p.pt,0)|0,0,3));
       if(p.b){ctx.fillStyle='rgba(255,120,40,.25)';ctx.beginPath();ctx.arc(sx(r.x),sy(r.y),TS*0.7,0,TAU);ctx.fill();}
       drawHero(p.c,typeof p.sk==='string'&&SKINS[p.c]&&SKINS[p.c][p.sk]?p.sk:null,r.x,r.y,p.f,0,p.mv?Math.abs(Math.sin(r.walk))*TS*0.05:Math.sin(time*2.4+r.x)*TS*0.015,WB[p.w]?p.w:null,num(p.wt,0),typeof p.sh==='number'&&!safe()?p.sh/100:null,r.thrust||0,!!p.mv,r.walk,p.iv?0.3:1,parseAura(p.au),typeof p.mo==='string'&&MON[p.mo]?p.mo:null);
       drawBar(r.x,r.y+0.55,TS*0.8,num(p.hp,100)/100,'#4fb8e8');
