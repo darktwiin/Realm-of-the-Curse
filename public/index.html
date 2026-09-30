@@ -2432,12 +2432,12 @@ function petFollow(o,tx,ty,dt){if(o.px==null){o.px=tx;o.py=ty;}const k=1-Math.ex
 function petTick(dt){const pe=eqPet();if(pe){petFollow(P,P.x-(P.face||1)*0.75,P.y+0.2,dt);}
   for(const r of remotes.values())if(r.p&&typeof r.p.pe==='string'&&PET_DEF[r.p.pe])petFollow(r,r.x-(r.p.f||1)*0.75,r.y+0.2,dt);
   if(scene==='vault')parkTick(dt);}
-function drawPet(k,x,y,seed,t){const s=TS*0.55,b=Math.abs(Math.sin(time*5+seed))*TS*0.08;if(t){ctx.fillStyle=PET_TIERS[t].col;ctx.globalAlpha=0.18+0.1*Math.sin(time*4+seed);ctx.beginPath();ctx.arc(sx(x),sy(y)-b,s*0.62,0,TAU);ctx.fill();ctx.globalAlpha=1;if(t>=2&&Math.random()<0.1)parts.push({x:x+rnd(-.25,.25),y:y+rnd(-.3,.1),vx:0,vy:-0.5,life:.6,col:PET_TIERS[t].col,s:.06});}ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(sx(x),sy(y)+s*0.42,s*0.3,s*0.08,0,0,TAU);ctx.fill();ctx.drawImage(petSpr(k),sx(x)-s/2,sy(y)-s/2-b,s,s);}
+function drawPet(k,x,y,seed,t){t=PET_TIERS[t]?t:0;if(!PET_DEF[k])return;const s=TS*0.55,b=Math.abs(Math.sin(time*5+seed))*TS*0.08;if(t){ctx.fillStyle=PET_TIERS[t].col;ctx.globalAlpha=0.18+0.1*Math.sin(time*4+seed);ctx.beginPath();ctx.arc(sx(x),sy(y)-b,s*0.62,0,TAU);ctx.fill();ctx.globalAlpha=1;if(t>=2&&Math.random()<0.1)parts.push({x:x+rnd(-.25,.25),y:y+rnd(-.3,.1),vx:0,vy:-0.5,life:.6,col:PET_TIERS[t].col,s:.06});}ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(sx(x),sy(y)+s*0.42,s*0.3,s*0.08,0,0,TAU);ctx.fill();ctx.drawImage(petSpr(k),sx(x)-s/2,sy(y)-s/2-b,s,s);}
 // parc : les familiers non équipés se promènent sans sortir de la clôture
 let parkPets=[];
 function parkTick(dt){const want=(save.pets||[]).filter(p=>p.id!==save.petEq);parkPets=parkPets.filter(q=>want.some(p=>p.id===q.id));
-  for(const p of want)if(!parkPets.some(q=>q.id===p.id))parkPets.push({id:p.id,k:p.k,t:p.t||0,x:rnd(PARK.x0+.5,PARK.x1+.5),y:rnd(PARK.y0+.5,PARK.y1+.5),tx:0,ty:0,t:0});
-  for(const q of parkPets){q.t-=dt;if(q.t<=0){q.t=rnd(1.5,4);q.tx=rnd(PARK.x0+.4,PARK.x1+.6);q.ty=rnd(PARK.y0+.4,PARK.y1+.6);}const dx=q.tx-q.x,dy=q.ty-q.y,d=Math.hypot(dx,dy);if(d>0.05){const sp=Math.min(d,1.3*dt);q.x+=dx/d*sp;q.y+=dy/d*sp;}
+  for(const p of want)if(!parkPets.some(q=>q.id===p.id))parkPets.push({id:p.id,k:p.k,t:p.t||0,x:rnd(PARK.x0+.5,PARK.x1+.5),y:rnd(PARK.y0+.5,PARK.y1+.5),tx:0,ty:0,wt:0});
+  for(const q of parkPets){q.wt-=dt;if(q.wt<=0){q.wt=rnd(1.5,4);q.tx=rnd(PARK.x0+.4,PARK.x1+.6);q.ty=rnd(PARK.y0+.4,PARK.y1+.6);}const dx=q.tx-q.x,dy=q.ty-q.y,d=Math.hypot(dx,dy);if(d>0.05){const sp=Math.min(d,1.3*dt);q.x+=dx/d*sp;q.y+=dy/d*sp;}
     q.x=clamp(q.x,PARK.x0+.3,PARK.x1+.7);q.y=clamp(q.y,PARK.y0+.3,PARK.y1+.7);}}
 function drawParkPets(){for(const q of parkPets)drawPet(q.k,q.x,q.y,q.x,q.t);}
 // décoration de la maison
