@@ -102,6 +102,101 @@ function filtrer(txt) {
   });
 }
 
+// ---- Guildes : sauvegardées dans guildes.json (effacé au redémarrage sur Render gratuit, comme le classement) ----
+const FICHIER_GUILDES = path.join(__dirname, 'guildes.json');
+let guildes = {};
+try { guildes = JSON.parse(fs.readFileSync(FICHIER_GUILDES, 'utf8')) || {}; } catch { guildes = {}; }
+let guildesModif = false;
+setInterval(() => { if (!guildesModif) return; guildesModif = false; fs.writeFile(FICHIER_GUILDES, JSON.stringify(guildes), () => {}); }, 5000);
+const invitesGuilde = new Map(); // peer invité -> { gid, t }
+const semaine = () => Math.floor((Date.now() / 86400000 + 3) / 7); // change chaque lundi
+const raidMax = g => Math.round(1000000 * Math.pow(1.3, (g.niv || 1) - 1));
+function raidEtat(g) { const w = semaine(); if (!g.raid || g.raid.w !== w) g.raid = { w, pv: raidMax(g), max: raidMax(g), contrib: {}, fini: false, recu: {} }; return g.raid; }
+const cle = pid => cyrb53('m' + pid).slice(0, 8);
+function guildeDe(pid) { for (const [gid, g] of Object.entries(guildes)) if (g.membres[pid]) return [gid, g]; return [null, null]; }
+function vueGuilde(gid, g, pid) {
+  const r = raidEtat(g);
+  return { id: gid, nom: g.nom, tag: g.tag, niv: g.niv || 1, chef: g.chef === pid,
+    membres: Object.entries(g.membres).map(([id, m]) => ({ k: cle(id), n: m.n, c: m.c, l: m.l, chef: id === g.chef, moi: id === pid, dmg: r.contrib[id] || 0 })),
+    raid: { pv: r.pv, max: r.max, fini: r.fini, recu: !!r.recu[pid], part: r.contrib[pid] || 0, total: Object.values(r.contrib).reduce((a, b) => a + b, 0) } };
+}
+function socketsDe(pids) { const out = []; for (const s of salles.values()) for (const j of s.values()) if (j.idJoueur && pids.includes(j.idJoueur)) out.push(j); return out; }
+const derniereDiffusion = new Map();
+function diffuserGuilde(gid, force) {
+  const g = guildes[gid]; if (!g) return;
+  const now = Date.now(); if (!force && now - (derniereDiffusion.get(gid) || 0) < 900) { if (!derniereDiffusion.has('p' + gid)) { derniereDiffusion.set('p' + gid, 1); setTimeout(() => { derniereDiffusion.delete('p' + gid); diffuserGuilde(gid, true); }, 950); } return; }
+  derniereDiffusion.set(gid, now);
+  for (const j of socketsDe(Object.keys(g.membres))) envoyer(j.ws, { t: 'g', a: 'info', g: vueGuilde(gid, g, j.idJoueur) });
+}
+function actionGuilde(moi, salle, m) {
+  const pid = String(m.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 24);
+  if (pid.length < 8) return;
+  moi.idJoueur = pid;
+  const rep = (o) => envoyer(moi.ws, Object.assign({ t: 'g' }, o));
+  const [gid, g] = guildeDe(pid);
+  const infosMembre = () => ({ n: filtrer(String(m.n || 'Joueur').replace(/[\u0000-\u001f]/g, '')).slice(0, 16) || 'Joueur', c: String(m.c || '').slice(0, 12), l: Math.max(1, Math.min(20, Math.floor(Number(m.l) || 1))) });
+  const a = String(m.a || '');
+  if (a === 'info') { if (g) { g.membres[pid] = infosMembre(); guildesModif = true; rep({ a: 'info', g: vueGuilde(gid, g, pid) }); } else rep({ a: 'info', g: null }); return; }
+  if (a === 'create') {
+    if (g) { rep({ a: 'err', msg: 'Tu es déjà dans une guilde' }); return; }
+    const nom = filtrer(String(m.nom || '').replace(/[^\p{L}\p{N} '\-]/gu, '').trim()).slice(0, 20);
+    const tag = String(m.tag || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    if (nom.length < 3 || tag.length < 2) { rep({ a: 'err', msg: 'Nom (3 à 20 caractères) et tag (2 à 4 lettres) obligatoires' }); return; }
+    if (nom.includes('*') || filtrer(tag).includes('*')) { rep({ a: 'err', msg: 'Ce nom n\'est pas autorisé' }); return; }
+    if (Object.values(guildes).some(x => x.nom.toLowerCase() === nom.toLowerCase() || x.tag === tag)) { rep({ a: 'err', msg: 'Ce nom ou ce tag est déjà pris' }); return; }
+    const id = crypto.randomBytes(5).toString('hex');
+    guildes[id] = { nom, tag, chef: pid, niv: 1, membres: { [pid]: infosMembre() }, cree: Date.now() };
+    guildesModif = true; rep({ a: 'created' }); diffuserGuilde(id, true); return;
+  }
+  if (a === 'invite') {
+    if (!g) return;
+    const cible = salle.get(String(m.to || ''));
+    if (!cible || cible === moi) return;
+    if (Object.keys(g.membres).length >= 20) { rep({ a: 'err', msg: 'Guilde complète (20 membres)' }); return; }
+    invitesGuilde.set(cible.peer, { gid, t: Date.now() });
+    envoyer(cible.ws, { t: 'g', a: 'invite', gid, nom: g.nom, tag: g.tag, from: moi.peer });
+    rep({ a: 'ok', msg: 'Invitation de guilde envoyée' }); return;
+  }
+  if (a === 'join') {
+    if (g) { rep({ a: 'err', msg: 'Quitte d\'abord ta guilde actuelle' }); return; }
+    const inv = invitesGuilde.get(moi.peer), cg = guildes[String(m.gid || '')];
+    if (!inv || inv.gid !== String(m.gid || '') || Date.now() - inv.t > 120000 || !cg) { rep({ a: 'err', msg: 'Invitation expirée' }); return; }
+    if (Object.keys(cg.membres).length >= 20) { rep({ a: 'err', msg: 'Guilde complète' }); return; }
+    invitesGuilde.delete(moi.peer); cg.membres[pid] = infosMembre(); guildesModif = true; diffuserGuilde(inv.gid, true); return;
+  }
+  if (!g) return;
+  if (a === 'leave') {
+    delete g.membres[pid];
+    if (!Object.keys(g.membres).length) delete guildes[gid];
+    else { if (g.chef === pid) g.chef = Object.keys(g.membres)[0]; diffuserGuilde(gid, true); }
+    guildesModif = true; rep({ a: 'info', g: null }); return;
+  }
+  if (a === 'kick') {
+    if (g.chef !== pid) return;
+    const cible = Object.keys(g.membres).find(id => cle(id) === String(m.k || ''));
+    if (!cible || cible === pid) return;
+    delete g.membres[cible]; guildesModif = true;
+    for (const j of socketsDe([cible])) envoyer(j.ws, { t: 'g', a: 'info', g: null, msg: 'Tu as été exclu de la guilde' });
+    diffuserGuilde(gid, true); return;
+  }
+  if (a === 'raid') {
+    const r = raidEtat(g); if (r.fini) return;
+    const dmg = Math.max(0, Math.min(40000, Math.floor(Number(m.dmg) || 0))); if (!dmg) return;
+    r.pv = Math.max(0, r.pv - dmg); r.contrib[pid] = (r.contrib[pid] || 0) + dmg; guildesModif = true;
+    if (r.pv <= 0) {
+      r.fini = true; g.niv = (g.niv || 1) + 1;
+      for (const j of socketsDe(Object.keys(g.membres))) envoyer(j.ws, { t: 'g', a: 'raidwin', niv: g.niv });
+      diffuserGuilde(gid, true);
+    } else diffuserGuilde(gid);
+    return;
+  }
+  if (a === 'claim') {
+    const r = raidEtat(g);
+    if (!r.fini || !r.contrib[pid] || r.recu[pid]) { rep({ a: 'err', msg: r.recu[pid] ? 'Récompense déjà récupérée' : 'Rien à récupérer pour le moment' }); return; }
+    r.recu[pid] = true; guildesModif = true; rep({ a: 'reward', niv: g.niv || 1 }); diffuserGuilde(gid, true); return;
+  }
+}
+
 function envoyer(ws, msg) {
   if (ws.readyState === 1) ws.send(JSON.stringify(msg));
 }
@@ -136,6 +231,7 @@ wss.on('connection', (ws, req) => {
     try { m = JSON.parse(data); } catch { return; }
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
+    if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {
       const cible = salle.get(String(m.to || ''));

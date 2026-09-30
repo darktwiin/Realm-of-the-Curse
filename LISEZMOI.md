@@ -93,6 +93,13 @@ Les nouveaux joueurs commencent par un tutoriel. On peut le refaire avec `/tuto`
 
 Quand un joueur est à moins de 6 cases, un bouton « ⇄ Échanger » apparaît à côté de son nom dans la liste des joueurs (ou tape `/echange pseudo` dans le chat). Il reçoit la proposition sur la droite de l'écran. S'il accepte, une fenêtre s'ouvre : chacun choisit jusqu'à 8 objets, puis les deux valident. Changer son offre annule les validations.
 
+## Arène et duels
+
+À côté du nom d'un joueur proche : ⇄ pour échanger, ⚔ pour le défier en duel (ou `/duel pseudo`). S'il accepte, vous êtes envoyés dans l'arène et choisissez tous les deux le type de duel :
+- **Duel entre amis** : le perdant ne perd rien, on peut relancer ou quitter l'arène.
+- **Duel à mort** (double confirmation) : le perdant perd son héros (remis à zéro, avec le prestige habituel), le gagnant reçoit une **pièce de sang**.
+Pendant le combat, on ne peut pas quitter l'arène (R bloqué).
+
 ## Donjons
 
 Les monstres des deux dernières zones (Terres brûlées et Terres du Dieu Fou) peuvent laisser un portail de donjon pendant 60 secondes. Le type est tiré au hasard :
@@ -111,7 +118,8 @@ Mode admin : tape `/admin` suivi du mot de passe dans le chat (`/admin off` pour
 - **Joueurs** : recherche par pseudo, se téléporter sur le joueur ou l'amener à soi (y compris dans la salle d'essai), GOD, Cursite, donner un objet, rendre muet, expulser, bannir l'adresse IP.
 - **Bannis** : liste des bannis, avec un bouton pour débannir.
 - **Objets** : tous les objets du jeu, un clic pour l'avoir dans ton sac.
-- **Monstres** : tous les monstres avec leur image, bouton Spawn pour les faire apparaître à côté de toi.
+- **Monstres** : tous les monstres avec leur image, bouton Spawn pour les faire apparaître à côté de toi, bouton Apparence pour prendre leur sprite.
+- **✨ Fête** (bouton doré) : flashs, musique rigolote et clones de toi chez un joueur pendant quelques secondes.
 - **Tuer les joueurs à l'écran** (onglet Moi) : double-clic puis confirmation.
 - **Filtre** : les mots remplacés par des étoiles dans le chat et les pseudos.
 
