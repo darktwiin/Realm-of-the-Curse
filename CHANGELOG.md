@@ -1,5 +1,12 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.8 (server.js modifié)
+- Le Dragon baisse et secoue la tête quand il attaque.
+- Nouvelle musique du Dragon, plus posée et orchestrale (taikos, gong, chœurs, cor).
+- La lave se traverse mais brûle ; au-delà, une corniche de roche permet de souffler.
+- Combat du raid ramené à 5 minutes.
+- Projectiles du Dragon en forme de flammes animées, éruptions de feu à la place des éclairs.
+
 ## ver.0.0.7 (server.js modifié)
 - Nouveau Dragon de Guilde : grand dragon rouge aux ailes battantes, gueule qui crache le feu quand il attaque.
 - Le portail s'ouvre au lancement du raid, le Dragon arrive 30 secondes plus tard : grondements, écran qui tremble, rugissement et flash à son apparition.

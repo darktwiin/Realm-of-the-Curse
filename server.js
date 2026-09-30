@@ -111,7 +111,7 @@ setInterval(() => { if (!guildesModif) return; guildesModif = false; fs.writeFil
 const invitesGuilde = new Map(); // peer invité -> { gid, t }
 // ---- Raid de guilde : le Dragon apparaît 10 minutes (lancé par un admin), il est invulnérable et compte les dégâts de chaque guilde ----
 const FICHIER_RAID = path.join(__dirname, 'raid.json');
-const RAID_DUREE = 10 * 60 * 1000, RAID_ATTENTE = 30 * 1000; // le portail s'ouvre, le Dragon arrive 30 s plus tard
+const RAID_DUREE = 5 * 60 * 1000, RAID_ATTENTE = 30 * 1000; // le portail s'ouvre, le Dragon arrive 30 s plus tard
 let raidEv = null; // { id, actif, fin, g: { gid: { dmg, c: { pid: dmg } } }, res: [...], recu: { pid: true } }
 try { raidEv = JSON.parse(fs.readFileSync(FICHIER_RAID, 'utf8')); } catch { raidEv = null; }
 const sauverRaid = () => fs.writeFile(FICHIER_RAID, JSON.stringify(raidEv), () => {});
@@ -283,7 +283,7 @@ wss.on('connection', (ws, req) => {
       const cmd = String(m.cmd || '');
       if (cmd === 'bans') { res(true, '', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); return; }
       if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
-      if (cmd === 'raid') { lancerRaid(); res(true, 'Raid lancé : portail ouvert, le Dragon arrive dans 30 secondes (10 minutes de combat)'); console.log('[raid] lancé'); return; }
+      if (cmd === 'raid') { lancerRaid(); res(true, 'Raid lancé : portail ouvert, le Dragon arrive dans 30 secondes (5 minutes de combat)'); console.log('[raid] lancé'); return; }
       if (cmd === 'raidstop') { if (!raidEv || !raidEv.actif) { res(false, 'Aucun raid en cours'); return; } finirRaid(); res(true, 'Raid terminé, classement envoyé'); return; }
       if (cmd === 'infos') { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push({ peer: j.peer, muet: !!modo.mutes[j.ip] }); res(true, '', { infos: out }); return; }
       const cible = trouverJoueur(String(m.to || ''));
