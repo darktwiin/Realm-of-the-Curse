@@ -224,7 +224,8 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .qrow.done{border-color:#7ed957}.qrow.got{opacity:.55}.qrow img{width:44px;height:44px;image-rendering:pixelated;object-fit:contain}.qrow b{display:block}.qrow .qbar{height:10px;background:#0b0a12;border:1px solid var(--line);margin-top:4px;position:relative}.qrow .qbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#9be86d,#4e9e2e)}
 .qrow .qr{font-size:12px;color:var(--muted)}.qicon{width:44px;height:44px;display:grid;place-items:center;font-size:26px}
 .pets-inner{max-width:680px}
-.guild-inner{max-width:640px}.gform{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:10px 0}.gform input{background:#0b0a12;border:2px solid var(--line2);color:#f4f1e8;font:inherit;padding:6px}
+.guild-inner{max-width:640px}
+#raidRes{z-index:9}.rrlist{display:flex;flex-direction:column;gap:4px;margin:10px 0}.rrrow{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;background:var(--panel2);border:2px solid var(--line);padding:8px}.rrrow.moi{border-color:var(--gold)}.rrrow b{font-size:20px;text-align:center}.rrrow em{color:#ffd23f;font-style:normal}.gform{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:10px 0}.gform input{background:#0b0a12;border:2px solid var(--line2);color:#f4f1e8;font:inherit;padding:6px}
 .graid{background:var(--panel2);border:2px solid var(--line);padding:10px;margin:8px 0}.graid .bar{height:18px;background:#0b0a12;border:1px solid var(--line);position:relative;margin:6px 0}.graid .bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(#ffe27a,#c9860a)}
 .glist{display:flex;flex-direction:column;gap:3px;max-height:260px;overflow:auto}.grow{display:grid;grid-template-columns:28px 1fr auto auto;gap:8px;align-items:center;background:var(--panel2);border:1px solid var(--line);padding:4px 8px}.grow img{width:24px;height:24px;image-rendering:pixelated}.grow.moi{border-color:var(--gold)}.grow em{color:#ffd23f;font-style:normal;font-size:12px}.grow button{font-size:11px;padding:2px 6px}
 .fish-inner{max-width:720px}.ftabs{margin:6px 0}.ftabs button.on{border-color:var(--gold);color:var(--gold)}.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin:6px 0}
@@ -345,7 +346,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.5"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.6"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Nexus</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -359,7 +360,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.5</div>
+    <div class="verTag" id="verTag">ver.0.0.6</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -378,7 +379,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <h2>Administration</h2>
         <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="monstres">Monstres</button><button type="button" data-at="filtre">Filtre</button></div>
         <div class="admpane" data-ap="moi">
-          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Nexus)</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
+          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Nexus)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (10 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
           <div class="killbox" id="killBox" hidden><b id="killTxt"></b><span class="acts"><button type="button" class="act danger" id="killYes">Oui, je confirme</button><button type="button" class="act" id="killNo">Annuler</button></span></div>
           <p class="hint">Invisible : les monstres t'ignorent et les autres joueurs ne te voient plus (ni sur la carte, ni dans la liste).</p>
           <p class="hint">GOD : invulnérable. Clic droit dans le jeu ou clic sur la mini-carte pour te téléporter.</p>
@@ -472,6 +473,14 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="shop-foot"><span class="hint" id="gdFoot"></span><button type="button" class="act" id="gdClose">Fermer · Échap</button></div>
       </div>
     </div>
+    <div class="overlay" id="raidRes" hidden>
+      <div class="shop-inner" role="dialog" aria-label="Classement du raid">
+        <h2>🐉 Classement du raid de guilde</h2>
+        <div class="rrlist" id="rrList"></div>
+        <p class="hint" id="rrMine"></p>
+        <div class="shop-foot"><button type="button" class="act main" id="rrClaim">Récupérer ma récompense</button><button type="button" class="act" id="rrClose">Fermer · Échap</button></div>
+      </div>
+    </div>
     <div class="overlay" id="kicked" hidden><div class="shop-inner" role="alertdialog"><h2 id="kickT">Déconnecté</h2><p id="kickS"></p></div></div>
     <div class="overlay" id="opts" hidden>
       <div class="shop-inner opts" role="dialog" aria-label="Options">
@@ -483,7 +492,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.5</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.6</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -524,7 +533,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.5</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.6</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -965,11 +974,15 @@ const MON={
   g_lion:{nom:'Gardien du Lion',hp:48000,xp:1500,spd:2.2,dmg:66,cd:0.7,pat:'lion',bs:6,br:9,sz:2,loot:[5,6],drop:1,n:2,pref:4,bc:'#ffb04a',boss:true,star:3,or:[1,8,12],rel:1/40,ai:2},
   devoreur:{nom:"Le Dévoreur d'Étoiles",hp:150000,xp:8000,spd:1.2,dmg:76,cd:0.45,pat:'devoreur',bs:5.5,br:11,sz:3,loot:[6,6],drop:1,n:4,pref:6,bc:'#ffd23f',boss:true,or:[1,40,60],rel:1/8,ai:2}
 };
-MON.titan={nom:'Titan de la Guilde',hp:1000000,xp:2500,spd:0.7,dmg:70,cd:0.55,pat:'colosse',bs:5,br:10,sz:3,loot:[5,6],drop:1,n:3,pref:5,bc:'#ffd23f',boss:true,or:[1,20,35],rel:1/40};
-{const mix=(a,b,k)=>{const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join('');};
-  const [rows,pal]=MON_SPR.colosse;const np={};for(const c in pal)np[c]=/^#[0-9a-f]{6}$/i.test(pal[c])?mix(pal[c],'#ffd23f',0.45):pal[c];MON_SPR.titan=[rows,np];}
+MON.dragon={nom:'Dragon de Guilde',hp:5000000,xp:0,spd:0.35,dmg:80,cd:1.15,pat:'dragon',bs:5.5,br:16,sz:6,loot:[0,0],drop:0,pref:7,bc:'#ff7a1a',boss:true,pw:true};
+const DRAGON_ROWS=[
+  ['................','.K............K.','.KK..W....W..KK.','.KKK.RRRRRR.KKK.','.KKKRRYRRYRRKKK.','KKKKRRRRRRRRKKKK','KKK.RRWRRWRR.KKK','KK..RRRRRRRR..KK','K...RROOOORR...K','....RROOOORR....','...RRROOOORRR...','...RR.ROOR.RR...','..RR..RRRR..RR..','..R...R..R...R..','.....RR..RR.....','................'],
+  ['K..............K','KK...W....W...KK','KKK..RRRRRR..KKK','.KKKRRYRRYRRKKK.','..KKRRRRRRRRKK..','...KRRKKKKRRK...','....RRKFFKRR....','....RRRFFRRR....','....RROOOORR....','....RROOOORR....','...RRROOOORRR...','...RR.ROOR.RR...','..RR..RRRR..RR..','..R...R..R...R..','.....RR..RR.....','................']];
+const DRAGON_PAL={R:'#b0202a',O:'#ff9a3c',Y:'#ffd23f',W:'#f4f1e8',K:'#5a1024',F:'#fff0a0'};
+MON_SPR.dragon=[DRAGON_ROWS[0],DRAGON_PAL];
 const MKEYS=Object.keys(MON);
 const MSPR={};for(const k in MON)MSPR[k]=makeSprite(MON_SPR[k][0],MON_SPR[k][1],6);
+const DRAGON_SPR=DRAGON_ROWS.map(r=>makeSprite(r,DRAGON_PAL,6));
 const ZONES=[
   {nom:'Plage des Naufragés',niv:'Niveaux 1 à 3',r:[98,200],pool:['slime','gobelin','crabe','mouette'],col:['#d6c089','#cfb87f','#c9b176'],det:'#b39a62',deco:[0.015,1]},
   {nom:"Plaines d'Émeraude",niv:'Niveaux 3 à 6',r:[86,98],pool:['gobelin','squelette','loup','champignon'],col:['#5d8c3c','#578535','#62923f'],det:'#86b35a',deco:[0.04,2]},
@@ -1235,7 +1248,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000005;let newerWarned=false;
+const NETV=2,BUILD=2600000006;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1338,7 +1351,7 @@ function onPeers(peers){
 function parseHits(s){const out=[];for(const e of s.split(';')){const [a,b]=e.split(':');const id=parseInt(a,36),t=parseInt(b,36);if(id>0&&t>0)out.push([id,t]);}return out.slice(0,60);}
 function applyHits(peer,s){
   let mp=applied.get(peer);if(!mp){mp=new Map();applied.set(peer,mp);}
-  for(const [id,tot] of parseHits(s)){const prev=mp.get(id)||0;if(tot<=prev)continue;mp.set(id,tot);const m=monsters.find(q=>q.id===id);if(!m||m.hp<=0)continue;m.hp-=Math.min(tot-prev,200000);if(m.key==='titan'&&m.hp<1&&!raidWon())m.hp=1;m.flash=0.1;if(m.hp<=0)hostKill(m);}
+  for(const [id,tot] of parseHits(s)){const prev=mp.get(id)||0;if(tot<=prev)continue;mp.set(id,tot);const m=monsters.find(q=>q.id===id);if(!m||m.hp<=0)continue;m.hp-=Math.min(tot-prev,200000);if(m.key==='dragon')m.hp=m.max;m.flash=0.1;if(m.hp<=0)hostKill(m);}
 }
 function deadBits(){const n=MAP.nInit|0,alive=new Set();for(const m of monsters)if(m.hp>0&&m.id<=n)alive.add(m.id);let out='';for(let i=1;i<=n;i+=4){let v=0;for(let j=0;j<4;j++)if(i+j<=n&&!alive.has(i+j))v|=1<<j;out+=v.toString(16);}return out;}
 let lastHostX=null;
@@ -1826,7 +1839,7 @@ function comteBurst(m){for(let i=0;i<26;i++)shoot(m,i*TAU/26,{bs:6.5,col:'#ff3b4
   burst(m.x,m.y,'#ff3b4a',40,5);if(Math.hypot(P.x-m.x,P.y-m.y)<18)sfx('boss',0.7);vfx.push({k:'boom',x:m.x,y:m.y,r:2.5,t:0,life:0.4,col:'#ff3b4a'});}
 function hitMon(m,dmg,col){
   if(m.hp<=0||m.pend)return;if(m.vuln>time)dmg=Math.round(dmg*1.5);
-  m.hp-=dmg;if(m.key==='titan'){raidAcc+=dmg;if(m.hp<1&&!raidWon())m.hp=1;}m.flash=0.1;ft(m.x+rnd(-.2,.2),m.y-m.d.sz*0.5,String(dmg),col||'#ffffff');if(m.key==='mannequin'){m.lastHit=time;if(m.hp<1)m.hp=1;}
+  m.hp-=dmg;if(m.key==='dragon'){raidAcc+=dmg;m.hp=m.max;}m.flash=0.1;ft(m.x+rnd(-.2,.2),m.y-m.d.sz*0.5,String(dmg),col||'#ffffff');if(m.key==='mannequin'){m.lastHit=time;if(m.hp<1)m.hp=1;}
   const rec=dmgTot.get(m.id)||{tot:0,t:0};rec.tot+=dmg;rec.t=time;dmgTot.set(m.id,rec);
   if(m.hp<=0){if(amHost)hostKill(m);else m.pend=time;}
 }
@@ -1894,6 +1907,15 @@ function shoot(m,a,o){
   eb.push({x:m.x,y:m.y,bx:m.x,by:m.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:o.life?o.life*1.15:br/sp,dmg:o.dmg||d.dmg,r:o.r||(d.boss?0.24:0.16),col:o.col||d.bc,src:d.nom,pw:o.pw!=null?o.pw:!!d.pw,bolt:!!d.bolt,wave:o.wave||0,wf:o.wf||7,hom:o.hom||0,dec:o.dec||0,t:0});
 }
 const PAT={
+  dragon:(m,a,tg)=>{m.phase=(m.phase||0)+1;m.atkT=time;const ph=m.phase%4,o={pw:true};
+    if(ph===1){ // souffle de feu en éventail, avec trois trous pour passer
+      const gaps=[rnd(-8,-4),rnd(-2,2),rnd(4,8)].map(Math.round);for(let i=-11;i<=11;i++){if(gaps.some(g=>Math.abs(i-g)<=0))continue;shoot(m,a+i*0.085,{pw:true,bs:6.5,r:0.32,col:'#ff7a1a',life:3});}}
+    else if(ph===2){ // anneau qui s'élargit, une grande brèche à trouver
+      const gap=Math.random()*TAU;for(let i=0;i<36;i++){const an=i*TAU/36;if(Math.abs(((an-gap+Math.PI*3)%TAU)-Math.PI)<0.5)continue;shoot(m,an,{pw:true,bs:4.2,r:0.3,col:'#ff4a2a',life:4.5});}}
+    else if(ph===3){ // pluie de météores : zones marquées au sol, il faut en sortir
+      if(Math.hypot(P.x-m.x,P.y-m.y)<22){strikes.push({x:P.x+(P.vx||0)*0.7,y:P.y+(P.vy||0)*0.7,t:1.2,r:1.6,dmg:m.d.dmg,src:m.d.nom});for(let k=0;k<5;k++)strikes.push({x:P.x+rnd(-5,5),y:P.y+rnd(-5,5),t:1.2+k*0.18,r:1.6,dmg:m.d.dmg,src:m.d.nom});}}
+    else{ // double spirale
+      for(let arm=0;arm<3;arm++)for(let i=0;i<9;i++)shoot(m,a+arm*TAU/3+i*0.22,{pw:true,bs:3.2+i*0.45,r:0.26,col:'#ffd23f',life:4.5});}},
   single:(m,a)=>shoot(m,a),
   none:()=>{},
   tuteur:(m,a)=>{for(let i=-1;i<=1;i++)shoot(m,a+i*0.35,{bs:3.2});},
@@ -2592,28 +2614,42 @@ document.addEventListener('mousedown',e=>{if(!pmEl.hidden&&!pmEl.contains(e.targ
 var GUILD=null,gInvite=null,raidAcc=0,raidSendT=0,gReqT=0;
 function gMsg(a){const ch=C();return {t:'g',a,id:PID,n:pseudo,c:save.current||'',l:ch?ch.lvl:1};}
 function guildReq(){if(room&&room.raw)room.raw(gMsg('info'));}
-function raidWon(){return !!(GUILD&&GUILD.raid&&GUILD.raid.fini);}
+function raidOn(){return !!(RAIDEV.fin&&Date.now()<RAIDEV.fin);}
+var RAIDEV={fin:0};
+function raidLeft(){const t=Math.max(0,RAIDEV.fin-Date.now());return Math.floor(t/60000)+':'+String(Math.floor(t/1000)%60).padStart(2,'0');}
 function guildMsg(m){
   if(m.a==='info'){const had=GUILD;GUILD=m.g||null;if(m.msg)showBanner('Guilde',m.msg,'#ff5a6a');if(had&&!GUILD&&(scene==='ghall'||scene==='raid'))enterNexus();
-    if(GUILD&&scene==='raid'){for(const q of monsters)if(q.key==='titan'&&!GUILD.raid.fini){q.max=GUILD.raid.max;q.hp=Math.max(1,GUILD.raid.pv);}}
+    if(GUILD&&GUILD.raid){if(GUILD.raid.actif)RAIDEV.fin=Date.now()+GUILD.raid.reste;else if(RAIDEV.fin>Date.now())RAIDEV.fin=0;}
     if(!guildEl.hidden)renderGuild();plSig='';updZoneForce();sendPresence();return;}
   if(m.a==='created'){save.gold=Math.max(0,save.gold-GUILD_COST);persist();invDirty=true;showBanner('Guilde fondée !','Bienvenue dans ton hall de guilde','#ffd23f');sfx('relic');setTimeout(()=>{if(GUILD)enterGuildHall();},400);return;}
   if(m.a==='err'){note(m.msg||'Action impossible');sfx('deny');return;}
   if(m.a==='ok'){note(m.msg||'OK');return;}
   if(m.a==='invite'){if(GUILD)return;gInvite={gid:m.gid,nom:m.nom,tag:m.tag};if(!treqEl.hidden)return;showTradeReq(m.from,'guild',m.gid);return;}
-  if(m.a==='raidwin'){if(GUILD&&GUILD.raid){GUILD.raid.fini=true;GUILD.raid.pv=0;}showBanner('LE TITAN EST VAINCU !','Récupérez vos récompenses au coffre du hall de guilde','#ffd23f');sfx('relic');
-    if(scene==='raid')for(const q of monsters)if(q.key==='titan'&&q.hp>0){q.hp=0;handleDeath(q.id,'titan',q.x,q.y);}return;}
-  if(m.a==='reward'){const n=m.niv||2,g=250+100*n,c=25+10*n;save.gold+=g;save.cursite+=c;giveItem(mkItem('egg',0));giveItem(mkItem('croquette',0));persist();invDirty=true;
-    showBanner('Récompense du raid !','+'+g+' pièces · +'+c+' Cursite · 1 œuf · 1 croquette','#ffd23f');sfx('relic');burst(P.x,P.y,'#ffd23f',60,5);return;}
+  if(m.a==='raidstart'){RAIDEV.fin=Date.now()+(m.reste||600000);showBanner('🐉 LE DRAGON DE GUILDE EST LÀ !',GUILD?'10 minutes : rejoins ton hall de guilde et frappe-le avec ta guilde !':'Rejoins une guilde pour participer au raid','#ff7a1a');sfx('boss');sendChat&&0;return;}
+  if(m.a==='raidend'){RAIDEV.fin=0;for(const q of monsters)if(q.key==='dragon')q.hp=0;monsters=monsters.filter(q=>q.key!=='dragon');if(raidAcc>0)raidAcc=0;
+    showBanner('Fin du raid de guilde !','Le Dragon s\'envole… voici le classement','#ffd23f');sfx('level');showRaidRes(m.res||[]);gReqT=0;return;}
+  if(m.a==='reward'){const G=m.gain||{or:250,cu:25,oeufs:0,cro:1};save.gold+=G.or;save.cursite+=G.cu;for(let i=0;i<G.oeufs;i++)giveItem(mkItem('egg',0));for(let i=0;i<G.cro;i++)giveItem(mkItem('croquette',0));persist();invDirty=true;
+    showBanner('Récompense du raid · '+m.rang+(m.rang===1?'re':'e')+' place !','+'+G.or+' pièces · +'+G.cu+' Cursite'+(G.oeufs?' · '+G.oeufs+' œuf'+(G.oeufs>1?'s':''):'')+(G.cro?' · '+G.cro+' croquette'+(G.cro>1?'s':''):''),'#ffd23f');sfx('relic');burst(P.x,P.y,'#ffd23f',60,5);if(!guildEl.hidden)renderGuild();if(!rrEl.hidden)closeRaidRes();return;}
 }
 function updZoneForce(){if(scene==='ghall'){curZone=-99;updZone();}}
 const GUILD_COST=500;
-setInterval(()=>{if(room&&room.raw&&save.current&&(Date.now()-gReqT>(scene==='ghall'||scene==='raid'?8000:30000))){gReqT=Date.now();guildReq();}},2000);
-// dégâts sur le Titan envoyés au serveur (réserve de vie commune à toute la guilde pour la semaine)
-function raidTick(dt){if(scene!=='raid')return;raidSendT-=dt;if(raidSendT<=0&&raidAcc>0){raidSendT=1;if(room&&room.raw){const d=Math.round(raidAcc);raidAcc=0;room.raw(Object.assign(gMsg('raid'),{dmg:d}));}}
-  if(GUILD&&GUILD.raid&&!GUILD.raid.fini)for(const q of monsters)if(q.key==='titan'){q.max=GUILD.raid.max;if(q.hp>GUILD.raid.pv)q.hp=Math.max(1,GUILD.raid.pv);}
-  if(amHost&&GUILD&&GUILD.raid&&!GUILD.raid.fini&&!monsters.some(m=>m.key==='titan')){const m=addMon('titan',RA.boss.x,RA.boss.y,0);m.max=GUILD.raid.max;m.hp=Math.max(1,GUILD.raid.pv);m.hx=RA.boss.x;m.hy=RA.boss.y;}}
-function claimRaid(){if(!GUILD)return;if(!GUILD.raid.fini){note('Le coffre s\'ouvrira quand le Titan sera vaincu');return;}if(!GUILD.raid.part){note('Tu n\'as pas participé au raid de cette semaine');return;}if(GUILD.raid.recu){note('Récompense déjà récupérée cette semaine');return;}room&&room.raw&&room.raw(gMsg('claim'));}
+setInterval(()=>{if(room&&room.raw&&save.current&&(Date.now()-gReqT>(scene==='ghall'||scene==='raid'||raidOn()?5000:30000))){gReqT=Date.now();guildReq();}},1000);
+// le Dragon est invulnérable : les dégâts de chaque joueur sont envoyés au serveur et comptent pour sa guilde
+function raidTick(dt){if(scene!=='raid')return;raidSendT-=dt;if(raidSendT<=0&&raidAcc>0){raidSendT=1;if(room&&room.raw&&raidOn()){const d=Math.round(raidAcc);raidAcc=0;room.raw(Object.assign(gMsg('raid'),{dmg:d}));}else raidAcc=0;}
+  for(const q of monsters)if(q.key==='dragon')q.hp=q.max;
+  if(!raidOn()){if(monsters.some(q=>q.key==='dragon'))monsters=monsters.filter(q=>q.key!=='dragon');return;}
+  if(amHost&&!monsters.some(m=>m.key==='dragon')){const m=addMon('dragon',RA.boss.x,RA.boss.y,0);m.hx=RA.boss.x;m.hy=RA.boss.y;}}
+function claimRaid(){if(!GUILD||!GUILD.raid)return;const d=GUILD.raid.dernier;if(raidOn()){note('Le raid est en cours : le coffre s\'ouvrira à la fin');return;}
+  if(!d){note('Pas encore de raid terminé');return;}if(!d.part){note('Tu n\'as pas participé au dernier raid');return;}if(d.recu){note('Récompense déjà récupérée');return;}room&&room.raw&&room.raw(gMsg('claim'));}
+/* ---------- classement de fin de raid ---------- */
+const rrEl=$('#raidRes');
+function showRaidRes(res){const L=$('#rrList');L.textContent='';
+  if(!res.length){L.innerHTML='<p class="hint">Aucune guilde n\'a frappé le Dragon.</p>';}
+  res.forEach((r,i)=>{const row=document.createElement('div');row.className='rrrow'+(GUILD&&r.tag===GUILD.tag?' moi':'');const rk=document.createElement('b');rk.textContent=['🥇','🥈','🥉'][i]||(i+1)+'.';const n=document.createElement('span');n.textContent='['+r.tag+'] '+r.nom+' · '+r.nb+' joueur'+(r.nb>1?'s':'');const d=document.createElement('em');d.textContent=Number(r.dmg).toLocaleString('fr-FR')+' dégâts';row.append(rk,n,d);L.append(row);});
+  const mine=GUILD?res.findIndex(r=>r.tag===GUILD.tag):-1;$('#rrMine').textContent=!GUILD?'Rejoins une guilde pour participer au prochain raid.':mine<0?'Ta guilde n\'a pas participé à ce raid.':'Ta guilde termine '+(mine+1)+(mine===0?'re':'e')+' ! Récompense à récupérer (si tu as frappé le Dragon).';
+  $('#rrClaim').hidden=!(GUILD&&mine>=0);rrEl.hidden=false;paused=true;keys.clear();mouse.down=false;}
+function closeRaidRes(){rrEl.hidden=true;paused=false;cv.focus();}
+$('#rrClose').addEventListener('click',closeRaidRes);$('#rrClaim').addEventListener('click',()=>{gReqT=0;setTimeout(claimRaid,300);});
 /* ---------- cartes : hall de guilde et arène du raid ---------- */
 const GHW=34,GHH=20,GH={back:{x:17,y:17.6},spawn:{x:17,y:15.5},raid:{x:28.5,y:9},board:{x:6.5,y:8},chest:{x:6.5,y:12.5},fire:{x:17,y:9.5}};
 const RAW=36,RAH=30,RA={c:{x:18,y:14},boss:{x:18,y:11},back:{x:18,y:26.6},spawn:{x:18,y:24.5}};
@@ -2624,9 +2660,9 @@ function genRaid(){const sol=new Uint8Array(RAW*RAH);for(let y=0;y<RAH;y++)for(l
   for(let i=0;i<8;i++){const a=i*TAU/8+0.39,x=Math.floor(RA.c.x+Math.cos(a)*9.5),y=Math.floor(RA.c.y+Math.sin(a)*9.5);sol[y*RAW+x]=1;}return{kind:'raid',w:RAW,h:RAH,sol};}
 function enterGuildHall(){if(!GUILD){openGuildWin();return;}if(!ghallMap)ghallMap=genGHall();sfx('portal');scene='ghall';MAP=ghallMap;P.x=GH.spawn.x;P.y=GH.spawn.y;resetScene();curZone=-2;amHost=false;updZone();
   showBanner('Hall de guilde','['+GUILD.tag+'] '+GUILD.nom+' · niveau '+GUILD.niv,'#ffd23f');gReqT=Date.now();guildReq();sendPresence();}
-function enterRaid(){if(!GUILD)return;if(GUILD.raid&&GUILD.raid.fini){note('Le Titan est vaincu cette semaine : reviens lundi pour un Titan plus fort !');return;}if(!raidMap)raidMap=genRaid();sfx('portal');
+function enterRaid(){if(!GUILD)return;if(!raidOn()){note('Le Dragon n\'est pas là : le raid de guilde est annoncé par les admins (10 minutes)');return;}if(!raidMap)raidMap=genRaid();sfx('portal');
   scene='raid';MAP=raidMap;P.x=RA.spawn.x;P.y=RA.spawn.y;resetScene();curZone=-2;sceneT=Date.now();amHost=computeHostIsMe();P.invul=2.5;updZone();
-  showBanner('Raid de guilde','Le Titan garde toute la semaine les dégâts de ta guilde','#ffd23f');sfx('boss');raidAcc=0;gReqT=Date.now();guildReq();sendPresence();}
+  showBanner('Raid de guilde','Le Dragon est invulnérable : chaque dégât compte pour le classement de ta guilde','#ff7a1a');sfx('boss');raidAcc=0;gReqT=Date.now();guildReq();sendPresence();}
 function gColor(){const t=GUILD?GUILD.tag:'?';let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return 'hsl('+h+',55%,45%)';}
 function drawGHall(x0,x1,y0,y1){const u=TS/16;
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const X=Math.floor(sx(tx)),Y=Math.floor(sy(ty));if(tx<0||ty<0||tx>=GHW||ty>=GHH){R(X,Y,TS+1,TS+1,'#0b0a12');continue;}
@@ -2643,17 +2679,18 @@ function drawGHall(x0,x1,y0,y1){const u=TS/16;
   // tableau de guilde
   {const X=sx(GH.board.x),Y=sy(GH.board.y);R(X-u,Y,u*2,7*u,'#5a3a22');R(X-10*u,Y-11*u,20*u,12*u,'#6a4424');R(X-9*u,Y-10*u,18*u,10*u,'#e8dcc0');for(let i=0;i<4;i++)R(X-7*u,Y-8*u+i*2.2*u,14*u,u,'#8a7a6a');label('Tableau de guilde',X,Y-TS*0.95,'#ffd23f',Math.round(TS*0.28));}
   // coffre du raid
-  {const X=sx(GH.chest.x),Y=sy(GH.chest.y),s=TS*0.95,ok=GUILD&&GUILD.raid&&GUILD.raid.fini&&GUILD.raid.part&&!GUILD.raid.recu;ctx.drawImage(ok?CHEST_OPEN:CHEST,X-s/2,Y-s/2,s,s);if(ok){ctx.fillStyle=`rgba(255,217,106,${0.2+0.15*Math.sin(time*5)})`;ctx.beginPath();ctx.arc(X,Y,TS*0.9,0,TAU);ctx.fill();}label('Coffre du raid',X,Y-TS*0.8,ok?'#ffd23f':'#dcd8e4',Math.round(TS*0.28));}
+  {const X=sx(GH.chest.x),Y=sy(GH.chest.y),s=TS*0.95,d=GUILD&&GUILD.raid&&GUILD.raid.dernier,ok=d&&d.part&&!d.recu&&!raidOn();ctx.drawImage(ok?CHEST_OPEN:CHEST,X-s/2,Y-s/2,s,s);if(ok){ctx.fillStyle=`rgba(255,217,106,${0.2+0.15*Math.sin(time*5)})`;ctx.beginPath();ctx.arc(X,Y,TS*0.9,0,TAU);ctx.fill();}label('Coffre du raid',X,Y-TS*0.8,ok?'#ffd23f':'#dcd8e4',Math.round(TS*0.28));}
   // portail du raid + jauge du Titan
-  drawPortal(GH.raid.x,GH.raid.y,'#8a6a10','#ffd23f','Raid','Titan de la Guilde',{scale:1.1,world:true});
-  if(GUILD&&GUILD.raid){const X=sx(GH.raid.x),Y=sy(GH.raid.y+1.9),w=TS*3,h=TS*0.22;R(X-w/2-2,Y-2,w+4,h+4,'#0b0a12');R(X-w/2,Y,w*(GUILD.raid.pv/GUILD.raid.max),h,'#ffd23f');label(GUILD.raid.fini?'Vaincu cette semaine !':Math.round(GUILD.raid.pv/GUILD.raid.max*100)+' % de vie',X,Y+TS*0.55,'#ffd23f',Math.round(TS*0.26));}
+  if(raidOn())drawPortal(GH.raid.x,GH.raid.y,'#8a1a10','#ff7a1a','Raid','Dragon · '+raidLeft(),{scale:1.1,world:true});else{const X=sx(GH.raid.x),Y=sy(GH.raid.y);ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(X,Y+TS*0.6,TS*0.9,TS*0.25,0,0,TAU);ctx.fill();R(X-TS*0.8,Y-TS*0.9,TS*1.6,TS*1.5,'#2a2438');R(X-TS*0.65,Y-TS*0.75,TS*1.3,TS*1.2,'#141020');label('Portail du raid',X,Y-TS*1.2,'#dcd8e4',Math.round(TS*0.3));label('fermé',X,Y,'#8a8494',Math.round(TS*0.28));}
+  if(GUILD&&GUILD.raid&&raidOn()){label('Dégâts de ta guilde : '+GUILD.raid.guilde.toLocaleString('fr-FR'),sx(GH.raid.x),sy(GH.raid.y+2.2),'#ffd23f',Math.round(TS*0.28));}
   drawPortal(GH.back.x,GH.back.y,'#3f7fe0','#8fd0ff','Nexus');}
 function drawRaid(x0,x1,y0,y1){const u=TS/16,d=MAP;
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const X=Math.floor(sx(tx)),Y=Math.floor(sy(ty));if(tx<0||ty<0||tx>=d.w||ty>=d.h){R(X,Y,TS+1,TS+1,'#0b0a12');continue;}const v=Math.floor(h2(tx,ty)*4);
     if(d.sol[ty*d.w+tx]){const dd=Math.hypot(tx+.5-RA.c.x,ty+.5-RA.c.y);if(dd<12){T16(cryptFloor(v),X,Y);drawD16(dspr('pillar',{L:'#e8d890',M:'#8a6a10',D:'#3a2a08',V:'#ffd23f'}),X,Y);}else R(X,Y,TS+1,TS+1,dd<14.5?'#1c1726':'#0b0a12');continue;}
     T16(cryptFloor(v),X,Y);const dd=Math.hypot(tx+.5-RA.c.x,ty+.5-RA.c.y);if(Math.abs(dd-6)<0.5||Math.abs(dd-11)<0.5){ctx.globalAlpha=0.25+0.15*Math.sin(time*2+dd);R(X,Y,TS+1,TS+1,'#ffd23f');ctx.globalAlpha=1;}}
   drawPortal(RA.back.x,RA.back.y,'#6a3ab0','#ffd23f','Hall');
-  if(GUILD&&GUILD.raid){const w=Math.min(W*0.5,520),X=W/2-w/2,Y=TS*0.5,h=TS*0.34;R(X-3,Y-3,w+6,h+6,'#0b0a12');R(X,Y,w*(GUILD.raid.pv/GUILD.raid.max),h,'#ffd23f');label('Titan de la Guilde · '+GUILD.raid.pv.toLocaleString('fr-FR')+' / '+GUILD.raid.max.toLocaleString('fr-FR')+' PV · réserve de la semaine',W/2,Y+h+TS*0.3,'#ffd23f',Math.round(TS*0.28));}}
+  if(GUILD&&GUILD.raid){const w=Math.min(W*0.5,520),X=W/2-w/2,Y=TS*0.5,h=TS*0.34,f=raidOn()?Math.max(0,(RAIDEV.fin-Date.now())/600000):0;R(X-3,Y-3,w+6,h+6,'#0b0a12');R(X,Y,w*f,h,'#ff7a1a');label('🐉 Dragon de Guilde · invulnérable · '+(raidOn()?raidLeft()+' restantes':'terminé')+' · ta guilde : '+GUILD.raid.guilde.toLocaleString('fr-FR')+' dégâts',W/2,Y+h+TS*0.3,'#ffd23f',Math.round(TS*0.28));
+    const top=GUILD.raid.top||[];ctx.textAlign='left';top.forEach((t,i)=>{const yy=TS*1.8+i*TS*0.42,me=t.tag===GUILD.tag;ctx.font=`${me?700:400} ${Math.round(TS*0.28)}px "DotGothic16", monospace`;ctx.fillStyle='rgba(11,10,18,.7)';ctx.fillRect(W-TS*5.2,yy-TS*0.3,TS*5,TS*0.4);ctx.fillStyle=me?'#ffd23f':'#dcd8e4';ctx.fillText((i+1)+'. ['+t.tag+'] '+Number(t.dmg).toLocaleString('fr-FR'),W-TS*5.1,yy);});ctx.textAlign='center';}}
 /* ---------- fenêtre de guilde ---------- */
 const guildEl=$('#guildWin');
 function openGuildWin(){guildEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderGuild();guildReq();sfx('item');}
@@ -2667,9 +2704,12 @@ function renderGuild(){const B=$('#gdBody');B.textContent='';
     for(const id of ['gdNom','gdTag'])$('#'+id).addEventListener('keydown',e=>e.stopPropagation());
     $('#gdCreate').onclick=()=>{if(save.gold<GUILD_COST){note('Il faut '+GUILD_COST+' pièces');sfx('deny');return;}room.raw(Object.assign(gMsg('create'),{nom:$('#gdNom').value,tag:$('#gdTag').value}));};
     $('#gdFoot').textContent='20 membres maximum par guilde';return;}
-  const G=GUILD,r=G.raid;$('#gdTitle').textContent='['+G.tag+'] '+G.nom;
-  const rd=document.createElement('div');rd.className='graid';rd.innerHTML=`<b>Raid de la semaine · Titan de la Guilde</b><div class="bar"><i style="width:${(r.pv/r.max*100).toFixed(1)}%"></i></div>
-    <span class="hint">${r.fini?'Vaincu ! Chaque participant récupère sa récompense au coffre du hall.'+(r.recu?' (récupérée)':''):r.pv.toLocaleString('fr-FR')+' / '+r.max.toLocaleString('fr-FR')+' PV restants · la vie ne remonte pas avant lundi : chaque combat compte.'} Tes dégâts : <b>${r.part.toLocaleString('fr-FR')}</b>. Guilde niveau ${G.niv} : le Titan grandit après chaque victoire.</span>`;B.append(rd);
+  const G=GUILD,r=G.raid||{};$('#gdTitle').textContent='['+G.tag+'] '+G.nom;
+  const rd=document.createElement('div');rd.className='graid';const d=r.dernier;
+  rd.innerHTML=`<b>🐉 Raid de guilde · Dragon</b><br><span class="hint">${raidOn()?`<b style="color:#ff7a1a">EN COURS · ${raidLeft()} restantes</b> · dégâts de ta guilde : <b>${r.guilde.toLocaleString('fr-FR')}</b> · les tiens : <b>${r.part.toLocaleString('fr-FR')}</b>`:'Une fois par semaine, le Dragon apparaît 10 minutes. Il est invulnérable : les guildes sont classées selon leurs dégâts.'}</span>
+    ${r.top&&r.top.length?'<div class="hint" style="margin-top:6px">'+r.top.map((t,i)=>(i+1)+'. ['+t.tag+'] '+t.nom+' · '+Number(t.dmg).toLocaleString('fr-FR')).join('<br>')+'</div>':''}
+    ${!raidOn()&&d?`<div class="hint" style="margin-top:6px">Dernier raid : ta guilde est <b>${d.rang?d.rang+(d.rang===1?'re':'e')+' / '+d.nb:'non classée'}</b>${d.gain?` · récompense : ${d.gain.or} pièces, ${d.gain.cu} Cursite${d.gain.oeufs?', '+d.gain.oeufs+' œuf(s)':''}${d.gain.cro?', '+d.gain.cro+' croquette(s)':''}`:''} · ${!d.part?'tu n\'as pas participé':d.recu?'récupérée ✓':'<b style="color:#ffd23f">à récupérer au coffre du hall</b>'}</div>`:''}
+    <div class="hint" style="margin-top:6px">Récompenses : 🥇 1000 pièces, 100 Cursite, 2 œufs, 2 croquettes · 🥈 700, 70, 1, 2 · 🥉 500, 50, 1, 1 · autres : 250, 25, 1 croquette.</div>`;B.append(rd);
   const h=document.createElement('h3');h.textContent='Membres ('+G.membres.length+'/20)';B.append(h);const L=document.createElement('div');L.className='glist';
   const online=new Set([...remotes.values()].filter(q=>q.p&&q.p.gt===G.tag&&Date.now()-q.upd<6000).map(q=>clean(q.p.n).slice(0,16)));
   [...G.membres].sort((a,b)=>b.dmg-a.dmg).forEach(m=>{const row=document.createElement('div');row.className='grow'+(m.moi?' moi':'');const im=document.createElement('img');if(heroURL[m.c])im.src=heroURL[m.c];const n=document.createElement('span');n.textContent=(m.chef?'👑 ':'')+m.n+' · niv. '+m.l+((m.moi||online.has(m.n))?' · en ligne':'');const e=document.createElement('em');e.textContent=m.dmg.toLocaleString('fr-FR')+' dégâts';row.append(im,n,e);
@@ -2688,6 +2728,7 @@ $('#adminBtn').addEventListener('click',()=>admEl.hidden?openAdmin():closeAdmin(
 $('#admClose').addEventListener('click',closeAdmin);
 admEl.addEventListener('click',e=>{if(e.target===admEl)closeAdmin();});
 $('#devHub').addEventListener('click',()=>{closeAdmin();enterHub();});
+$('#devRaid').addEventListener('click',()=>devSend(myPeer,'raid'));$('#devRaidStop').addEventListener('click',()=>devSend(myPeer,'raidstop'));
 $('#devTest').addEventListener('click',()=>{closeAdmin();if(scene!=='nexus')enterNexus();P.x=-52.5;P.y=24;burst(P.x,P.y,'#ffd23f',16,3);sfx('portal');sendPresence();});
 function setAdmInv(on){admInv=on;$('#devInv').textContent='👻 Invisible : '+(on?'oui':'non');$('#devInv').classList.toggle('godon',on);sendPresence();plSig='';}
 function partyArg(){const w=C()&&C().equip[0];return{c:save.current,sk:mySkin()||'',n:pseudo,w:w?w.kind:'',wt:w?w.tier:0};}
@@ -2980,7 +3021,7 @@ function updZone(){
   if(z!==curZone){curZone=z;
     if(z===-1){$('#zone').textContent='Nexus';$('#zoneLvl').textContent='Zone sûre · la fontaine soigne';}
     else if(z===105){$('#zone').textContent='Hall de guilde';$('#zoneLvl').textContent=GUILD?'['+GUILD.tag+'] '+GUILD.nom:'';}
-    else if(z===106){$('#zone').textContent='Raid de guilde';$('#zoneLvl').textContent='Titan de la Guilde · semaine en cours';}
+    else if(z===106){$('#zone').textContent='Raid de guilde';$('#zoneLvl').textContent='Dragon de Guilde · 10 minutes';}
     else if(z===101){$('#zone').textContent='Ta maison';$('#zoneLvl').textContent='Coffres · parc des familiers';}
     else if(z===104){$('#zone').textContent='Arène';$('#zoneLvl').textContent='Duel contre '+(DU?DU.name:'…');}
     else if(z===103){$('#zone').textContent='Tutoriel';$('#zoneLvl').textContent='Apprends les commandes · R pour passer';}
@@ -3098,7 +3139,7 @@ function doAct(a,e){
 }
 const MOVE_ACTS=['up','down','left','right'];
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
+  if(e.key==='Escape'){if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
   const A=actsOf(e.code);
   if(!kbWin.hidden)return;
@@ -3207,7 +3248,7 @@ function update(dt){
         if(b.vol){if(b.vol.has(m))continue;b.vol.add(m);}
         if(!b.counted){b.counted=true;const ch=C();ch.hits=(ch.hits||0)+1;}
         let dg=b.dmg;if(b.pct)dg+=Math.round(m.max*(m.d.boss?0.15:0.5));if(m.vuln>time)dg=Math.round(dg*1.5);
-        m.hp-=dg;if(m.key==='titan'){raidAcc+=dg;if(m.hp<1&&!raidWon())m.hp=1;}m.flash=0.1;sfx('hit');ft(m.x+rnd(-.2,.2),m.y-m.d.sz*0.5,String(dg),m.vuln>time||b.pct?'#ffd23f':'#ffffff');
+        m.hp-=dg;if(m.key==='dragon'){raidAcc+=dg;m.hp=m.max;}m.flash=0.1;sfx('hit');ft(m.x+rnd(-.2,.2),m.y-m.d.sz*0.5,String(dg),m.vuln>time||b.pct?'#ffd23f':'#ffffff');
         const rec=dmgTot.get(m.id)||{tot:0,t:0};rec.tot+=dg;rec.t=time;dmgTot.set(m.id,rec);
         if(m.key==='mannequin'){m.lastHit=time;TU.hit=1;if(m.hp<1)m.hp=1;}
         if(m.hp<=0){if(amHost)hostKill(m);else m.pend=time;}
@@ -4052,6 +4093,7 @@ function render(){
       if(m.d.pw){ctx.fillStyle=`rgba(180,90,255,${0.18+0.1*Math.sin(t*4)})`;ctx.beginPath();ctx.arc(sx(m.x),sy(m.y),TS*m.d.sz*0.6,0,TAU);ctx.fill();}
       if(m.vuln>time){ctx.strokeStyle='#ffd23f';ctx.globalAlpha=0.5+0.3*Math.sin(time*8);ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx(m.x),sy(m.y),TS*m.d.sz*0.55,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
       if(m.inv){ctx.globalAlpha=0.08+0.05*Math.sin(time*9);drawSpriteAt(MSPR[m.key],m.x,m.y,TS*m.d.sz,false,0,bob,sq);ctx.globalAlpha=1;return;}
+      if(m.key==='dragon'){const atk=time-(m.atkT||-9)<0.6,fl=Math.sin(time*(atk?10:3))*TS*0.12;ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(sx(m.x),sy(m.y)+TS*m.d.sz*0.42,TS*m.d.sz*0.36,TS*0.5,0,0,TAU);ctx.fill();if(atk){ctx.fillStyle='rgba(255,120,30,.18)';ctx.beginPath();ctx.arc(sx(m.x),sy(m.y),TS*m.d.sz*0.55,0,TAU);ctx.fill();}drawSpriteAt(DRAGON_SPR[atk?1:0],m.x,m.y,TS*m.d.sz,false,0,fl,0);if(m.flash>0){ctx.globalAlpha=0.12;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx(m.x),sy(m.y)-fl,TS*m.d.sz*0.3,0,TAU);ctx.fill();ctx.globalAlpha=1;}return;}
       drawSpriteAt(MSPR[m.key],m.x,m.y,TS*m.d.sz,((P.x-m.x)*Math.cos(camA)-(P.y-m.y)*Math.sin(camA))<0,m.flash,bob,sq);
       if(m.hp<m.max)drawBar(m.x,m.y+m.d.sz*0.55,TS*Math.max(0.7,m.d.sz*0.8),m.hp/m.max,m.d.boss?'#ffd23f':'#e04a52');
       if(m.d.boss)label(m.d.nom,sx(m.x),sy(m.y-m.d.sz*0.62),'#ffd23f',Math.round(TS*0.36),700);
@@ -4115,7 +4157,7 @@ function render(){
   else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans le Royaume';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';}
   else if(scene==='vault'){const c=nearChest();if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Nexus';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt='E · Changer la décoration de la maison';else if(Math.hypot(P.x-FBOARD.x,P.y-FBOARD.y)<1.5)prompt='E · Tableau de pêche';else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';else if(Math.hypot(P.x-PSIGN.x,P.y-PSIGN.y)<1.6||inPark(P.x,P.y))prompt='E · Gérer mes familiers';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
   else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Nexus (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='ghall'){if(Math.hypot(P.x-GH.back.x,P.y-GH.back.y)<1.4)prompt='E · Retour au Nexus';else if(Math.hypot(P.x-GH.raid.x,P.y-GH.raid.y)<1.6)prompt=GUILD&&GUILD.raid&&GUILD.raid.fini?'Le Titan est vaincu cette semaine · retour lundi':'E · Raid : affronter le Titan de la Guilde';else if(Math.hypot(P.x-GH.board.x,P.y-GH.board.y)<1.6)prompt='E · Tableau de guilde';else if(Math.hypot(P.x-GH.chest.x,P.y-GH.chest.y)<1.6)prompt=GUILD&&GUILD.raid&&GUILD.raid.fini&&GUILD.raid.part&&!GUILD.raid.recu?'E · Récupérer la récompense du raid !':'Coffre du raid · s\'ouvre quand le Titan est vaincu';}
+  else if(scene==='ghall'){if(Math.hypot(P.x-GH.back.x,P.y-GH.back.y)<1.4)prompt='E · Retour au Nexus';else if(Math.hypot(P.x-GH.raid.x,P.y-GH.raid.y)<1.6)prompt=raidOn()?'E · Raid : affronter le Dragon ('+raidLeft()+')':'Portail du raid fermé · le Dragon est annoncé par les admins';else if(Math.hypot(P.x-GH.board.x,P.y-GH.board.y)<1.6)prompt='E · Tableau de guilde';else if(Math.hypot(P.x-GH.chest.x,P.y-GH.chest.y)<1.6)prompt=GUILD&&GUILD.raid&&GUILD.raid.dernier&&GUILD.raid.dernier.part&&!GUILD.raid.dernier.recu&&!raidOn()?'E · Récupérer la récompense du raid !':'Coffre du raid · récompense selon le classement de ta guilde';}
   else if(scene==='raid'){if(Math.hypot(P.x-RA.back.x,P.y-RA.back.y)<1.4)prompt='E · Retour au hall de guilde';}
   else if(scene==='hub'){const p=nearHubPort();if(Math.hypot(P.x-HBACK.x,P.y-HBACK.y)<1.4)prompt='E · Retour au Nexus';else if(p)prompt='E · Tester : '+DTYPES[p.t].nom;}
   else if(scene==='realm'){const d=nearDPortal();if(d)prompt='E · Entrer : '+DTYPES[d.t||'c'].nom+(d.t==='a'?' (très difficile)':'');else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher en mer';}

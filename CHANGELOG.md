@@ -1,5 +1,13 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.6 (server.js modifié)
+- Le raid de guilde devient un événement de 10 minutes lancé par un admin (bouton dans le panneau admin).
+- Nouveau boss : le Dragon de Guilde, 2 fois plus grand, pixels doublés, animation d'attaque (ailes et souffle).
+- Le Dragon est invulnérable : chaque guilde fait son maximum de dégâts, classement en direct dans l'arène.
+- Ses attaques traversent les murs : souffle en éventail avec des trous, anneau avec une brèche, pluie de météores, double spirale.
+- Fin des 10 minutes : le Dragon s'envole et le classement des guildes s'affiche pour tout le monde.
+- Récompenses selon la place de la guilde, pour chaque joueur ayant frappé le Dragon.
+
 ## ver.0.0.5 (server.js modifié)
 - Clic sur le nom d'un joueur dans la liste : menu Groupe, Échange, Duel, Rejoindre, Guilde.
 - Groupes (6 joueurs max) : en entrant dans le Royaume, on arrive à côté d'un membre du groupe déjà sur place. Noms des membres en vert.
