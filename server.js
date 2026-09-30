@@ -29,7 +29,7 @@ function enregistrerScore(m) {
   if (id.length < 8) return;
   const nom = filtrer(String(m.n || 'Joueur').replace(/[\u0000-\u001f\u007f]/g, '')).slice(0, 16) || 'Joueur';
   scores[id] = {
-    n: nom, c: CLASSES_OK.includes(m.c) ? m.c : 'guerrier', l: entier(m.l, 20),
+    n: nom, c: CLASSES_OK.includes(m.c) ? m.c : 'guerrier', l: entier(m.l, 25),
     gold: entier(m.gold, 1e9), pres: entier(m.pres, 1e9), kills: entier(m.kills, 1e9),
     shots: entier(m.shots, 1e10), hits: Math.min(entier(m.hits, 1e10), entier(m.shots, 1e10)),
     t: Date.now()
@@ -283,6 +283,11 @@ wss.on('connection', (ws, req) => {
       const res = (ok, msg, extra) => envoyer(ws, Object.assign({ t: 'devres', ok, msg }, extra || {}));
       if (cyrb53(String(m.pw || '')) !== DEV_HASH) { res(false, 'Mot de passe refusé par le serveur'); return; }
       const cmd = String(m.cmd || '');
+      // suivi des admins connectés (onglet « Admins » du panneau)
+      if (cmd === 'bye') { moi.admin = 0; res(true, ''); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} quitte le mode admin`); return; }
+      if (!moi.admin) { moi.admin = Date.now(); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} (${masquer(moi.ip)}) passe admin`); }
+      if (cmd === 'hello') { res(true, ''); return; }
+      if (cmd === 'admins') { const out = []; for (const s of salles.values()) for (const j of s.values()) if (j.admin) out.push({ n: String((j.etat && j.etat.n) || 'Joueur').slice(0, 16), ip: masquer(j.ip), t: j.admin, s: String((j.etat && j.etat.s) || ''), moi: j === moi }); res(true, '', { admins: out }); return; }
       if (cmd === 'bans') { res(true, '', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); return; }
       if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
       if (cmd === 'raid') { lancerRaid(); res(true, 'Raid lancé : portail ouvert, le Dragon arrive dans 30 secondes (5 minutes de combat)'); console.log('[raid] lancé'); return; }
@@ -309,10 +314,10 @@ wss.on('connection', (ws, req) => {
         if (!it || typeof it !== 'object' || JSON.stringify(it).length > 2000) { res(false, 'Objet invalide'); return; }
         envoyer(cible.ws, { t: 'dev', cmd: 'item', arg: it });
         res(true, String(it.name || 'Objet').slice(0, 40) + ' envoyé à ' + nom);
-      } else if (cmd === 'god' || cmd === 'cursite') {
-        const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(1000000, Math.floor(Number(m.arg) || 0)));
+      } else if (cmd === 'god' || cmd === 'cursite' || cmd === 'gold') {
+        const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(10000000, Math.floor(Number(m.arg) || 0)));
         envoyer(cible.ws, { t: 'dev', cmd, arg });
-        res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + ' Cursite envoyée à ' + nom);
+        res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + (cmd === 'gold' ? ' pièces envoyées à ' : ' Cursite envoyée à ') + nom);
       } else if (cmd === 'mute' || cmd === 'unmute') {
         if (cmd === 'mute') modo.mutes[cible.ip] = { n: nom, t: Date.now() }; else delete modo.mutes[cible.ip];
         sauverModo(); envoyer(cible.ws, { t: 'dev', cmd, arg: 0 });

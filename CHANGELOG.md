@@ -1,5 +1,19 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.10 (server.js modifié)
+- Familiers entièrement redessinés, avec 2 fois plus de pixels. Chaque rang change vraiment leur look (écharpe, capuche de mage, carapace de lave, crinière de feu, ailes…).
+- Tous les boss de donjon redessinés avec 2 fois plus de pixels, y compris les 4 gardiens de l'Observatoire. Chacun a une pose d'attaque et ses propres projectiles : os, chauves-souris, scarabées, bulles, plumes, crânes enflammés, éclats de glace, étoiles, épines, lucioles, rochers, engrenages… Les attaques restent les mêmes.
+- On arrive dans le Royaume sur la plage, au bord de la mer.
+- Le bord de mer (6 cases) et tous les lacs se traversent à la nage : vitesse réduite, le héros a de l'eau jusqu'à la taille. Les monstres n'y entrent pas.
+- Gardien du Prestige dans la maison : il débloque les niveaux 21 à 25 pour tous tes héros (1000 / 2500 / 3500 / 5000 / 6000 prestige). Chaque niveau donne ses statistiques en plus des plafonds.
+- La musique de boss continue pendant tout le combat, même si on s'éloigne un moment.
+- Assassin : barre bleue sous la vie pour le temps d'invisibilité restant, et les monstres ne semblent plus regagner de vie pendant l'invisibilité.
+- Connexion quotidienne : jour 3 = 100 Cursite, jour 5 = 150 Cursite (250 au total, de quoi prendre un skin en promo).
+- Historique du chat : Entrée affiche les derniers messages.
+- Options : le choix du curseur ne montre plus que le style (la couleur se choisit en dessous).
+- Nexus : les statues ne font plus ramer le jeu sur Edge.
+- Admin : commande /god, don de pièces aux joueurs, onglet « Admins » qui liste qui a le mode admin en ce moment.
+
 ## ver.0.0.9 (server.js modifié)
 - Raid de guilde : mourir face au Dragon ne coûte plus rien (ni niveau, ni XP, ni objet). Retour direct au hall de guilde, 45 secondes d'attente avant de pouvoir y retourner.
 - 4 donjons intermédiaires (entre le Terrier des Gobelins et les donjons de fin), qui s'ouvrent rarement sur les monstres de la Forêt des Murmures et du Canyon de Rouille :
