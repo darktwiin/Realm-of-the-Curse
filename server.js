@@ -95,11 +95,20 @@ const sql = {
   sessVieilles: db.prepare('DELETE FROM sessions WHERE cree < ?'),
 };
 const arbitre = require('./arbitre');
+const butin = require('./butin');
 db.exec(`CREATE TABLE IF NOT EXISTS anomalies (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER, nom TEXT, quand INTEGER, raisons TEXT)`);
 sql.anoIns = db.prepare('INSERT INTO anomalies (compte, nom, quand, raisons) VALUES (?, ?, ?, ?)');
 sql.anoListe = db.prepare('SELECT nom, quand, raisons FROM anomalies ORDER BY id DESC LIMIT 60');
 for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { try { arbitre.apprendre(JSON.parse(r.save)); } catch {} }
-const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0 });
+const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0, xp: 0, kills: 0, boss: 0, liste: {} });
+// état anti-triche par compte (survit aux reconnexions tant que le serveur tourne)
+const etatsComptes = new Map();
+function etatCompte(id) { let e = etatsComptes.get(id); if (!e) { e = { dons: DONS0(), seaux: arbitre.nouveauxSeaux(), rythme: {}, aPerdre: [] }; etatsComptes.set(id, e); } return e; }
+// retire n exemplaires d'un objet (sac d'abord, puis coffres, puis équipement)
+function retirerObjets(save, sig, n) {
+  const zones = []; for (const ch of Object.values(save.chars || {})) zones.push(ch.inv || []); for (const c of ((save.vault && save.vault.c) || [])) zones.push(c || []); for (const ch of Object.values(save.chars || {})) zones.push(ch.equip || []);
+  for (const z of zones) for (let i = 0; i < z.length && n > 0; i++) if (z[i] && butin.signature(z[i]) === sig) { z[i] = null; n--; }
+}
 const hacher = (mdp, sel) => crypto.scryptSync(String(mdp), sel, 64).toString('hex');
 const essais = new Map(); // anti force brute : 8 essais par minute et par IP
 function tropDEssais(ip) { const t = Date.now(), e = (essais.get(ip) || []).filter(x => t - x < 60000); e.push(t); essais.set(ip, e); return e.length > 8; }
@@ -110,7 +119,7 @@ function connecter(moi, c, ws) {
   if (ancien && ancien !== moi) { try { envoyer(ancien.ws, { t: 'authout', msg: 'Ce compte vient de se connecter ailleurs' }); ancien.ws.close(4004, 'Connecté ailleurs'); } catch {} }
   moi.compte = { id: c.id, nom: c.nom, admin: ADMINS.has(String(c.nom).toLowerCase()) };
   moi.admin = 0; enLigne.set(c.id, moi); sql.vu.run(Date.now(), c.id);
-  moi.seaux = arbitre.nouveauxSeaux(); moi.dons = DONS0(); moi.refus = 0;
+  moi.cpt = etatCompte(c.id); moi.seaux = moi.cpt.seaux; moi.dons = moi.cpt.dons; moi.refus = 0; moi.tues = null;
   const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
@@ -142,19 +151,46 @@ function sauverCompte(moi, m) {
   const txt = JSON.stringify(m.data); if (txt.length > 1500000) return;
   const row = sql.parId.get(moi.compte.id); let ancien = null; try { ancien = row && row.save ? JSON.parse(row.save) : null; } catch { ancien = null; }
   // les admins ne sont pas contrôlés (outils de test)
+  const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); moi.dons = cpt.dons; moi.seaux = cpt.seaux;
   if (!moi.compte.admin) {
-    let v; try { v = arbitre.verifier(ancien, m.data, { seaux: moi.seaux || (moi.seaux = arbitre.nouveauxSeaux()), dons: moi.dons || DONS0() }); } catch (e) { console.error('[arbitre] erreur', e); v = { ok: true }; }
+    let v; try { v = arbitre.verifier(ancien, m.data, { seaux: cpt.seaux, dons: cpt.dons, aPerdre: cpt.aPerdre }); } catch (e) { console.error('[arbitre] erreur', e); v = { ok: true }; }
     if (!v.ok) {
       moi.refus = (moi.refus || 0) + 1;
       sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(v.raisons));
       console.log(`[arbitre] sauvegarde refusée pour ${moi.compte.nom} : ${v.raisons.join(' · ')}`);
+      // objets donnés lors d'un échange mais gardés : on les retire aussi de la sauvegarde du serveur
+      if (ancien && v.enTrop && v.enTrop.length) {
+        for (const e of v.enTrop) { const n = butin.compterSig(ancien, e.sig) - e.max; if (n > 0) retirerObjets(ancien, e.sig, n); }
+        cpt.aPerdre = cpt.aPerdre.filter(e => !v.enTrop.includes(e));
+        sql.save.run(JSON.stringify(ancien), Date.now(), moi.compte.id);
+      }
       envoyer(moi.ws, { t: 'savefix', save: ancien, raisons: v.raisons });
       return;
     }
-  }
-  moi.dons = DONS0();
+    // ce qui n'a pas encore servi reste disponible (butin pas encore ramassé…), modifié sur place
+    const D = cpt.dons, r = v.reste || DONS0();
+    D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {};
+    cpt.aPerdre = [];
+  } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
   sql.save.run(txt, Date.now(), moi.compte.id);
+}
+// ---- échanges : à la conclusion, le serveur note ce que chacun reçoit et ce que chacun doit perdre ----
+function conclureEchange(A, B) {
+  const notes = [];
+  for (const [X, Y] of [[A, B], [B, A]]) {
+    if (!X.compte || !Y.compte || !X.offre || X.offre.to !== Y.peer) continue;
+    let sx = null; try { const row = sql.parId.get(X.compte.id); sx = row && row.save ? JSON.parse(row.save) : null; } catch { sx = null; }
+    if (!sx) continue;
+    const prep = butin.preparerEchange(sx, X.offre.items), parSig = new Map();
+    const YC = Y.cpt || (Y.cpt = etatCompte(Y.compte.id)), XC = X.cpt || (X.cpt = etatCompte(X.compte.id));
+    for (const p of prep) { butin.noter(YC.dons, p.recu); parSig.set(p.sigDonneur, (parSig.get(p.sigDonneur) || 0) + 1); notes.push({ YC, sig: butin.signature(p.recu) }); }
+    for (const [sig, n] of parSig) { const e = { sig, max: butin.compterSig(sx, sig) - n, t: Date.now() }; XC.aPerdre.push(e); notes.push({ XC, e }); }
+  }
+  // si l'échange est annulé juste après (sac plein…), on efface ce qui a été noté
+  const annuler = () => { for (const n of notes) { if (n.e) n.XC.aPerdre = n.XC.aPerdre.filter(x => x !== n.e); else { const L = n.YC.dons.liste[n.sig]; if (L && L.length) L.pop(); } } };
+  A.dernierEchange = B.dernierEchange = { t: Date.now(), annuler };
+  A.offre = B.offre = A.trOk = B.trOk = null;
 }
 function trouverJoueur(peer) { for (const s of salles.values()) { const j = s.get(peer); if (j) return j; } return null; }
 
@@ -351,11 +387,18 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
+    if (m && m.t === 'kill') { if (moi.compte) butin.reclamer(moi, m, { salle: nom, membres: salle, dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } }); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {
       const cible = salle.get(String(m.to || ''));
       if (!cible || cible === moi) return;
       const out = { t: 'tr', from: peer, k: String(m.k || '').slice(0, 10) };
+      if (out.k === 'offer') { moi.offre = { to: cible.peer, items: Array.isArray(m.items) ? m.items.slice(0, 8) : [] }; moi.trOk = cible.trOk = null; }
+      else if (out.k === 'ok') {
+        moi.trOk = m.ok ? { to: cible.peer, h: String(m.h || ''), t: Date.now() } : null;
+        const a = moi.trOk, b = cible.trOk;
+        if (a && b && b.to === peer && Date.now() - b.t < 120000 && a.h.split('/').reverse().join('/') === b.h) conclureEchange(moi, cible);
+      } else if (out.k === 'cancel') { moi.trOk = cible.trOk = null; moi.offre = cible.offre = null; const de = moi.dernierEchange; if (de && Date.now() - de.t < 5000) { de.annuler(); moi.dernierEchange = cible.dernierEchange = null; } }
       if (m.ok !== undefined) out.ok = !!m.ok;
       if (typeof m.h === 'string') out.h = m.h.slice(0, 64);
       if (Array.isArray(m.items)) out.items = m.items.slice(0, 8);
@@ -432,6 +475,7 @@ wss.on('connection', (ws, req) => {
       return;
     }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
+    if (m.patch.s !== undefined && m.patch.s !== moi.etat.s) { moi.sAvant = moi.etat.s; moi.sT = Date.now(); }
     for (const k of Object.keys(m.patch).slice(0, 96)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
       let v = m.patch[k];
@@ -442,6 +486,7 @@ wss.on('connection', (ws, req) => {
     }
     if (!modo.mutes[moi.ip]) moi.averti = false;
     if (JSON.stringify(moi.etat).length > MAX_OCTETS_ETAT) moi.etat = {};
+    try { butin.observer(nom, moi, m.patch); } catch (e) { console.error('[butin] témoin', e.message); }
     diffuser(salle, { t: 'p', peer, presence: moi.etat }, moi);
   });
 

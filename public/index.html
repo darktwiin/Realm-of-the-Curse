@@ -391,7 +391,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.13"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.14"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -407,7 +407,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.13</div>
+    <div class="verTag" id="verTag">ver.0.0.14</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -566,7 +566,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.13</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.14</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -608,7 +608,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.13</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.14</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1605,10 +1605,10 @@ function onAuthRes(m){
   if(m.t==='authout'){authKicked();return;}
   if(!m.ok){if(lsGet(TOKEN_KEY)&&!AUTH.ok)lsSet(TOKEN_KEY,null);showAuth(m.msg||'Erreur',true);return;}
   lsSet(TOKEN_KEY,m.token);const me=String(m.nom).toLowerCase(),owner=lsGet(OWNER_KEY),reloaded=sessionStorage.getItem('rm-reload')==='1';sessionStorage.removeItem('rm-reload');
-  AUTH={ok:true,nom:m.nom,admin:!!m.admin};
+  // AUTH.ok reste faux tant qu'on va recharger la page (sinon la sauvegarde vide de ce navigateur partirait au serveur)
   if(m.save&&m.save.chars){if(!reloaded&&JSON.stringify(m.save)!==JSON.stringify(save)){lsSet(SAVE_KEY,JSON.stringify(m.save));lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}}
   else if(owner&&owner!==me&&!reloaded){lsSet(SAVE_KEY,null);lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}
-  lsSet(OWNER_KEY,me);pushSave(true);hideAuth();if(!devMode)note('Connecté au compte '+m.nom+(AUTH.admin?' (admin : /god)':''));try{fillTitles();}catch(e){}}
+  AUTH={ok:true,nom:m.nom,admin:!!m.admin};lsSet(OWNER_KEY,me);pushSave(true);hideAuth();if(!devMode)note('Connecté au compte '+m.nom+(AUTH.admin?' (admin : /god)':''));try{fillTitles();}catch(e){}}
 function authSend(a){const nom=document.getElementById('authNom').value.trim(),mdp=document.getElementById('authMdp').value;if(!room||!room.raw){showAuth('Serveur injoignable, nouvel essai dans un instant…',true);return;}
   if(a==='register'&&mdp!==document.getElementById('authMdp2').value){showAuth('Les deux mots de passe ne correspondent pas',true);return;}room.raw({t:'auth',a,nom,mdp});showAuth('Envoi…');}
 function logout(){const tk=lsGet(TOKEN_KEY);try{room.raw({t:'auth',a:'logout',token:tk});}catch(e){}pushSave(true);lsSet(TOKEN_KEY,null);AUTH={ok:false,nom:null,admin:false};if(devMode)setDevMode(false);showAuth('Déconnecté.');}
@@ -1878,7 +1878,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000013;let newerWarned=false;
+const NETV=2,BUILD=2600000014;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1921,7 +1921,7 @@ function makeNetRoom(){
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'){for(const f of rawH)f(m);}};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'||m.t==='butin'){for(const f of rawH)f(m);}};
     ws.onclose=e=>{if(e.code===4004){setConn(false);others.clear();me=null;emitPeers();authKicked();return;}if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
@@ -1938,7 +1938,7 @@ async function initRoom(){
   if(window.claude&&typeof window.claude.use==='function'){let r=null;try{r=await window.claude.use('room');}catch(e){r=null;}if(r)room=r;}
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
-  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}
+  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}if(m.t==='butin'){onButin(m);return;}
     if(m.t==='tr'){tradeMsg(m);return;}
     if(m.t==='g'){guildMsg(m);return;}
     if(m.t==='dev'&&m.cmd==='party'){startParty(m.arg);return;}
@@ -2323,7 +2323,7 @@ function classVfx(cls,x,y,ang,rel){
 }
 
 /* ================= scènes ================= */
-function resetScene(){FISH=null;INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostX=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;}
+function resetScene(){FISH=null;INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostX=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;handled.clear();}
 function enterNexus(){setTimeout(dailyAuto,700);if(scene==='arena'&&DU&&DU.state!=='fight'){duelSend({k:'dleave'});DU=null;$('#duelBox').hidden=true;}if(scene==='tuto'&&!save.tutoDone){save.tutoDone=true;persist();}if(scene!=='nexus')sfx('portal');scene='nexus';MAP=nexusMap;P.x=NSPAWN.x;P.y=NSPAWN.y;resetScene();curZone=-2;amHost=false;updZone();showBanner('Village','Zone sûre · la fontaine soigne');sendPresence();}
 // point d'arrivée tiré au hasard sur la plage, loin des monstres connus
 // même point pour tous les joueurs pendant une minute (tiré selon l'heure), puis il change de place
@@ -2691,18 +2691,26 @@ function handleDeath(id,key,x,y){
   const mine=dmgTot.has(id)||Math.hypot(x-P.x,y-P.y)<12;
   if(!mine)return;
   {const Q=dailyQuests();if(Q[0].k===key)questAdd(0,1);if(scene==='dungeon'&&MAP.bossKey===key&&Q[2].k===dungeonT)questAdd(2,1);}
-  const ch=C();ch.kills++;save.stats.kills=(save.stats.kills||0)+1;if(d.boss)ch.bosses=(ch.bosses||0)+1;gainXP(d.xp,x,y);
-  const items=[];if(d.tuto){gainXP(d.xp,x,y);statsDirty=true;return;}
-  if(Math.random()<d.drop){const n=d.n&&d.boss?d.n:1;for(let i=0;i<n;i++){let t=ri(d.loot[0],d.loot[1]);if(Math.random()<0.08)t=Math.min(6,t+1);items.push(randomItem(t));}}
-  if(d.rel&&(key==='devoreur'||Math.random()<d.rel)){const it=randomItem(7);items.push(it);showBanner('RELIQUE !',it.name,'#3ff0ff');burst(x,y,'#3ff0ff',50,5);burst(x,y,'#ff4fd8',40,4);sfx('relic');sendChat('✦ a trouvé une Relique : '+it.name+' !');}
-  if(Math.random()<(d.boss?1:0.12))items.push(mkItem(Math.random()<0.6?'pvie':'pmana',0));
-  if(Math.random()<0.001){items.push(mkItem('egg',0));showBanner('Un œuf de familier !','Va le faire éclore chez l\'éleveur du Village','#f0dca0');sfx('relic');sendChat('🥚 a trouvé un Œuf de familier !');}
-  if(d.midBoss||['liche','pharaon','leviathan','archange','abysses','reine','devoreur'].includes(key)){addToBag(x-0.7,y+0.3,[mkItem('sp_'+pick(SK),0)],false);ft(x,y-1.8,'Potion de caractéristique garantie !','#ff9a3c',true);}
-  {const sp=statDrops(key,d);if(sp.length){addToBag(x+0.7,y+0.3,sp.map(k=>mkItem('sp_'+k,0)),false);ft(x,y-1.4,'Potion de caractéristique !','#ff9a3c',true);sfx('relic',0.5);}}
+  // le butin, l'XP et les pièces sont tirés par le serveur (anti-triche) : on lui signale la mort
+  if(room&&room.raw&&AUTH.ok){room.raw({t:'kill',id,k:key,s:sceneKey(),c:save.current,x:Math.round(x*10)/10,y:Math.round(y*10)/10});}
+}
+// Réponse du serveur : on applique exactement ce qu'il a tiré
+function onButin(m){
+  if(!m||m.refus||!save.current)return;const d=MON[m.k];if(!d)return;const x=+m.x||P.x,y=+m.y||P.y;
+  const fix=it=>{const o=sanitizeLoot(it);return o;};
+  const ch=C();ch.kills++;save.stats.kills=(save.stats.kills||0)+1;if(m.b)ch.bosses=(ch.bosses||0)+1;gainXP(m.xp|0,x,y);
+  if(m.tuto){statsDirty=true;persist();return;}
+  const items=(m.it||[]).map(fix).filter(Boolean);
+  if(m.rel>=0&&items[m.rel]){const it=items[m.rel];showBanner('RELIQUE !',it.name,'#3ff0ff');burst(x,y,'#3ff0ff',50,5);burst(x,y,'#ff4fd8',40,4);sfx('relic');sendChat('✦ a trouvé une Relique : '+it.name+' !');}
+  if(m.oeuf){showBanner('Un œuf de familier !','Va le faire éclore chez l\'éleveur du Village','#f0dca0');sfx('relic');sendChat('🥚 a trouvé un Œuf de familier !');}
+  const spg=(m.spg||[]).map(fix).filter(Boolean);if(spg.length){addToBag(x-0.7,y+0.3,spg,false);ft(x,y-1.8,'Potion de caractéristique garantie !','#ff9a3c',true);}
+  const sp=(m.sp||[]).map(fix).filter(Boolean);if(sp.length){addToBag(x+0.7,y+0.3,sp,false);ft(x,y-1.4,'Potion de caractéristique !','#ff9a3c',true);sfx('relic',0.5);}
   if(items.length){addToBag(x,y,items,false);sfx('loot',0.8);}
-  if(d.or&&Math.random()<d.or[0]){const g=ri(d.or[1],d.or[2]);save.gold+=g;for(let i=0;i<Math.min(g,8);i++)coinsFx.push({x:x+rnd(-.3,.3),y:y+rnd(-.3,.3),vx:rnd(-2,2),vy:rnd(-3,-1),t:0});sfx('coin');ft(x,y-1,'+'+g+' pièce'+(g>1?'s':''),'#ffd96a');}
+  const g=m.or|0;if(g>0){save.gold+=g;for(let i=0;i<Math.min(g,8);i++)coinsFx.push({x:x+rnd(-.3,.3),y:y+rnd(-.3,.3),vx:rnd(-2,2),vy:rnd(-3,-1),t:0});sfx('coin');ft(x,y-1,'+'+g+' pièce'+(g>1?'s':''),'#ffd96a');}
   statsDirty=true;persist();
 }
+// objet reçu du serveur : on garde ses statistiques exactes (le serveur les a notées), seul le nom est recalculé si besoin
+function sanitizeLoot(o){if(!o||typeof o!=='object'||!KINDS[o.kind])return null;const it=mkItem(o.kind,clamp(o.tier|0,0,7));if(o.stats&&typeof o.stats==='object'){const st={};for(const k in o.stats){const v=+o.stats[k];if(isFinite(v))st[k]=v;}it.stats=st;}if(Array.isArray(o.dmg))it.dmg=o.dmg.slice(0,2).map(Number);if(o.name)it.name=String(o.name).slice(0,40);return it;}
 // Potions de caractéristiques (sac orange, butin personnel : une seule par joueur)
 const DUN_POT={s:['vdep',0.2],o:['mana',0.15],p:['puissance',0.15],e:['vatt',0.2],g:['vie',0.1],c:['*',0.4]};
 function statDrops(key,d){

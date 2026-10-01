@@ -129,8 +129,8 @@ Le jeu reste aussi jouable dans un navigateur à la même adresse, avec le même
 
 Aujourd'hui, la progression est **gardée** sur le serveur, mais c'est encore le jeu du joueur qui **décide** du butin, des dégâts et de l'XP. Un tricheur motivé peut donc encore mentir au serveur. Les prochaines étapes passent cette logique côté serveur, une partie à la fois, en gardant le jeu jouable entre chaque étape :
 
-1. **Économie** : le serveur détient l'or, la Cursite, l'inventaire, les coffres, la boutique, les échanges et les quêtes. Il refuse toute modification qu'il n'a pas décidée lui-même.
-2. **Butin et XP** : le serveur tire le butin à la mort de chaque monstre, distribue l'XP et vérifie les dégâts reçus.
+1. ✅ **Économie** (ver.0.0.13) : chaque sauvegarde est vérifiée par l'arbitre (`arbitre.js`). Toute modification incohérente est refusée.
+2. ✅ **Butin et XP** (ver.0.0.14) : le serveur tire le butin, l'XP et les pièces à la mort de chaque monstre (`butin.js`) et refuse tout ce qu'il n'a pas donné.
 3. **Plaines Sauvages** : le serveur fait tourner les monstres, leurs tirs et les collisions. Le jeu du joueur n'envoie plus que ses touches et sa visée.
 4. **Donjons et raid** : même chose pour chaque donjon et pour le Dragon.
 5. **Plusieurs serveurs** au choix (« Europe 1 », « Europe 2 »…) quand il y aura du monde.

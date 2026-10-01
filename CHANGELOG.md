@@ -1,5 +1,14 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.14 (server.js modifié + nouveau fichier butin.js, arbitre.js modifié)
+- Anti-triche, étape 2 : le butin, l'XP et les pièces des monstres sont maintenant tirés par le serveur. Le jeu signale chaque monstre tué et le serveur vérifie que c'est plausible : bonne zone, monstre près du joueur, compté une seule fois, rythme humain. À plusieurs, la mort doit avoir été annoncée par l'hôte.
+- Le serveur refuse tout équipement qu'il n'a pas donné lui-même (butin, récompense du jour, échange, cadeau admin, équipement de départ), ainsi que toute XP ou tout monstre tué qu'il n'a pas comptés.
+- Échanges protégés contre la duplication : celui qui donne un objet doit bien le perdre, sinon l'objet est retiré de sa sauvegarde.
+- La limite de niveaux gagnés par minute disparaît : l'XP est maintenant vérifiée exactement.
+- Onglet admin « Triche » : signale aussi les joueurs dont beaucoup de monstres réclamés sont refusés.
+- Correction : dès le deuxième donjon d'une session, une partie des monstres ne donnait ni XP ni butin.
+- Correction : à la première connexion sur un nouveau navigateur, une sauvegarde vide pouvait être envoyée au serveur juste avant le rechargement de la page.
+
 ## ver.0.0.13 (server.js modifié + nouveau fichier arbitre.js)
 - Anti-triche, étape 1 : le serveur vérifie chaque sauvegarde avant de l'enregistrer (or, Cursite, objets, niveaux, potions, familiers, prestige, coffre et sacs). Une sauvegarde impossible est refusée et le joueur revient automatiquement à sa dernière sauvegarde valide.
 - Objets trafiqués (stats impossibles) supprimés, gains d'or ou de Cursite irréalistes annulés.

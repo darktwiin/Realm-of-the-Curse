@@ -12,16 +12,31 @@ function chargerRegles(html) {
   const a = html.indexOf('/* ================= données de jeu ================= */');
   const b = html.indexOf('/* ---------- monstres ----------');
   if (a < 0 || b < 0) throw new Error('Règles introuvables dans index.html');
-  const code = html.slice(a, b);
   // bac à sable permissif : tout ce qui touche au dessin est remplacé par une fonction vide
   const noop = new Proxy(function () {}, { get: (t, k) => k === Symbol.toPrimitive ? (() => 0) : k === 'length' ? 0 : noop, apply: () => noop, construct: () => noop, set: () => true });
-  const base = { Math, JSON, Object, Array, String, Number, Set, Map, Symbol, parseInt, parseFloat, isFinite, console,
-    pick: x => x[Math.floor(Math.random() * x.length)], clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)), rnd: (lo, hi) => lo + Math.random() * (hi - lo) };
-  const G = new Proxy(base, { has: () => true, get: (t, k) => k in t ? t[k] : (k === Symbol.unscopables ? undefined : noop), set: (t, k, v) => { t[k] = v; return true; } });
-  const R = new Function('__G', 'with(__G){' + code + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem};}')(G);
+  const bac = () => {
+    const base = { Math, JSON, Object, Array, String, Number, Set, Map, Symbol, parseInt, parseFloat, isFinite, console,
+      pick: x => x[Math.floor(Math.random() * x.length)], clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)), rnd: (lo, hi) => lo + Math.random() * (hi - lo), ri: (lo, hi) => Math.floor(lo + Math.random() * (hi - lo + 1)) };
+    return new Proxy(base, { has: () => true, get: (t, k) => k in t ? t[k] : (k === Symbol.unscopables ? undefined : noop), set: (t, k, v) => { t[k] = v; return true; } });
+  };
+  const code = html.slice(a, b);
+  let R;
+  // étape 2 : on lit aussi les monstres, les zones et les donjons (butin tiré par le serveur)
+  try {
+    const c = html.indexOf('const MKEYS=Object.keys(MON);'), z0 = html.indexOf('const ZONES=['), z1 = html.indexOf('const DUNGEON_POOL='), d0 = html.indexOf('const DTYPES={'), d1 = html.indexOf('const REG_DUN=');
+    if (c < 0 || z0 < 0 || z1 < 0 || d0 < 0 || d1 < 0) throw new Error('monstres introuvables');
+    const code2 = code + '\n' + html.slice(b, c) + '\nconst MKEYS=Object.keys(MON);\n' + html.slice(z0, z1) + '\n' + html.slice(d0, d1);
+    R = new Function('__G', 'with(__G){' + code2 + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,MON,MKEYS,ZONES,DTYPES};}')(bac());
+  } catch (e) {
+    console.error('[arbitre] monstres non chargés (butin serveur désactivé) :', e.message);
+    R = new Function('__G', 'with(__G){' + code + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem};}')(bac());
+  }
   const nombres = (re, def) => { const m = html.match(re); if (!m) return def; try { return JSON.parse(m[1].replace(/(\d+):/g, '"$1":')); } catch { return def; } };
   R.VAULT_PRICES = nombres(/const VAULT_PRICES=(\[[^\]]*\])/, [0, 50, 40, 60, 80, 100, 150, 200, 300, 500]);
   R.CAP_COST = nombres(/const CAP_COST=(\{[^}]*\})/, { 21: 1000, 22: 2500, 23: 3500, 24: 5000, 25: 6000 });
+  R.SELL_PRICE = nombres(/SELL_PRICE=(\[[^\]]*\])/, [0, 0, 0, 1, 3, 5, 10, 25]);
+  { const m = html.match(/const need=l=>([^;\n]+);/); try { R.need = new Function('l', 'return ' + (m ? m[1] : '(40+l*l*8+l*20)*(l>=20?2:1)')); } catch { R.need = l => (40 + l * l * 8 + l * 20) * (l >= 20 ? 2 : 1); } }
+  { const m = html.match(/GLORY_XP=(\d+)/); R.GLORY_XP = m ? +m[1] : 4000; }
   R.PET_KEYS = ['vie', 'mana', 'puissance', 'vatt', 'vdep', 'armure'];
   return R;
 }
@@ -133,6 +148,8 @@ function verifier(ancien, nouveau, ctx) {
   if ((nouveau.titles || []).includes('admin')) pb.push('titre admin');
   if (pb.length) return { ok: false, raisons: [...new Set(pb)].slice(0, 6) };
 
+  // une sauvegarde sans aucun héros ne remplace jamais des héros existants
+  if (ancien && ancien.chars && Object.keys(ancien.chars).length && !Object.keys(nouveau.chars).length) return { ok: false, raisons: ['sauvegarde vide'] };
   // --- première sauvegarde (reprise depuis le navigateur) : plafonds raisonnables ---
   if (!ancien || !ancien.chars) {
     if ((nouveau.gold || 0) > 60000) pb.push('trop d\'or pour une reprise');
@@ -179,34 +196,71 @@ function verifier(ancien, nouveau, ctx) {
   if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
   if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 6 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
 
-  // --- or : rythme humain + achats obligatoires (coffres, sacs) ---
+  // --- or : achats obligatoires (coffres, sacs), pièces tirées par le serveur, ventes, quêtes ---
+  const o0 = objets(ancien), o1 = objets(nouveau), c0 = compter(o0), c1 = compter(o1);
+  const etape2 = !!R.MON;
   let orDepenseMin = 0;
   for (let n = (ancien.vault && ancien.vault.n) || 1; n < ((nouveau.vault && nouveau.vault.n) || 1); n++) orDepenseMin += R.VAULT_PRICES[n] || 0;
   for (const [cls, ch1] of Object.entries(nouveau.chars)) { const ch0 = ancien.chars[cls]; const n0 = ch0 ? ch0.inv.length : 8; if (ch1.inv.length > n0) orDepenseMin += (n0 < 16 && ch1.inv.length >= 16 ? 250 : 0) + (ch1.inv.length >= 24 && n0 < 24 ? 1500 : 0); }
-  const gainOr = d('gold') + orDepenseMin - (dons.or || 0);
+  // valeur de revente des équipements disparus (vendus au marchand ou jetés)
+  let ventes = 0;
+  for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0); if (moins > 0) { const t = +k.split('|')[1], K = R.KINDS[k.split('|')[0]]; if (K && K.slot !== 'conso') ventes += moins * (R.SELL_PRICE[t] || 0); } }
+  const gainBrut = d('gold') + orDepenseMin;
+  const orServeur = Math.min(Math.max(0, gainBrut), dons.or || 0);
+  const gainOr = gainBrut - (dons.or || 0) - (etape2 ? ventes : 0);
   if (gainOr > sx.or + 0.5) pb.push('or gagné trop vite (+' + Math.round(gainOr) + ')'); else if (gainOr > 0) sx.or -= gainOr;
 
   // --- progression des héros ---
-  let gainNiv = 0, gainKills = 0, gainBoss = 0, gainGloire = 0;
+  let gainNiv = 0, gainKills = 0, gainBoss = 0, gainGloire = 0, gainXP = 0, kits = 0;
+  const xpTot = ch => { let x = 0; for (let l = 1; l < (ch.lvl | 0); l++) x += R.need(l); return x + Math.max(0, +ch.xp || 0) + Math.max(0, +ch.gxp || 0) + (ch.gp | 0) * R.GLORY_XP; };
   for (const [cls, ch1] of Object.entries(nouveau.chars)) {
-    const ch0 = ancien.chars[cls]; if (!ch0) { if ((ch1.lvl | 0) > 1) gainNiv += ch1.lvl - 1; continue; }
+    let ch0 = ancien.chars[cls];
+    // héros neuf ou mort définitive : il repart de zéro avec son équipement de départ
+    if (!ch0 || ((ch1.lvl | 0) <= (ch0.lvl | 0) && (ch1.kills | 0) < (ch0.kills | 0))) { kits++; ch0 = { lvl: 1, xp: 0, gxp: 0, gp: 0, kills: 0, bosses: 0 }; }
     if ((ch1.lvl | 0) > (ch0.lvl | 0)) gainNiv += ch1.lvl - ch0.lvl;
     gainKills += Math.max(0, (ch1.kills | 0) - (ch0.kills | 0)); gainBoss += Math.max(0, (ch1.bosses | 0) - (ch0.bosses | 0)); gainGloire += Math.max(0, (ch1.gp | 0) - (ch0.gp | 0));
+    gainXP += Math.max(0, xpTot(ch1) - xpTot(ch0));
   }
-  if (gainNiv > sx.niveaux + 0.01) pb.push('niveaux gagnés trop vite (+' + gainNiv + ')'); else sx.niveaux -= gainNiv;
-  if (gainKills > sx.monstres + 0.5) pb.push('monstres tués trop vite (+' + gainKills + ')'); else sx.monstres -= gainKills;
-  if (gainBoss > sx.boss + 0.5) pb.push('boss tués trop vite (+' + gainBoss + ')'); else sx.boss -= gainBoss;
-  if (gainGloire > sx.gloire + 0.5) pb.push('gloire gagnée trop vite (+' + gainGloire + ')'); else sx.gloire -= gainGloire;
+  if (!etape2) { // étape 1 seulement : sans butin serveur, on limite le rythme
+    if (gainNiv > sx.niveaux + 0.01) pb.push('niveaux gagnés trop vite (+' + gainNiv + ')'); else sx.niveaux -= gainNiv;
+    if (gainKills > sx.monstres + 0.5) pb.push('monstres tués trop vite (+' + gainKills + ')'); else sx.monstres -= gainKills;
+    if (gainBoss > sx.boss + 0.5) pb.push('boss tués trop vite (+' + gainBoss + ')'); else sx.boss -= gainBoss;
+    if (gainGloire > sx.gloire + 0.5) pb.push('gloire gagnée trop vite (+' + gainGloire + ')'); else sx.gloire -= gainGloire;
+  } else {
+    // XP, monstres et boss : seulement ce que le serveur a compté
+    if (gainXP > (dons.xp || 0) + 2) pb.push('XP non donnée par le serveur (+' + Math.round(gainXP - (dons.xp || 0)) + ')');
+    if (gainKills > (dons.kills || 0)) pb.push('monstres non comptés par le serveur (+' + (gainKills - (dons.kills || 0)) + ')');
+    if (gainBoss > (dons.boss || 0)) pb.push('boss non comptés par le serveur (+' + (gainBoss - (dons.boss || 0)) + ')');
+  }
 
   // --- objets : apparitions comptées (les déplacements entre héros et coffres ne comptent pas) ---
-  const o0 = objets(ancien), o1 = objets(nouveau), c0 = compter(o0), c1 = compter(o1);
-  let nouveaux = 0, nT6 = 0, nRel = 0;
-  for (const [k, n] of c1) { const plus = n - (c0.get(k) || 0); if (plus > 0) { nouveaux += plus; const t = +k.split('|')[1]; if (t === 6) nT6 += plus; if (t >= 7) nRel += plus; } }
-  const donsObj = dons.objets || 0;
-  nouveaux = Math.max(0, nouveaux - bonusObjets - donsObj); nT6 = Math.max(0, nT6 - bonusT6 - donsObj); nRel = Math.max(0, nRel - bonusReliques - donsObj);
-  if (nouveaux > sx.objets + 0.5) pb.push('trop d\'objets d\'un coup (+' + nouveaux + ')'); else sx.objets -= nouveaux;
+  const liste = {}; for (const k in (dons.liste || {})) liste[k] = (dons.liste[k] || []).slice();
+  let donsObj = dons.objets || 0, kitT0 = kits * 3, libT6 = bonusT6, libRel = bonusReliques, libConso = Math.max(0, bonusObjets - bonusT6 - bonusReliques);
+  let nConso = 0, horsListe = 0, nT6 = 0, nRel = 0, nouveaux = 0;
+  for (const [k, n] of c1) {
+    let plus = n - (c0.get(k) || 0); if (plus <= 0) continue;
+    nouveaux += plus;
+    const L = liste[k]; while (plus > 0 && L && L.length) { L.shift(); plus--; } // donné par le serveur (butin, échange)
+    if (!plus) continue;
+    const kind = k.split('|')[0], t = +k.split('|')[1], conso = R.KINDS[kind] && R.KINDS[kind].slot === 'conso';
+    for (; plus > 0; plus--) {
+      if (conso) { if (libConso > 0) libConso--; else if (donsObj > 0) donsObj--; else nConso++; continue; }
+      if (t === 0 && kitT0 > 0) { kitT0--; continue; }
+      if (t === 6 && libT6 > 0) { libT6--; continue; }
+      if (t >= 7 && libRel > 0) { libRel--; continue; }
+      if (donsObj > 0) { donsObj--; continue; }
+      if (etape2) horsListe++; else { nConso++; if (t === 6) nT6++; if (t >= 7) nRel++; }
+    }
+  }
+  if (horsListe) pb.push('équipement non donné par le serveur (+' + horsListe + ')');
+  if (nConso > sx.objets + 0.5) pb.push('trop d\'objets d\'un coup (+' + nConso + ')'); else sx.objets -= nConso;
   if (nT6 > sx.t6 + 0.01) pb.push('trop d\'objets tier 6 (+' + nT6 + ')'); else sx.t6 -= nT6;
   if (nRel > sx.reliques + 0.01) pb.push('trop de reliques (+' + nRel + ')'); else sx.reliques -= nRel;
+  // --- objets donnés lors d'un échange : celui qui donne doit bien les perdre (anti-duplication) ---
+  const aPerdre = (ctx.aPerdre || []).filter(e => Date.now() - e.t < 30 * 60000);
+  const enTrop = [];
+  for (const e of aPerdre) { const n = c1.get(e.sig) || 0; if (n > e.max) enTrop.push(e); }
+  if (enTrop.length) pb.push('objet échangé toujours dans le sac (duplication)');
 
   // --- potions de caractéristique bues : chaque point demande une potion disparue ---
   for (const k of Object.keys(R.SP_DEF)) {
@@ -228,7 +282,11 @@ function verifier(ancien, nouveau, ctx) {
     if (evos > croq + (dons.objets || 0)) pb.push('évolution sans croquette');
   }
 
-  return pb.length ? { ok: false, raisons: [...new Set(pb)].slice(0, 6) } : { ok: true };
+  if (pb.length) return { ok: false, raisons: [...new Set(pb)].slice(0, 6), enTrop };
+  // ce qui reste des dons du serveur après cette sauvegarde (butin pas encore ramassé, etc.)
+  const reste = { cursite: 0, prestige: 0, objets: 0, or: Math.max(0, (dons.or || 0) - orServeur),
+    xp: Math.max(0, (dons.xp || 0) - gainXP), kills: Math.max(0, (dons.kills || 0) - gainKills), boss: Math.max(0, (dons.boss || 0) - gainBoss), liste };
+  return { ok: true, reste, aPerdre: [] };
 }
 
 module.exports = { verifier, nouveauxSeaux, regles: () => R, objetValide, apprendre };
