@@ -1,0 +1,16 @@
+   # Mise en ligne automatique : à chaque envoi sur la branche main, le VPS récupère la nouvelle version et redémarre le jeu.
+   name: Mise en ligne
+   on:
+     push:
+       branches: [main]
+   jobs:
+     deployer:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Mettre à jour le serveur
+           uses: appleboy/ssh-action@v1.2.0
+           with:
+             host: ${{ secrets.VPS_HOTE }}
+             username: ${{ secrets.VPS_UTILISATEUR || 'ubuntu' }}
+             key: ${{ secrets.VPS_CLE }}
+             script: sudo bash /opt/royaume/deploy/mettre-a-jour.sh
