@@ -1,5 +1,32 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.11 (server.js modifié)
+- Nouveau système d'états, avec une icône au-dessus des joueurs et des monstres, et dans le HUD au-dessus de ta barre de vie :
+  - paralysé (ne bouge plus) ;
+  - empoisonné (dégâts par seconde, les poisons s'additionnent) ;
+  - ralenti (sables, ronces, nage, contre-courant…) ;
+  - aveuglé (écran noir sauf un petit cercle autour de toi) ;
+  - enflammé (lave, attaques de feu) ;
+  - enragé (Berserk du guerrier) ;
+  - invulnérable ;
+  - sonic (chemins, courants dans le bon sens).
+- Archer : sa flèche spéciale paralyse les monstres (pas les boss), plus longtemps avec un meilleur carquois. Portée de l'arc ramenée à 10 cases.
+- Manoir Hanté : les chauves-souris et les orbes roses du Comte aveuglent.
+- Fournaise : les diables cornus, les cerbères et les boules de feu du Seigneur des Abysses enflamment, comme les flammes du Dragon de raid.
+- Marais Putride (crapauds, sangsues) et Gardien du Serpent : poison.
+- Abysses : la noyade est progressive (1 %, 2 %, 3 %, 5 %, 8 %… de vie par seconde), et une poche d'air apparaît à la mort du Léviathan.
+- Jardins Célestes : courants moins forts (-90 % à contre-courant, +90 % dans le sens, ils t'emportent quand même). Les tourbillons violets de la salle du boss deviennent des tremplins qui te propulsent pour esquiver. Éclairs de l'Archange -20 %.
+- Les boss des 7 donjons de fin (Manoir, Tombeau, Abysses, Jardins, Fournaise, Caverne, Observatoire) donnent une potion de caractéristique à coup sûr.
+- Retour au Royaume après un donjon : 5 s d'invulnérabilité, annulées par ton premier tir.
+- Les monstres esquivent 2 fois moins, contournent les murs quand ils ne peuvent pas te toucher, et peuvent maintenant nager.
+- Le compteur du prochain boss central n'est plus visible que par les admins.
+- Flèche vers le maître des quêtes quand une quête est à récupérer.
+- Titre « ADMIN » (réservé aux admins vérifiés par le serveur).
+- Maison : 2 nouvelles décorations, le Château des Ombres (très sombre) et le Paradis (tout blanc), à la place de la cabane sylvestre et du sanctuaire astral.
+- Marchand réorganisé en 3 rayons (Potions, Familiers, Sacs à dos), cartes plus petites. Nouveaux articles : œuf de familier (300 pièces) et potion de caractéristique du jour (50 pièces, 1 par jour).
+- Étang du Nexus au sud du hall : ponton, nénuphars, roseaux et cabane du pêcheur. On y pêche ensemble et on voit la ligne des autres.
+- Menu des joueurs : nouvelle option « Inspecter » (équipement, statistiques, monstres tués, prestige, familier…).
+
 ## ver.0.0.10 (server.js modifié)
 - Familiers entièrement redessinés, avec 2 fois plus de pixels. Chaque rang change vraiment leur look (écharpe, capuche de mage, carapace de lave, crinière de feu, ailes…).
 - Tous les boss de donjon redessinés avec 2 fois plus de pixels, y compris les 4 gardiens de l'Observatoire. Chacun a une pose d'attaque et ses propres projectiles : os, chauves-souris, scarabées, bulles, plumes, crânes enflammés, éclats de glace, étoiles, épines, lucioles, rochers, engrenages… Les attaques restent les mêmes.

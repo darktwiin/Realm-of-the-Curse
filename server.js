@@ -275,6 +275,7 @@ wss.on('connection', (ws, req) => {
       if (m.ok !== undefined) out.ok = !!m.ok;
       if (typeof m.h === 'string') out.h = m.h.slice(0, 64);
       if (Array.isArray(m.items)) out.items = m.items.slice(0, 8);
+      if (m.info && typeof m.info === 'object' && !Array.isArray(m.info)) out.info = m.info; // fiche « Inspecter »
       if (JSON.stringify(out).length > 8000) return;
       envoyer(cible.ws, out);
       return;
@@ -339,6 +340,7 @@ wss.on('connection', (ws, req) => {
     for (const k of Object.keys(m.patch).slice(0, 96)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
       let v = m.patch[k];
+      if (k === 'ti' && v === 'admin' && !moi.admin) v = null; // titre ADMIN réservé aux admins vérifiés
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
       if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
       if (v === null) delete moi.etat[k]; else moi.etat[k] = v;
