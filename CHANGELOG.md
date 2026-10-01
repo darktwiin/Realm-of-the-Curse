@@ -1,5 +1,13 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.12 (server.js modifié)
+- Comptes joueurs : connexion au lancement, progression sauvegardée sur le serveur (on la retrouve sur n'importe quel PC), un seul appareil connecté par compte. La sauvegarde locale actuelle est reprise à la première connexion.
+- Admin lié au compte (variable ADMIN_COMPTES côté serveur) : /god sans mot de passe pour les admins, refusé pour les autres.
+- Nouveaux noms : le Nexus devient le Village, le Royaume devient les Plaines Sauvages, le Dieu Fou devient le Roi Bouffon (et ses Terres Désolées), le Colosse devient le Béhémoth d'Obsidienne, le Manoir Hanté devient le Château de Morvane, le Tombeau des Sables devient la Nécropole des Dunes, le Seigneur des Abysses devient le Seigneur des Braises, le Trickster devient le Mystificateur, les tomes deviennent des grimoires, les prismes des miroirs, Berserk devient Rage et Sonic devient Véloce.
+- Support manette : stick gauche pour bouger, stick droit pour viser et tirer, A interagir, X capacité, Y et LB potions, B ramasser ou fermer, Start options.
+- Bouton Boutique doré (aperçu admin, au Village).
+- Lanceur Windows (.exe) qui charge le jeu depuis le serveur : les mises à jour arrivent sans réinstaller.
+
 ## ver.0.0.11 (server.js modifié)
 - Nouveau système d'états, avec une icône au-dessus des joueurs et des monstres, et dans le HUD au-dessus de ta barre de vie :
   - paralysé (ne bouge plus) ;

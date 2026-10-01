@@ -5,10 +5,11 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "sauvegarde": "node --disable-warning=ExperimentalWarning deploy/sauvegarde.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.13"
   },
   "dependencies": {
     "ws": "^8.21.3"

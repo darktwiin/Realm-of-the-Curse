@@ -68,12 +68,73 @@ const server = http.createServer((req, res) => {
   }
 });
 
-const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 16 * 1024 });
+const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 2 * 1024 * 1024 });
 const salles = new Map(); // nom de salle -> Map(peer -> joueur)
 
 // ---- Commandes développeur : vérifiées ici, jamais par le navigateur du joueur visé ----
 function cyrb53(str, seed = 7) { let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed; for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); } h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909); return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36); }
-const DEV_HASH = '2858b4huwnf';
+// ---- Comptes joueurs (base SQLite intégrée à Node 22) ----
+// Les admins sont désignés par la variable d'environnement ADMIN_COMPTES (noms de comptes séparés par des virgules).
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch {}
+const { DatabaseSync } = require('node:sqlite');
+const db = new DatabaseSync(path.join(DATA_DIR, 'jeu.db'));
+db.exec(`PRAGMA journal_mode=WAL;
+CREATE TABLE IF NOT EXISTS comptes (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT NOT NULL UNIQUE COLLATE NOCASE, sel TEXT NOT NULL, hash TEXT NOT NULL, cree INTEGER NOT NULL, vu INTEGER, save TEXT, maj INTEGER);
+CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, compte INTEGER NOT NULL, cree INTEGER NOT NULL);`);
+const ADMINS = new Set(String(process.env.ADMIN_COMPTES || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
+const sql = {
+  parNom: db.prepare('SELECT * FROM comptes WHERE nom = ?'),
+  parId: db.prepare('SELECT * FROM comptes WHERE id = ?'),
+  creer: db.prepare('INSERT INTO comptes (nom, sel, hash, cree) VALUES (?, ?, ?, ?)'),
+  vu: db.prepare('UPDATE comptes SET vu = ? WHERE id = ?'),
+  save: db.prepare('UPDATE comptes SET save = ?, maj = ? WHERE id = ?'),
+  sessIns: db.prepare('INSERT INTO sessions (token, compte, cree) VALUES (?, ?, ?)'),
+  sessGet: db.prepare('SELECT * FROM sessions WHERE token = ?'),
+  sessDel: db.prepare('DELETE FROM sessions WHERE token = ?'),
+  sessVieilles: db.prepare('DELETE FROM sessions WHERE cree < ?'),
+};
+const hacher = (mdp, sel) => crypto.scryptSync(String(mdp), sel, 64).toString('hex');
+const essais = new Map(); // anti force brute : 8 essais par minute et par IP
+function tropDEssais(ip) { const t = Date.now(), e = (essais.get(ip) || []).filter(x => t - x < 60000); e.push(t); essais.set(ip, e); return e.length > 8; }
+setInterval(() => { try { sql.sessVieilles.run(Date.now() - 60 * 86400000); } catch {} essais.clear(); }, 3600000);
+const enLigne = new Map(); // id de compte -> connexion (un seul appareil à la fois)
+function connecter(moi, c, ws) {
+  const ancien = enLigne.get(c.id);
+  if (ancien && ancien !== moi) { try { envoyer(ancien.ws, { t: 'authout', msg: 'Ce compte vient de se connecter ailleurs' }); ancien.ws.close(4004, 'Connecté ailleurs'); } catch {} }
+  moi.compte = { id: c.id, nom: c.nom, admin: ADMINS.has(String(c.nom).toLowerCase()) };
+  moi.admin = 0; enLigne.set(c.id, moi); sql.vu.run(Date.now(), c.id);
+  const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
+  let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
+  envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
+  console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
+}
+function actionCompte(moi, ws, m) {
+  const non = msg => envoyer(ws, { t: 'authres', ok: false, msg });
+  if (m.a === 'token') { const s = sql.sessGet.get(String(m.token || '')); if (!s) { non('Session expirée, reconnecte-toi'); return; } const c = sql.parId.get(s.compte); if (!c) { non('Compte introuvable'); return; } sql.sessDel.run(s.token); connecter(moi, c, ws); return; }
+  if (m.a === 'logout') { if (m.token) sql.sessDel.run(String(m.token)); if (moi.compte) enLigne.delete(moi.compte.id); moi.compte = null; moi.admin = 0; return; }
+  if (tropDEssais(moi.ip)) { non('Trop d\'essais, attends une minute'); return; }
+  const nom = String(m.nom || '').trim(), mdp = String(m.mdp || '');
+  if (!/^[A-Za-z0-9_-]{3,16}$/.test(nom)) { non('Nom de compte : 3 à 16 lettres, chiffres, _ ou -'); return; }
+  if (mdp.length < 6 || mdp.length > 100) { non('Mot de passe : 6 caractères minimum'); return; }
+  if (m.a === 'register') {
+    if (filtrer(nom) !== nom) { non('Ce nom n\'est pas autorisé'); return; }
+    if (sql.parNom.get(nom)) { non('Ce nom de compte est déjà pris'); return; }
+    const sel = crypto.randomBytes(16).toString('hex'); sql.creer.run(nom, sel, hacher(mdp, sel), Date.now());
+    console.log(`[compte] création ${nom}`); connecter(moi, sql.parNom.get(nom), ws); return;
+  }
+  if (m.a === 'login') {
+    const c = sql.parNom.get(nom);
+    if (!c || !crypto.timingSafeEqual(Buffer.from(hacher(mdp, c.sel), 'hex'), Buffer.from(c.hash, 'hex'))) { non('Nom ou mot de passe incorrect'); return; }
+    connecter(moi, c, ws); return;
+  }
+  non('Action inconnue');
+}
+function sauverCompte(moi, m) {
+  if (!moi.compte || !m.data || typeof m.data !== 'object' || Array.isArray(m.data)) return;
+  const txt = JSON.stringify(m.data); if (txt.length > 1500000) return;
+  sql.save.run(txt, Date.now(), moi.compte.id);
+}
 function trouverJoueur(peer) { for (const s of salles.values()) { const j = s.get(peer); if (j) return j; } return null; }
 
 // ---- Modération : bannissements et sourdines par adresse IP, gardés dans moderation.json ----
@@ -264,6 +325,8 @@ wss.on('connection', (ws, req) => {
     if (++moi.msgs > 60) return; // plus de 60 messages/seconde : ignorés
     let m;
     try { m = JSON.parse(data); } catch { return; }
+    if (m && m.t === 'auth') { actionCompte(moi, ws, m); return; }
+    if (m && m.t === 'save') { sauverCompte(moi, m); return; }
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
@@ -282,7 +345,7 @@ wss.on('connection', (ws, req) => {
     }
     if (m && m.t === 'dev') {
       const res = (ok, msg, extra) => envoyer(ws, Object.assign({ t: 'devres', ok, msg }, extra || {}));
-      if (cyrb53(String(m.pw || '')) !== DEV_HASH) { res(false, 'Mot de passe refusé par le serveur'); return; }
+      if (!(moi.compte && moi.compte.admin)) { res(false, 'Réservé aux comptes admin'); return; }
       const cmd = String(m.cmd || '');
       // suivi des admins connectés (onglet « Admins » du panneau)
       if (cmd === 'bye') { moi.admin = 0; res(true, ''); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} quitte le mode admin`); return; }
@@ -360,6 +423,7 @@ wss.on('connection', (ws, req) => {
 
   ws.on('pong', () => { moi.vivant = true; });
   ws.on('close', () => {
+    if (moi.compte && enLigne.get(moi.compte.id) === moi) enLigne.delete(moi.compte.id);
     salle.delete(peer);
     diffuser(salle, { t: 'leave', peer });
     console.log(`[${nom}] départ ${peer} (${salle.size} joueur(s))`);

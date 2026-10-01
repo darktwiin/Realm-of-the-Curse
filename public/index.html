@@ -336,6 +336,10 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
 .app{transition:grid-template-columns .2s}
 .app.closed{grid-template-columns:minmax(0,1fr) 0}
 .app.closed .side{display:none}
+.authwin{z-index:60;background:rgba(5,4,10,.92)}.authtabs{display:flex;gap:6px}.authtabs button{flex:1;background:var(--panel2);border:2px solid var(--line);color:var(--muted);padding:6px;cursor:pointer;font-family:var(--display)}.authtabs button.on{border-color:var(--gold);color:var(--gold)}
+.authf{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}.authf input{background:#0b0a12;border:2px solid var(--line);color:var(--text);font:inherit;font-size:16px;padding:6px 8px}.authf input:focus{outline:none;border-color:var(--gold)}#authMsg.err{color:#ff6a6a}
+.gshop{position:absolute;top:10px;left:158px;z-index:6;font-family:var(--display);font-size:20px;letter-spacing:.06em;color:#2a1a04;background:linear-gradient(#ffe48a,#e8a92a 55%,#b8761a);border:3px solid #fff1b0;box-shadow:0 0 0 3px #5a3a08,0 0 18px rgba(255,200,60,.6),4px 4px 0 #000;padding:10px 18px;cursor:pointer;animation:gshine 2.4s ease-in-out infinite}
+.gshop:hover{filter:brightness(1.12)}@keyframes gshine{50%{box-shadow:0 0 0 3px #5a3a08,0 0 30px rgba(255,220,90,.95),4px 4px 0 #000}}
 .hudtl{position:absolute;top:10px;left:10px;z-index:5;display:flex;flex-direction:column;gap:3px;width:136px;background:rgba(20,17,30,.28);border:1px solid rgba(90,80,120,.35);padding:6px;pointer-events:none;text-shadow:1px 1px 0 #000}
 .hudtl .brand h1{font-size:16px;text-align:center;width:100%}
 .hudtl #mini{width:122px;height:122px;pointer-events:auto;cursor:pointer;opacity:.92}
@@ -362,10 +366,32 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
 <div class="app">
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
+    <div class="overlay authwin" id="authWin" hidden>
+      <div class="shop-inner" role="dialog" aria-label="Connexion">
+        <h2>Royaume Maudit</h2>
+        <p>Connecte-toi pour jouer : ta progression est gardée sur le serveur.</p>
+        <div class="authtabs"><button type="button" class="on" id="authTabLog">Connexion</button><button type="button" id="authTabReg">Créer un compte</button></div>
+        <label class="authf">Nom de compte<input id="authNom" maxlength="16" autocomplete="username"></label>
+        <label class="authf">Mot de passe<input id="authMdp" type="password" maxlength="100" autocomplete="current-password"></label>
+        <label class="authf" id="authMdp2Row" hidden>Confirme le mot de passe<input id="authMdp2" type="password" maxlength="100" autocomplete="new-password"></label>
+        <p class="hint" id="authMsg"></p>
+        <div class="shop-foot"><span class="hint">Le nom de compte est privé : ton pseudo en jeu se choisit après.</span><button type="button" class="act main" id="authGo">Se connecter</button></div>
+      </div>
+    </div>
+    <button type="button" class="gshop" id="gshopBtn" hidden>🛒 BOUTIQUE</button>
+    <div class="overlay" id="gshopWin" hidden>
+      <div class="shop-inner" role="dialog" aria-label="Boutique">
+        <h2>Boutique</h2>
+        <p class="hint">Aperçu réservé à l'admin : rien n'est encore payant. Les packs serviront plus tard (paiement à brancher côté serveur).</p>
+        <div class="shop-sec"><h3>Packs de Cursite</h3><div class="shop-grid" id="gshopPacks"></div></div>
+        <div class="shop-sec"><h3>Apparences</h3><div class="acts"><button type="button" class="act main" id="gshopSkins">Voir les skins (Cursite)</button></div></div>
+        <div class="shop-foot"><span class="hint">Cursite : <b id="gshopCur">0</b></span><button type="button" class="act" id="gshopClose">Fermer · Échap</button></div>
+      </div>
+    </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.11"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.12"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
-      <div id="zone">Nexus</div>
+      <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
       <div class="cur"><span class="gold"><i class="coin"></i><span id="goldT">0</span></span><span class="gold prest"><i class="pstar"></i><span id="presT">0</span></span><span class="gold curs"><i class="cgem"></i><span id="cursT">0</span></span><span class="gold sangc" title="Pièces de sang (duels à mort gagnés)"><i class="bcoin"></i><span id="sangT">0</span></span></div>
     </div>
@@ -379,7 +405,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.11</div>
+    <div class="verTag" id="verTag">ver.0.0.12</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -398,7 +424,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <h2>Administration</h2>
         <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="monstres">Monstres</button><button type="button" data-at="filtre">Filtre</button><button type="button" data-at="admins">Admins</button><button type="button" data-at="etats">États</button></div>
         <div class="admpane" data-ap="moi">
-          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Nexus)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (5 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
+          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Village)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (5 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
           <div class="killbox" id="killBox" hidden><b id="killTxt"></b><span class="acts"><button type="button" class="act danger" id="killYes">Oui, je confirme</button><button type="button" class="act" id="killNo">Annuler</button></span></div>
           <p class="hint">Invisible : les monstres t'ignorent et les autres joueurs ne te voient plus (ni sur la carte, ni dans la liste).</p>
           <p class="hint">GOD : invulnérable. Clic droit dans le jeu ou clic sur la mini-carte pour te téléporter.</p>
@@ -416,7 +442,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         </div>
         <div class="admpane" data-ap="bans" hidden><div id="devBans" class="devplayers"></div></div>
         <div class="admpane" data-ap="objets" hidden><p class="hint" id="itTarget">Clic sur un objet : il arrive dans ton sac à dos.</p><div id="itGrid" class="itgrid"></div></div>
-        <div class="admpane" data-ap="monstres" hidden><p class="hint">Le monstre apparaît à côté de toi (Royaume, donjons, tutoriel). Si tu n'es pas l'hôte ★, tu le deviens pour le faire apparaître.</p>
+        <div class="admpane" data-ap="monstres" hidden><p class="hint">Le monstre apparaît à côté de toi (Plaines Sauvages, donjons, tutoriel). Si tu n'es pas l'hôte ★, tu le deviens pour le faire apparaître.</p>
           <input id="monSearch" class="devsearch" placeholder="Chercher un monstre…" autocomplete="off"><div id="monGrid" class="mongrid"></div></div>
         <div class="admpane" data-ap="etats" hidden>
           <p class="hint">Applique un état pour tester. « Joueurs à l'écran » = les joueurs visibles autour de toi, dans la même zone.</p>
@@ -480,7 +506,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="fishWin" hidden>
       <div class="shop-inner fish-inner" role="dialog" aria-label="Tableau de pêche">
         <h2>Tableau de pêche</h2>
-        <div class="seg ftabs" id="fishTabs"><button type="button" data-f="lac" class="on">Lac de la maison</button><button type="button" data-f="mer">Mer du Royaume</button></div>
+        <div class="seg ftabs" id="fishTabs"><button type="button" data-f="lac" class="on">Lac de la maison</button><button type="button" data-f="mer">Mer des Plaines Sauvages</button></div>
         <div class="fgrid" id="fishGrid"></div>
         <div class="shop-foot"><span class="hint" id="fishFoot"></span><button type="button" class="act" id="fishClose">Fermer · Échap</button></div>
       </div>
@@ -536,7 +562,8 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Curseur</label><div class="curnow"><img id="curPrev" alt=""><button type="button" class="act main" id="curOpen">Changer le curseur…</button></div><span></span></div>
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.11</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.12</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -561,7 +588,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     </div>
     <div class="touch" id="touch">
       <button id="tChat" type="button">Chat</button>
-      <button id="tNexus" type="button">Nexus</button>
+      <button id="tNexus" type="button">Village</button>
       <button id="tPot" type="button">Potion</button>
       <button id="tUse" type="button">E</button>
       <button id="tAbil" type="button" class="big">Capacité</button>
@@ -578,8 +605,8 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.11</p>
-        <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Nexus.</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.12</p>
+        <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
         <button class="reset" id="resetBtn" type="button">Effacer la sauvegarde</button>
@@ -622,8 +649,8 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="overlay" id="shop" hidden>
-      <div class="shop-inner" role="dialog" aria-label="Échoppe du Nexus">
-        <h2>Échoppe du Nexus</h2>
+      <div class="shop-inner" role="dialog" aria-label="Échoppe du Village">
+        <h2>Échoppe du Village</h2>
         <p>Le marchand n'accepte que les pièces ramassées sur les monstres.</p>
         <div id="shopList"></div>
         <div class="shop-foot"><span class="gold"><i class="coin"></i><span id="shopGold">0</span> pièces</span><button type="button" class="act" id="shopClose">Fermer · Échap</button></div>
@@ -670,7 +697,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <dt>Espace</dt><dd>capacité de classe (mana)</dd>
         <dt>E</dt><dd>portail, autel, marchand, ramasser, échanger</dd>
         <dt>F / V</dt><dd>potion de vie / de mana</dd>
-        <dt>R</dt><dd>retour au Nexus (seul moyen de quitter le Royaume)</dd>
+        <dt>R</dt><dd>retour au Village (seul moyen de quitter les Plaines Sauvages)</dd>
         <dt>I / C</dt><dd>inventaire / statistiques</dd>
         <dt>Entrée</dt><dd>écrire aux autres joueurs</dd>
         <dt>O</dt><dd>options : son, musique, curseur, touches</dd>
@@ -841,14 +868,14 @@ const BACKPACK=makeSprite(BACKPACK_ROWS,{H:'#5a3a22',B:'#a86a3a',Y:'#e8b04a',D:'
 const SK=['vie','mana','puissance','vatt','vdep'];
 const SL={armure:'Armure',vie:'Vie',mana:'Mana',puissance:'Puissance',vatt:"Vitesse d'attaque",vdep:'Vitesse de déplacement',mreg:'Régénération de mana'};
 const CLASSES={
-  guerrier:{nom:'Guerrier',role:'Corps à corps, très résistant. Berserk.',arme:'epee',capa:'casque',armure:'lourde',base:{vie:200,mana:100,puissance:15,vatt:10,vdep:10},gain:{vie:22,mana:4,puissance:2,vatt:1,vdep:1},pal:{H:'#b9bccb',A:'#b3363a',Y:'#e8b04a'}},
+  guerrier:{nom:'Guerrier',role:'Corps à corps, très résistant. Rage.',arme:'epee',capa:'casque',armure:'lourde',base:{vie:200,mana:100,puissance:15,vatt:10,vdep:10},gain:{vie:22,mana:4,puissance:2,vatt:1,vdep:1},pal:{H:'#b9bccb',A:'#b3363a',Y:'#e8b04a'}},
   mage:{nom:'Mage',role:'Deux projectiles. Explosion de sort.',arme:'baton',capa:'sort',armure:'robe',base:{vie:110,mana:160,puissance:14,vatt:14,vdep:11},gain:{vie:12,mana:10,puissance:2,vatt:2,vdep:1},pal:{H:'#6c3bc0',A:'#4c2a8f',Y:'#c9a0ff'}},
   archer:{nom:'Archer',role:'Tir en éventail. Flèche perçante.',arme:'arc',capa:'carquois',armure:'cuir',base:{vie:140,mana:110,puissance:13,vatt:13,vdep:14},gain:{vie:16,mana:6,puissance:2,vatt:1,vdep:2},pal:{H:'#3f8a3a',A:'#6a4a2a',Y:'#9fd06a'}},
   pretre:{nom:'Prêtre',role:'Longue portée. Soigne son groupe.',arme:'baguette',capa:'tome',armure:'robe',base:{vie:120,mana:150,puissance:11,vatt:12,vdep:13},gain:{vie:14,mana:9,puissance:1,vatt:1,vdep:2},pal:{H:'#efe8d2',A:'#d8c98e',Y:'#f5d451'}},
-  trickster:{nom:'Trickster',role:'Dague rapide. Se téléporte.',arme:'dague',capa:'prisme',armure:'cuir',tpl:'bouffon',base:{vie:130,mana:130,puissance:13,vatt:14,vdep:14},gain:{vie:14,mana:8,puissance:2,vatt:2,vdep:2},pal:{H:'#2ab8a8',A:'#7a2a8a',Y:'#ffd23f'}},
+  trickster:{nom:'Mystificateur',role:'Dague rapide. Se téléporte.',arme:'dague',capa:'prisme',armure:'cuir',tpl:'bouffon',base:{vie:130,mana:130,puissance:13,vatt:14,vdep:14},gain:{vie:14,mana:8,puissance:2,vatt:2,vdep:2},pal:{H:'#2ab8a8',A:'#7a2a8a',Y:'#ffd23f'}},
   assassin:{nom:'Assassin',role:'Dague mortelle. Devient invisible.',arme:'dague',capa:'voile',armure:'cuir',tpl:'masque',base:{vie:125,mana:120,puissance:16,vatt:13,vdep:15},gain:{vie:13,mana:6,puissance:2,vatt:1,vdep:2},pal:{H:'#2a2a3a',A:'#3a2a4a',Y:'#b46aff'}}
 };
-// modèles de tête des nouvelles classes : bonnet à deux pointes du Trickster, masque de l'Assassin
+// modèles de tête des nouvelles classes : bonnet à deux pointes du Mystificateur, masque de l'Assassin
 const HERO_TPL_X={
   bouffon:['.H....H.','HHH..HHH','.HSESEH.','..SSSS..','.AAAAAA.','S.AYYA.S','..AAAA..','..L..L..'],
   masque:['..HHHH..','.HHHHHH.','.HSESEH.','.HKKKKH.','.AAAAAA.','S.AYYA.S','..AAAA..','..L..L..']
@@ -858,20 +885,20 @@ for(const k in CLASSES)HERO_SPR[k]=makeSprite(CLASSES[k].tpl?HERO_TPL_X[CLASSES[
 const TIER_COL=['#a7a2b3','#dcd8e4','#7ed957','#4aa3ff','#b16cff','#f2b84b','#ff5a6a','#3ff0ff'];
 const TIER_NOM=['Tier 0','Tier 1','Tier 2','Tier 3','Tier 4','Tier 5','Tier 6','Relique'];
 const KINDS={
-  epee:{slot:'arme',cls:['guerrier'],type:'Épée',dmg:[22,36],noms:['Épée courte','Épée de fer',"Épée d'acier",'Lame de mithril','Lame runique','Lame du crépuscule','Lame du Dieu Fou','Épée des Mille Soleils']},
-  baton:{slot:'arme',cls:['mage'],type:'Bâton',dmg:[15,25],noms:['Bâton de frêne','Bâton de chêne','Bâton de cristal','Bâton de braise','Bâton des arcanes','Bâton du néant','Bâton du Dieu Fou',"Bâton de l'Aube Stellaire"]},
-  arc:{slot:'arme',cls:['archer'],type:'Arc',dmg:[12,21],noms:['Arc court','Arc de chasse','Arc long','Arc de mithril','Arc sylvestre','Arc du crépuscule','Arc du Dieu Fou','Arc des Mille Étoiles']},
-  baguette:{slot:'arme',cls:['pretre'],type:'Baguette',dmg:[24,36],noms:['Baguette de saule',"Baguette d'os",'Baguette bénie','Baguette solaire','Baguette sacrée','Baguette céleste','Baguette du Dieu Fou','Baguette du Premier Souffle']},
-  dague:{slot:'arme',cls:['trickster','assassin'],type:'Dague',dmg:[19,31],noms:['Dague rouillée','Dague de fer',"Dague d'acier",'Dague de mithril','Dague runique','Dague du crépuscule','Dague du Dieu Fou','Croc du Néant']},
-  casque:{slot:'capa',cls:['guerrier'],type:'Casque',cost:50,bonus:'puissance',amt:2,noms:['Casque de cuir','Casque de fer',"Heaume d'acier",'Heaume de mithril','Heaume runique','Heaume de rage','Heaume du Dieu Fou','Couronne du Titan']},
-  sort:{slot:'capa',cls:['mage'],type:'Sort',cost:60,bonus:'puissance',amt:3,noms:["Sort d'étincelle",'Sort de feu','Sort de givre','Sort de foudre','Sort arcanique','Sort du néant','Sort du Dieu Fou',"Sort de l'Éclipse"]},
-  carquois:{slot:'capa',cls:['archer'],type:'Carquois',cost:45,bonus:'vatt',amt:2,noms:['Carquois de cuir','Carquois renforcé','Carquois de chasseur','Carquois de mithril','Carquois sylvestre','Carquois du crépuscule','Carquois du Dieu Fou','Carquois des Comètes']},
-  tome:{slot:'capa',cls:['pretre'],type:'Tome',cost:55,bonus:'vie',amt:15,noms:['Tome de novice','Tome de soin','Tome béni','Tome de lumière','Tome sacré','Tome céleste','Tome du Dieu Fou','Tome de la Genèse']},
-  prisme:{slot:'capa',cls:['trickster'],type:'Prisme',cost:30,bonus:'mreg',amt:0.8,noms:['Prisme de verre','Prisme de quartz','Prisme poli','Prisme de mithril','Prisme runique','Prisme du crépuscule','Prisme du Dieu Fou','Prisme des Mille Reflets']},
-  voile:{slot:'capa',cls:['assassin'],type:"Voile d'ombre",cost:60,bonus:'vdep',amt:2,noms:['Voile de lin','Voile de soie noire','Voile du rôdeur','Voile de mithril','Voile runique','Voile du crépuscule','Voile du Dieu Fou','Voile du Néant']},
-  lourde:{slot:'armure',cls:['guerrier'],type:'Armure lourde',st:t=>({vie:20+18*t,puissance:t}),noms:['Armure matelassée','Cotte de mailles',"Armure d'acier",'Armure de mithril','Armure runique','Armure du crépuscule','Armure du Dieu Fou','Armure du Titan']},
-  cuir:{slot:'armure',cls:['archer','trickster','assassin'],type:'Armure de cuir',st:t=>({vie:12+12*t,vdep:1+t,vatt:t}),noms:['Veste de cuir','Cuir clouté','Cuir de loup','Cuir de wyverne','Cuir sylvestre','Cuir du crépuscule','Cuir du Dieu Fou','Cuir du Phénix']},
-  robe:{slot:'armure',cls:['mage','pretre'],type:'Robe',st:t=>({vie:6*t,mana:15+12*t,puissance:1+t}),noms:['Robe de lin','Robe de soie',"Robe d'apprenti","Robe de l'érudit",'Robe arcanique','Robe du néant','Robe du Dieu Fou','Robe des Constellations']},
+  epee:{slot:'arme',cls:['guerrier'],type:'Épée',dmg:[22,36],noms:['Épée courte','Épée de fer',"Épée d'acier",'Lame de mithril','Lame runique','Lame du crépuscule','Lame du Roi Bouffon','Épée des Mille Soleils']},
+  baton:{slot:'arme',cls:['mage'],type:'Bâton',dmg:[15,25],noms:['Bâton de frêne','Bâton de chêne','Bâton de cristal','Bâton de braise','Bâton des arcanes','Bâton du néant','Bâton du Roi Bouffon',"Bâton de l'Aube Stellaire"]},
+  arc:{slot:'arme',cls:['archer'],type:'Arc',dmg:[12,21],noms:['Arc court','Arc de chasse','Arc long','Arc de mithril','Arc sylvestre','Arc du crépuscule','Arc du Roi Bouffon','Arc des Mille Étoiles']},
+  baguette:{slot:'arme',cls:['pretre'],type:'Baguette',dmg:[24,36],noms:['Baguette de saule',"Baguette d'os",'Baguette bénie','Baguette solaire','Baguette sacrée','Baguette céleste','Baguette du Roi Bouffon','Baguette du Premier Souffle']},
+  dague:{slot:'arme',cls:['trickster','assassin'],type:'Dague',dmg:[19,31],noms:['Dague rouillée','Dague de fer',"Dague d'acier",'Dague de mithril','Dague runique','Dague du crépuscule','Dague du Roi Bouffon','Croc du Néant']},
+  casque:{slot:'capa',cls:['guerrier'],type:'Casque',cost:50,bonus:'puissance',amt:2,noms:['Casque de cuir','Casque de fer',"Heaume d'acier",'Heaume de mithril','Heaume runique','Heaume de rage','Heaume du Roi Bouffon','Couronne du Titan']},
+  sort:{slot:'capa',cls:['mage'],type:'Sort',cost:60,bonus:'puissance',amt:3,noms:["Sort d'étincelle",'Sort de feu','Sort de givre','Sort de foudre','Sort arcanique','Sort du néant','Sort du Roi Bouffon',"Sort de l'Éclipse"]},
+  carquois:{slot:'capa',cls:['archer'],type:'Carquois',cost:45,bonus:'vatt',amt:2,noms:['Carquois de cuir','Carquois renforcé','Carquois de chasseur','Carquois de mithril','Carquois sylvestre','Carquois du crépuscule','Carquois du Roi Bouffon','Carquois des Comètes']},
+  tome:{slot:'capa',cls:['pretre'],type:'Grimoire',cost:55,bonus:'vie',amt:15,noms:['Grimoire de novice','Grimoire de soin','Grimoire béni','Grimoire de lumière','Grimoire sacré','Grimoire céleste','Grimoire du Roi Bouffon','Grimoire de la Genèse']},
+  prisme:{slot:'capa',cls:['trickster'],type:'Miroir',cost:30,bonus:'mreg',amt:0.8,noms:['Miroir de verre','Miroir de quartz','Miroir poli','Miroir de mithril','Miroir runique','Miroir du crépuscule','Miroir du Roi Bouffon','Miroir des Mille Reflets']},
+  voile:{slot:'capa',cls:['assassin'],type:"Voile d'ombre",cost:60,bonus:'vdep',amt:2,noms:['Voile de lin','Voile de soie noire','Voile du rôdeur','Voile de mithril','Voile runique','Voile du crépuscule','Voile du Roi Bouffon','Voile du Néant']},
+  lourde:{slot:'armure',cls:['guerrier'],type:'Armure lourde',st:t=>({vie:20+18*t,puissance:t}),noms:['Armure matelassée','Cotte de mailles',"Armure d'acier",'Armure de mithril','Armure runique','Armure du crépuscule','Armure du Roi Bouffon','Armure du Titan']},
+  cuir:{slot:'armure',cls:['archer','trickster','assassin'],type:'Armure de cuir',st:t=>({vie:12+12*t,vdep:1+t,vatt:t}),noms:['Veste de cuir','Cuir clouté','Cuir de loup','Cuir de wyverne','Cuir sylvestre','Cuir du crépuscule','Cuir du Roi Bouffon','Cuir du Phénix']},
+  robe:{slot:'armure',cls:['mage','pretre'],type:'Robe',st:t=>({vie:6*t,mana:15+12*t,puissance:1+t}),noms:['Robe de lin','Robe de soie',"Robe d'apprenti","Robe de l'érudit",'Robe arcanique','Robe du néant','Robe du Roi Bouffon','Robe des Constellations']},
   anneau:{slot:'anneau',cls:['guerrier','mage','archer','pretre','trickster','assassin'],type:'Anneau'},
   pvie:{slot:'conso',type:'Potion',noms:['Potion de vie']},
   sp_vie:{slot:'conso',type:'Potion de caractéristique',noms:['Potion de vitalité'],sp:'vie'},
@@ -1056,7 +1083,7 @@ const HARD_CAP={vatt:70,vdep:60};
 KINDS.egg={slot:'conso',type:'Œuf de familier',egg:true,noms:['Œuf de familier']};
 for(const k in PET_DEF)KINDS['egg_'+k]={slot:'conso',type:'Œuf de familier',egg:true,legacy:true,noms:['Œuf de familier']};
 KINDS.croquette={slot:'conso',type:'Nourriture de familier',food:true,noms:['Croquette de familier']};
-const RING_N=['Anneau de cuivre',"Anneau d'argent","Anneau d'or",'Anneau de saphir',"Anneau d'améthyste",'Anneau solaire','Anneau du Dieu Fou',"Anneau de l'Infini"];
+const RING_N=['Anneau de cuivre',"Anneau d'argent","Anneau d'or",'Anneau de saphir',"Anneau d'améthyste",'Anneau solaire','Anneau du Roi Bouffon',"Anneau de l'Infini"];
 const RING_S={vie:'de vitalité',mana:'de sagesse',puissance:'de force',vatt:'de dextérité',vdep:'du vent'};
 const SLOT_IDX={arme:0,capa:1,armure:2,anneau:3};
 const SLOT_NOM=['Arme','Capacité','Armure','Anneau'];
@@ -1107,14 +1134,14 @@ const MON={
   imp:{nom:'Diablotin',hp:900,xp:115,spd:4.5,dmg:46,cd:0.9,pat:'burst',n:5,bs:9,br:6,sz:0.85,loot:[3,5],drop:0.28,pref:4,bc:'#ff4fd8',mv:'erratic',or:[0.15,1,2]},
   cendreux:{nom:'Cendreux',hp:1400,xp:130,spd:1.4,dmg:58,cd:2,pat:'mines',n:8,bs:5,br:8,sz:1,loot:[3,5],drop:0.3,pref:3,bc:'#ff9a3c',or:[0.15,1,2]},
   wyrm:{nom:'Wyrm de lave',hp:1800,xp:140,spd:2,dmg:56,cd:0.3,pat:'spiral',arms:2,bs:6,br:7,sz:1.2,loot:[3,5],drop:0.32,pref:4,bc:'#ffcf3a',or:[0.16,1,2]},
-  // Zone 6 — Terres du Dieu Fou (ces monstres peuvent lâcher un donjon)
+  // Zone 6 — Terres Désolées (ces monstres peuvent lâcher un donjon)
   demon:{nom:'Démon',hp:2200,xp:170,spd:2.2,dmg:64,cd:1.2,pat:'ring',n:14,bs:6.5,br:7,sz:1.15,loot:[4,6],drop:0.34,pref:5,bc:'#ff4d5e',or:[0.2,1,2],rel:1/1500,dun:1/29},
   sentinelle:{nom:'Sentinelle',hp:2600,xp:180,spd:0,dmg:80,cd:1.6,pat:'sniper',n:3,bs:13,br:11,sz:1.1,loot:[4,6],drop:0.34,pref:6,bc:'#ff4a6a',mv:'still',or:[0.2,1,2],rel:1/1500,dun:1/29},
   spectre_vide:{nom:'Spectre du Vide',hp:1800,xp:175,spd:2.6,dmg:60,cd:1.3,pat:'vide',bs:5,br:8,sz:1,loot:[4,6],drop:0.32,pref:5,bc:'#b45aff',pw:true,or:[0.2,1,2],rel:1/1500,dun:1/29},
   chimere:{nom:'Chimère',hp:2400,xp:185,spd:3,dmg:66,cd:1,pat:'chimere',n:5,bs:7,br:6,sz:1.15,loot:[4,6],drop:0.34,pref:3,bc:'#ffcf3a',mv:'charge',or:[0.2,1,2],rel:1/1500,dun:1/29},
   // Boss du centre
-  dieu_fou:{dun2:0.58,nom:'Le Dieu Fou',hp:30000,xp:3000,spd:1,dmg:70,cd:0.6,pat:'dieu_fou',bs:6,br:9,sz:2.4,loot:[5,6],drop:1,n:3,pref:6,bc:'#ffd84d',boss:true,or:[1,12,20],rel:1/60},
-  colosse:{dun2:0.58,nom:"Colosse d'Obsidienne",hp:36000,xp:3200,spd:0.8,dmg:75,cd:0.5,pat:'colosse',bs:5,br:10,sz:2.6,loot:[5,6],drop:1,n:3,pref:5,bc:'#ff9a3c',boss:true,or:[1,12,20],rel:1/60},
+  dieu_fou:{dun2:0.58,nom:'Le Roi Bouffon',hp:30000,xp:3000,spd:1,dmg:70,cd:0.6,pat:'dieu_fou',bs:6,br:9,sz:2.4,loot:[5,6],drop:1,n:3,pref:6,bc:'#ffd84d',boss:true,or:[1,12,20],rel:1/60},
+  colosse:{dun2:0.58,nom:"Béhémoth d'Obsidienne",hp:36000,xp:3200,spd:0.8,dmg:75,cd:0.5,pat:'colosse',bs:5,br:10,sz:2.6,loot:[5,6],drop:1,n:3,pref:5,bc:'#ff9a3c',boss:true,or:[1,12,20],rel:1/60},
   // Donjon — Manoir hanté (ancienne Crypte du Néant)
   acolyte:{nom:'Acolyte du Néant',hp:1600,xp:150,spd:2,dmg:55,cd:1.3,pat:'homing',n:2,bs:4,br:8,sz:0.95,loot:[4,5],drop:0.3,pref:5,bc:'#ff4fd8',or:[0.25,1,2],rel:1/800},
   gargouille:{nom:'Gargouille',hp:2200,xp:170,spd:3.4,dmg:60,cd:1.1,pat:'burst',n:4,bs:9,br:7,sz:1,loot:[4,5],drop:0.3,pref:3,bc:'#d8d4e8',mv:'charge',or:[0.25,1,2],rel:1/800},
@@ -1142,7 +1169,7 @@ const MON={
   cornu:{nom:'Diable cornu',hp:1600,xp:155,spd:3.6,dmg:54,cd:1,pat:'trio',bs:8,br:6,sz:0.85,loot:[4,5],drop:0.3,or:[0.25,1,2],rel:1/800,pref:3,bc:'#ffd23f',mv:'erratic'},
   cerbere:{nom:'Cerbère',hp:2500,xp:175,spd:3,dmg:60,cd:1.3,pat:'shotgun',n:7,spread:0.12,bs:8,br:6,sz:1.1,loot:[4,5],drop:0.3,or:[0.25,1,2],rel:1/800,pref:2.5,bc:'#ff9a3c',mv:'charge'},
   flammeche:{nom:'Flammèche',hp:1200,xp:145,spd:2.4,dmg:50,cd:1.6,pat:'mines',n:8,bs:5,br:8,sz:0.85,loot:[4,5],drop:0.3,or:[0.25,1,2],rel:1/800,pref:4,bc:'#fff27a'},
-  abysses:{nom:'Le Seigneur des Abysses',hp:40000,xp:4400,spd:1.2,dmg:70,cd:0.5,pat:'b_abysses',bs:5.5,br:10,sz:2.6,loot:[5,6],drop:1,n:3,boss:true,or:[1,15,25],rel:1/30,pref:6,bc:'#ffd23f'},
+  abysses:{nom:'Le Seigneur des Braises',hp:40000,xp:4400,spd:1.2,dmg:70,cd:0.5,pat:'b_abysses',bs:5.5,br:10,sz:2.6,loot:[5,6],drop:1,n:3,boss:true,or:[1,15,25],rel:1/30,pref:6,bc:'#ffd23f'},
   // Donjon — Caverne gelée
   yeti:{nom:'Yéti',hp:2600,xp:175,spd:2,dmg:60,cd:1.6,pat:'golem',bs:3.5,br:7,sz:1.15,loot:[4,5],drop:0.3,or:[0.25,1,2],rel:1/800,pref:3,bc:'#e8f4ff'},
   loup_givre:{nom:'Loup de givre',hp:1500,xp:150,spd:4,dmg:52,cd:1.1,pat:'shotgun',n:3,spread:0.2,bs:8,br:3.5,sz:0.9,loot:[4,5],drop:0.3,or:[0.25,1,2],rel:1/800,pref:1.5,bc:'#bfe8ff',mv:'charge'},
@@ -1253,7 +1280,7 @@ function bossCanvas(){const c=document.createElement('canvas');c.width=64;c.heig
   const ell=(x,y,rx,ry,col)=>{g.fillStyle=col;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill();};
   const line=(x0,y0,x1,y1,w,col)=>{g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();};
   return {c,g,poly,ell,line};}
-// Le Dieu Fou : roi-bouffon flottant, masque souriant, couronne d'yeux, grande cape pourpre
+// Le Roi Bouffon : roi-bouffon flottant, masque souriant, couronne d'yeux, grande cape pourpre
 function makeMadGod(f){const {c,g,poly,ell,line}=bossCanvas(),cx=32,a=f?2:0;
   // cape
   poly([[cx-6,18],[cx+6,18],[cx+22,56-a],[cx+12,52],[cx+6,58],[cx,53],[cx-6,58],[cx-12,52],[cx-22,56-a]],'#4a1a6a');
@@ -1271,7 +1298,7 @@ function makeMadGod(f){const {c,g,poly,ell,line}=bossCanvas(),cx=32,a=f?2:0;
   // couronne d'yeux
   for(let k=-2;k<=2;k++){const x=cx+k*4.2,y=5-Math.abs(k)*0.8-(f&&k%2?1:0);poly([[x-2,8],[x+2,8],[x,y-2]],'#ffd23f');ell(x,y+1,1.6,1.6,'#fff');g.fillStyle=k%2?'#b16cff':'#ff3b4a';g.fillRect(x-0.5,y+0.5,1,1);}
   return pixelize(c,[20,6,26]);}
-// Le Colosse d'Obsidienne : golem massif noir, fissures de lave, poings énormes
+// Le Béhémoth d'Obsidienne : golem massif noir, fissures de lave, poings énormes
 function makeColossus(f){const {c,g,poly,ell,line}=bossCanvas(),cx=32,a=f?3:0;
   // jambes
   for(const s of [-1,1]){poly([[cx+s*4,40],[cx+s*12,40],[cx+s*13,58],[cx+s*3,58]],'#2a2436');poly([[cx+s*3,56],[cx+s*14,56],[cx+s*15,60],[cx+s*2,60]],'#1a1622');}
@@ -1376,7 +1403,7 @@ const BOSS_ART={
     else{line(cx+5,14,cx+8,19,2,'#f0d8c0');line(cx+8,19,cx+9,29,2,'#fff6c0');line(cx+6,19,cx+11,18,1.5,'#ffd23f');}
     line(cx-5,14,cx-8,19,2,'#f0d8c0');
     return pix32(c,[40,30,56]);},
-  // Le Seigneur des Abysses : démon de lave, cornes, poitrine fissurée, flammes dans les mains
+  // Le Seigneur des Braises : démon de lave, cornes, poitrine fissurée, flammes dans les mains
   abysses(f){const {c,g,poly,ell,line,px}=bc32(),cx=16;
     for(const s of [-1,1])poly([[cx+s*2,22],[cx+s*8,22],[cx+s*9,30],[cx+s*3,30]],'#5a0a0a');
     poly([[cx-9,10],[cx+9,10],[cx+7,24],[cx-7,24]],'#8a1a0a');poly([[cx-7,11],[cx+1,11],[cx-1,22],[cx-5,22]],'#aa2a14');
@@ -1520,7 +1547,7 @@ const ZONES=[
   {nom:'Forêt des Murmures',niv:'Niveaux 9 à 12',r:[62,74],pool:['ogre','spectre','sylvain','araignee'],col:['#2f5a2d','#2b5429','#335f30'],det:'#4f7f3f',deco:[0.1,2]},
   {nom:'Canyon de Rouille',niv:'Niveaux 12 à 15',r:[50,62],pool:['golem','harpie','scorpion','bandit'],col:['#a0643c','#985e38','#a86a40'],det:'#c4844e',deco:[0.06,5]},
   {nom:'Terres Brûlées',niv:'Niveaux 15 à 18',r:[38,50],pool:['salamandre','imp','cendreux','wyrm'],col:['#3d2f2c','#382a28','#43332f'],det:'#6b2a1a',deco:[0.04,6]},
-  {nom:'Terres du Dieu Fou',niv:'Niveaux 18 à 20 · 2 boss',r:[0,38],pool:['demon','sentinelle','spectre_vide','chimere'],col:['#57516a','#4f4a61','#5c566f'],det:'#7c7494',deco:[0.035,4]}
+  {nom:'Terres Désolées',niv:'Niveaux 18 à 20 · 2 boss',r:[0,38],pool:['demon','sentinelle','spectre_vide','chimere'],col:['#57516a','#4f4a61','#5c566f'],det:'#7c7494',deco:[0.035,4]}
 ];
 const DUNGEON_POOL=['acolyte','gargouille','ombre'];
 const ASTRAL_POOL=['comete','nebuleuse','meduse','astre'],GARDIENS=['g_belier','g_scorpion','g_serpent','g_lion'];
@@ -1555,7 +1582,30 @@ if(!save.vault||!Array.isArray(save.vault.c))save.vault={n:1,c:[]};
 while(save.vault.c.length<10)save.vault.c.push([null,null,null,null,null,null,null,null]);
 for(const ch of Object.values(save.chars||{})){for(const it of [...(ch.equip||[]),...(ch.inv||[])])if(it&&it.slot==='capa'&&KINDS[it.kind]){const f=mkItem(it.kind,it.tier);it.stats=f.stats;it.cost=f.cost;}}
 for(const c of save.vault.c)for(const it of c)if(it&&it.slot==='capa'&&KINDS[it.kind])it.stats=mkItem(it.kind,it.tier).stats;
-function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}pushSave(false);}
+/* ================= comptes : connexion et sauvegarde sur le serveur ================= */
+const ONLINE=location.protocol==='http:'||location.protocol==='https:';
+const TOKEN_KEY='rm-token',OWNER_KEY='rm-owner';
+let AUTH={ok:false,nom:null,admin:false},srvSaveT=null;
+function pushSave(now){if(!AUTH.ok||typeof room==='undefined'||!room||!room.raw)return;clearTimeout(srvSaveT);const go=()=>{try{room.raw({t:'save',data:save});}catch(e){}};if(now)go();else srvSaveT=setTimeout(go,1500);}
+window.addEventListener('beforeunload',()=>pushSave(true));
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+function showAuth(msg,err){const el=document.getElementById('authWin');if(!el)return;el.hidden=false;const m=document.getElementById('authMsg');m.textContent=msg||'';m.className='hint'+(err?' err':'');}
+function hideAuth(){const el=document.getElementById('authWin');if(el)el.hidden=true;}
+function onNetHello(){if(!ONLINE)return;const tk=lsGet(TOKEN_KEY);if(tk){AUTH.ok=false;room.raw({t:'auth',a:'token',token:tk});showAuth('Connexion à ton compte…');}else if(!AUTH.ok)showAuth('');}
+function authKicked(){AUTH.ok=false;lsSet(TOKEN_KEY,null);showAuth('Ton compte vient de se connecter sur un autre appareil.',true);}
+function onAuthRes(m){
+  if(m.t==='authout'){authKicked();return;}
+  if(!m.ok){if(lsGet(TOKEN_KEY)&&!AUTH.ok)lsSet(TOKEN_KEY,null);showAuth(m.msg||'Erreur',true);return;}
+  lsSet(TOKEN_KEY,m.token);const me=String(m.nom).toLowerCase(),owner=lsGet(OWNER_KEY),reloaded=sessionStorage.getItem('rm-reload')==='1';sessionStorage.removeItem('rm-reload');
+  AUTH={ok:true,nom:m.nom,admin:!!m.admin};
+  if(m.save&&m.save.chars){if(!reloaded&&JSON.stringify(m.save)!==JSON.stringify(save)){lsSet(SAVE_KEY,JSON.stringify(m.save));lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}}
+  else if(owner&&owner!==me&&!reloaded){lsSet(SAVE_KEY,null);lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}
+  lsSet(OWNER_KEY,me);pushSave(true);hideAuth();if(!devMode)note('Connecté au compte '+m.nom+(AUTH.admin?' (admin : /god)':''));try{fillTitles();}catch(e){}}
+function authSend(a){const nom=document.getElementById('authNom').value.trim(),mdp=document.getElementById('authMdp').value;if(!room||!room.raw){showAuth('Serveur injoignable, nouvel essai dans un instant…',true);return;}
+  if(a==='register'&&mdp!==document.getElementById('authMdp2').value){showAuth('Les deux mots de passe ne correspondent pas',true);return;}room.raw({t:'auth',a,nom,mdp});showAuth('Envoi…');}
+function logout(){const tk=lsGet(TOKEN_KEY);try{room.raw({t:'auth',a:'logout',token:tk});}catch(e){}pushSave(true);lsSet(TOKEN_KEY,null);AUTH={ok:false,nom:null,admin:false};if(devMode)setDevMode(false);showAuth('Déconnecté.');}
 const C=()=>save.chars[save.current];
 
 /* ================= cartes ================= */
@@ -1563,11 +1613,11 @@ const RK3=3,RN=720,RC=360,SPAWN={x:360.5,y:673.5},RPORT={x:360.5,y:684};
 let REALM_SEED=Math.floor(Math.random()*1e9);
 function setRealmSeed(sd){sd=Math.floor(Number(sd))||0;if(!sd||sd===REALM_SEED)return;REALM_SEED=sd;if(scene!=='realm'){realm=null;realmImg=null;fogCv=null;zoneCapCache={};}}
 const ARENAS=[]; // les boss centraux apparaissent maintenant tous les 20 monstres tués
-// Nexus : grand hall (x 1–30), échoppe du marchand dans une salle à droite (x 32–42, y 10–22)
+// Village : grand hall (x 1–30), échoppe du marchand dans une salle à droite (x 32–42, y 10–22)
 const GPORT={x:23,y:30.2},NW=44,NH=48,NPORT={x:16,y:3.4},FONT={x:16,y:17},ALTAR={x:4.5,y:13.5},NSPAWN={x:16,y:23.5},VPORT={x:16,y:30};
 const ELEVEUR={x:11.5,y:26.5},QUESTNPC={x:37.5,y:21.4},GUIDE={x:24.5,y:22.5},NSTATUES=[{x:6,y:7,c:'guerrier'},{x:25,y:7,c:'mage'},{x:6,y:27,c:'archer'},{x:25,y:27,c:'pretre'}];
 // Salle des coffres (personnelle)
-// étang du Nexus (au sud du hall) : lac, ponton, nénuphars, roseaux, cabane du pêcheur
+// étang du Village (au sud du hall) : lac, ponton, nénuphars, roseaux, cabane du pêcheur
 const NLAKE={cx:16,cy:39.8,rx:7.6,ry:3.4},NHUT={x0:12,x1:20,y0:45,y1:46};
 const nLake=(x,y)=>{const dx=(x+.5-NLAKE.cx)/NLAKE.rx,dy=(y+.5-NLAKE.cy)/NLAKE.ry;return dx*dx+dy*dy<=1;};
 const nPont=(x,y)=>(x===15||x===16)&&y>=36&&y<=40;
@@ -1771,11 +1821,11 @@ function genAstralTry(seed){
     minis:ends.map((r,i)=>({x:r.x+.5,y:r.y+.5,i})),needStars:true,fog:true,seen:new Uint8Array(w*h)};
 }
 const DTYPES={
-  c:{nom:'Manoir Hanté',boss:'le Comte Maudit',col:['#2a1420','#d23c3c'],niv:'Donjon · obscurité',pool:['fantome','armure','chauve'],bk:'liche',mini:[92,52,58],mech:'Il fait noir : reste près des chandelles'},
-  s:{nom:'Tombeau des Sables',boss:'le Pharaon Éternel',col:['#8a5a1a','#ffd23f'],niv:'Donjon · sables mouvants',pool:['momie','scarabee','djinn'],bk:'pharaon',mini:[200,160,96],mech:'Les sables mouvants te ralentissent jusqu\'à 60 %'},
+  c:{nom:'Château de Morvane',boss:'le Comte Maudit',col:['#2a1420','#d23c3c'],niv:'Donjon · obscurité',pool:['fantome','armure','chauve'],bk:'liche',mini:[92,52,58],mech:'Il fait noir : reste près des chandelles'},
+  s:{nom:'Nécropole des Dunes',boss:'le Pharaon Éternel',col:['#8a5a1a','#ffd23f'],niv:'Donjon · sables mouvants',pool:['momie','scarabee','djinn'],bk:'pharaon',mini:[200,160,96],mech:'Les sables mouvants te ralentissent jusqu\'à 60 %'},
   o:{nom:'Abysses Engloutis',boss:'le Léviathan',col:['#0a3050','#3ff0ff'],niv:'Donjon · oxygène',pool:['requin','calmar','lanterne'],bk:'leviathan',mini:[40,110,140],mech:'15 secondes d\'oxygène : respire dans les bulles'},
   p:{nom:'Jardins Célestes',boss:"l'Archange Déchu",col:['#dfe8f8','#ffb020'],niv:'Donjon · courants célestes',pool:['ange','orbe','griffon'],bk:'archange',mini:[235,238,248],mech:'Les courants célestes t\'emportent (difficile à remonter) · tremplins violets près du boss : élan pour esquiver'},
-  e:{nom:'Fournaise Infernale',boss:'le Seigneur des Abysses',col:['#5a0a0a','#ff5a1a'],niv:'Donjon · lave',pool:['cornu','cerbere','flammeche'],bk:'abysses',mini:[120,30,24],mech:'La lave brûle : ne marche pas dedans'},
+  e:{nom:'Fournaise Infernale',boss:'le Seigneur des Braises',col:['#5a0a0a','#ff5a1a'],niv:'Donjon · lave',pool:['cornu','cerbere','flammeche'],bk:'abysses',mini:[120,30,24],mech:'La lave brûle : ne marche pas dedans'},
   b:{nom:'Terrier des Gobelins',boss:'le Roi Gobelin',col:['#4a3018','#9fd06a'],niv:'Donjon débutant',pool:['gob_eclaireur','rat_geant','gob_chaman'],bk:'roi_gobelin',mini:[120,88,52],mech:'Donjon débutant · les champignons lumineux soignent'},
   r:{nom:'Bosquet des Ronces',boss:'la Mère des Ronces',col:['#1f3a1a','#b06ad0'],niv:'Donjon intermédiaire · ronces',pool:['ronceux','guepe','loup_ronce'],bk:'mere_ronces',mini:[70,120,60],mech:'Les ronces ralentissent et piquent : contourne-les'},
   k:{nom:'Sanctuaire des Lucioles',boss:'le Gardien Luciole',col:['#10202a','#ffe27a'],niv:'Donjon intermédiaire · autels',pool:['luciole','hibou','esprit_bois'],bk:'gardien_luciole',mini:[60,100,120],mech:'Prie aux autels lumineux (E) : +30 % de dégâts pendant 20 s'},
@@ -1822,7 +1872,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000011;let newerWarned=false;
+const NETV=2,BUILD=2600000012;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1861,12 +1911,12 @@ function makeNetRoom(){
   function connect(){
     try{ws=new WebSocket(url);}catch(e){setTimeout(connect,3000);return;}
     ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(err){return;}
-      if(m.t==='hello'){if(m.seed)setRealmSeed(m.seed);me=m.peer;others.clear();for(const p of m.peers||[])other(p.peer,p.presence);setConn(true);if(Object.keys(myPres).length)ws.send(JSON.stringify({t:'p',patch:myPres}));emitPeers();}
+      if(m.t==='hello'){if(m.seed)setRealmSeed(m.seed);me=m.peer;others.clear();for(const p of m.peers||[])other(p.peer,p.presence);setConn(true);if(Object.keys(myPres).length)ws.send(JSON.stringify({t:'p',patch:myPres}));emitPeers();setTimeout(()=>{try{onNetHello();}catch(e){}},0);}
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'){for(const f of rawH)f(m);}};
-    ws.onclose=e=>{if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'){for(const f of rawH)f(m);}};
+    ws.onclose=e=>{if(e.code===4004){setConn(false);others.clear();me=null;emitPeers();authKicked();return;}if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
   connect();
@@ -1882,7 +1932,7 @@ async function initRoom(){
   if(window.claude&&typeof window.claude.use==='function'){let r=null;try{r=await window.claude.use('room');}catch(e){r=null;}if(r)room=r;}
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
-  if(room.onRaw)room.onRaw(m=>{
+  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}
     if(m.t==='tr'){tradeMsg(m);return;}
     if(m.t==='g'){guildMsg(m);return;}
     if(m.t==='dev'&&m.cmd==='party'){startParty(m.arg);return;}
@@ -2003,7 +2053,7 @@ function chatCommand(t){
   if(cmd==='echange'||cmd==='échange'){const q=arg.toLowerCase();const r=[...remotes.values()].find(r=>r.p&&clean(r.p.n).toLowerCase()===q)||[...remotes.values()].find(r=>r.p&&q&&clean(r.p.n).toLowerCase().startsWith(q));if(!r){note('Joueur introuvable : /echange pseudo');return true;}requestTrade(r.peer);return true;}
   if(cmd==='duel'){const q=arg.toLowerCase();const r=[...remotes.values()].find(r=>r.p&&clean(r.p.n).toLowerCase()===q)||[...remotes.values()].find(r=>r.p&&q&&clean(r.p.n).toLowerCase().startsWith(q));if(!r){note('Joueur introuvable : /duel pseudo');return true;}requestDuel(r.peer);return true;}
   if(cmd==='tuto'){if(!save.current){note('Choisis d\'abord un héros');return true;}enterTuto();return true;}
-  if(cmd==='god'){if(arg.toLowerCase()==='off'){adminReq('bye');setDevMode(false);devPw='';return true;}if(cyrb53(arg)===DEV_HASH){devPw=arg;adminReq('hello');setDevMode(true);}else{note('Mot de passe incorrect');sfx('deny');}return true;}
+  if(cmd==='god'){if(arg.toLowerCase()==='off'){adminReq('bye');setDevMode(false);devPw='';return true;}if(AUTH.admin||(!ONLINE&&cyrb53(arg)===DEV_HASH)){devPw='compte';adminReq('hello');setDevMode(true);}else if(ONLINE){note('Commande inconnue : /god');return true;}else{note('Mot de passe incorrect');sfx('deny');}return true;}
   note('Commande inconnue : /'+cmd);return true;
 }
 // Filtre de langage : même liste que le serveur
@@ -2069,11 +2119,11 @@ function noise(t,dur,vol,dest,freq,type){const c=AU.ctx,s=c.createBufferSource()
 function kick(t,v){const c=AU.ctx,os=c.createOscillator(),g=c.createGain();os.frequency.setValueAtTime(140,t);os.frequency.exponentialRampToValueAtTime(40,t+0.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.15);os.connect(g);g.connect(AU.mus);os.start(t);os.stop(t+0.16);}
 function mkSong(bpm,style,chords,lead){const L={};for(const [s,n,l] of lead)L[s]=[n,l];return{bpm,style,chords,L,len:chords.length*16};}
 const SONGS={
-  // Nexus et menus : calme, do majeur
+  // Village et menus : calme, do majeur
   lobby:mkSong(92,'calme',[['C4','E4','G4'],['A3','C4','E4'],['F3','A3','C4'],['G3','B3','D4'],['C4','E4','G4'],['A3','C4','E4'],['F3','A3','C4'],['G3','B3','D4']],
     [[0,'E5',4],[4,'G5',4],[8,'C6',6],[14,'B5',2],[16,'A5',6],[22,'G5',2],[24,'E5',8],[32,'F5',4],[36,'A5',4],[40,'C6',4],[44,'A5',4],[48,'B5',6],[54,'A5',2],[56,'G5',8],
      [64,'G5',4],[68,'E5',4],[72,'G5',4],[76,'C6',4],[80,'C6',6],[86,'B5',2],[88,'A5',8],[96,'A5',4],[100,'F5',4],[104,'A5',4],[108,'C6',4],[112,'D6',6],[118,'B5',2],[120,'G5',8]]),
-  // Royaume : épique, ré mineur
+  // Plaines Sauvages : épique, ré mineur
   aventure:mkSong(138,'epique',[['D4','F4','A4'],['Bb3','D4','F4'],['C4','E4','G4'],['A3','C#4','E4'],['D4','F4','A4'],['Bb3','D4','F4'],['C4','E4','G4'],['A3','C#4','E4']],
     [[0,'D5',3],[3,'F5',1],[4,'A5',4],[8,'D6',4],[12,'C6',2],[14,'A5',2],[16,'Bb5',6],[22,'A5',2],[24,'F5',4],[28,'D5',4],[32,'E5',3],[35,'F5',1],[36,'G5',4],[40,'C6',4],[44,'Bb5',2],[46,'G5',2],[48,'A5',8],[56,'C#6',4],[60,'E6',4],
      [64,'F6',4],[68,'E6',2],[70,'D6',2],[72,'A5',8],[80,'Bb5',4],[84,'C6',2],[86,'D6',2],[88,'F6',8],[96,'E6',4],[100,'D6',2],[102,'C6',2],[104,'G5',8],[112,'A5',4],[116,'C#6',4],[120,'E6',4],[124,'A6',4]]),
@@ -2268,7 +2318,7 @@ function classVfx(cls,x,y,ang,rel){
 
 /* ================= scènes ================= */
 function resetScene(){FISH=null;INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostX=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;}
-function enterNexus(){setTimeout(dailyAuto,700);if(scene==='arena'&&DU&&DU.state!=='fight'){duelSend({k:'dleave'});DU=null;$('#duelBox').hidden=true;}if(scene==='tuto'&&!save.tutoDone){save.tutoDone=true;persist();}if(scene!=='nexus')sfx('portal');scene='nexus';MAP=nexusMap;P.x=NSPAWN.x;P.y=NSPAWN.y;resetScene();curZone=-2;amHost=false;updZone();showBanner('Nexus','Zone sûre · la fontaine soigne');sendPresence();}
+function enterNexus(){setTimeout(dailyAuto,700);if(scene==='arena'&&DU&&DU.state!=='fight'){duelSend({k:'dleave'});DU=null;$('#duelBox').hidden=true;}if(scene==='tuto'&&!save.tutoDone){save.tutoDone=true;persist();}if(scene!=='nexus')sfx('portal');scene='nexus';MAP=nexusMap;P.x=NSPAWN.x;P.y=NSPAWN.y;resetScene();curZone=-2;amHost=false;updZone();showBanner('Village','Zone sûre · la fontaine soigne');sendPresence();}
 // point d'arrivée tiré au hasard sur la plage, loin des monstres connus
 // même point pour tous les joueurs pendant une minute (tiré selon l'heure), puis il change de place
 // horloge du serveur (en-tête Date) pour que tous les joueurs changent de minute en même temps
@@ -2284,7 +2334,7 @@ function enterRealm(){
   scene='realm';MAP=realm;{const b=beachSpot();P.x=b.x;P.y=b.y;}P.invul=2.5;resetScene();curZone=-2;sceneT=Date.now();
   amHost=computeHostIsMe();
   if(amHost)populateRealm();
-  else showBanner('Royaume partagé',hostName()+' fait tourner les monstres','#8fd0ff');
+  else showBanner('Plaines partagées',hostName()+' fait tourner les monstres','#8fd0ff');
   groupSpawn();sendPresence();
 }
 function enterDungeon(id,t){
@@ -2332,12 +2382,12 @@ function drawPartyFx(){if(!PARTY)return;const k=Math.floor(PARTY.t*7);if(k%2===0
 function genTuto(){const w=66,h=17,sol=new Uint8Array(w*h).fill(1);const carve=(x0,y0,x1,y1)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)sol[y*w+x]=0;};
   carve(2,3,13,13);carve(14,7,17,9);carve(18,3,31,13);carve(32,7,35,9);carve(36,4,45,12);carve(46,7,49,9);carve(50,2,63,14);
   return{kind:'tuto',w,h,sol,start:{x:5.5,y:8.5},bagAt:{x:40.5,y:8.5},boss:{x:58.5,y:8.5},dummies:[{x:27.5,y:5.5},{x:28.5,y:8.5},{x:27.5,y:11.5}],
-    signs:[{x:8,y:5.2,l:['Bienvenue, héros !','Z Q S D : se déplacer (ou les flèches)','R : retour au Nexus à tout moment']},
+    signs:[{x:8,y:5.2,l:['Bienvenue, héros !','Z Q S D : se déplacer (ou les flèches)','R : retour au Village à tout moment']},
       {x:8,y:11.6,l:['O : options (son, musique, curseur)','Entrée : écrire dans le chat','L : classement des joueurs']},
       {x:22,y:4.9,l:['Clic gauche maintenu : tirer vers la souris','T : tir automatique','Espace : capacité de classe (coûte du mana)']},
       {x:22,y:12,l:['Les mannequins ne ripostent pas.','Tes tirs réussis comptent pour la précision.']},
       {x:40.5,y:5.2,l:['E : ramasser un sac, prendre un portail, parler','I : inventaire · C : statistiques','F : potion de vie · V : potion de mana']},
-      {x:40.5,y:11.4,l:['Glisse un objet sur ton équipement pour l\'équiper','R : retour au Nexus (seul moyen de quitter le Royaume)']},
+      {x:40.5,y:11.4,l:['Glisse un objet sur ton équipement pour l\'équiper','R : retour au Village (seul moyen de quitter les Plaines Sauvages)']},
       {x:56.5,y:3.3,l:['Le Gardien d\'entraînement','Ses invocations ne font rien : bats le Gardien !']}]};}
 function enterTuto(){
   if(!save.current)return;closeAdmin&&closeAdmin();
@@ -2355,7 +2405,7 @@ function tutoTick(dt){
   const boss=monsters.find(m=>m.key==='tuteur'&&m.hp>0);
   if(boss&&amHost){TU.sumT-=dt;if(TU.sumT<=0){TU.sumT=3.2;if(monsters.filter(m=>m.key==='invoc').length<5){for(let k=0;k<2;k++){const a=Math.random()*TAU;addMon('invoc',boss.x+Math.cos(a)*1.6,boss.y+Math.sin(a)*1.6,0);}burst(boss.x,boss.y,'#7ed957',16,3);}}}
 }
-function finishTuto(){save.tutoDone=true;persist();enterNexus();showBanner('Tutoriel terminé !','Prends le portail Royaume au nord pour commencer','#7ed957');}
+function finishTuto(){save.tutoDone=true;persist();enterNexus();showBanner('Tutoriel terminé !','Prends le portail des Plaines au nord pour commencer','#7ed957');}
 let hubOwner='',hubSeed=1;
 function enterHub(owner,seed){
   if(!owner&&!devMode){note('Réservé au mode admin');return;}
@@ -2399,7 +2449,7 @@ function arenaHost(dt){ // l'hôte remet l'arène à zéro si plus personne ne s
   if(fight!==1)return;const k=sceneKey();let any=inArena(P.x,P.y);for(const r of remotes.values())if(activeIn(r,k)&&inArena(r.x,r.y))any=true;
   if(any){arenaEmptyT=0;return;}arenaEmptyT+=dt;if(arenaEmptyT>8){monsters=monsters.filter(m=>m.key!==MAP.bossKey);setFight(0);}}
 function populateRealm(){monsters=[];for(let r=0;r<ZONES.length;r++){const cap=zoneCap(r);for(let i=0;i<cap;i++)spawnIn(r);}bossTimers={};}
-// sortie du donjon : retour dans le Royaume, à l'endroit du portail (ou sur la plage), pour retrouver ses amis
+// sortie du donjon : retour dans les Plaines Sauvages, à l'endroit du portail (ou sur la plage), pour retrouver ses amis
 let dunFrom='realm',realmRet=null;
 function exitDungeon(){if(dunFrom==='hub'){enterNexus();return;}const r=realmRet;enterRealm();if(r&&!solidAt(r.x,r.y)){P.x=r.x;P.y=r.y;}realmRet=null;P.invul=5;P.backProt=1;note('Protégé 5 s · ton premier tir annule la protection');sendPresence();}
 function populateDungeon(){const R0=Math.random;Math.random=mulberry((dungeonId|0)*7919+13);try{populateDungeon0();}finally{Math.random=R0;}
@@ -2427,13 +2477,13 @@ function spawnIn(r){
 }
 function addMon(key,x,y,r,id,hp){const d=MON[key];const m={id:id||(++monId),key,d,x,y,tx:x,ty:y,hx:x,hy:y,r,hp:hp==null?d.hp:hp,max:d.hp,cd:rnd(0.5,1.5),wt:0,wx:0,wy:0,dir:Math.random()<.5?1:-1,flash:0,spin:0,phase:0,pend:0,bq:0,bt:0,ba:0,dash:0,dcd:rnd(1,3),seed:Math.random()*10};monsters.push(m);return m;}
 function spawnBoss(key){for(let k=0;k<300;k++){const tx=ri(0,RN-1),ty=ri(0,RN-1),i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]<5)continue;const x=tx+.5,y=ty+.5;let ok=true;for(let q=0;q<16&&ok;q++){const a=q*TAU/16;if(solidAt(x+Math.cos(a)*3,y+Math.sin(a)*3))ok=false;}if(!ok)continue;const m=addMon(key,x,y,regionAt(x,y));m.hx=x;m.hy=y;return m;}return null;}
-// tous les 20 monstres tués dans le Royaume, un des deux boss centraux apparaît au hasard (Terres Brûlées ou du Dieu Fou)
+// tous les 20 monstres tués dans les Plaines Sauvages, un des deux boss centraux apparaît au hasard (Terres Brûlées ou du Roi Bouffon)
 let realmKills=0;const CENTRAL=['dieu_fou','colosse'];
 function centralBoss(){const m=monsters.find(q=>CENTRAL.includes(q.key)&&q.hp>0);if(m&&amHost)return{key:m.key,x:m.x,y:m.y};if(!amHost){const h=hostKey();if(h.r&&typeof h.r.p.RB==='string'){const f=h.r.p.RB.split(',');if(CENTRAL.includes(f[0]))return{key:f[0],x:+f[1]/10,y:+f[2]/10};}}return m?{key:m.key,x:m.x,y:m.y}:null;}
 function killsToBoss(){if(amHost)return realmKills;const h=hostKey();return h.r&&typeof h.r.p.RK==='number'?h.r.p.RK:0;}
 
 /* ================= combat ================= */
-function aimWorld(){if(FPV)return{x:P.x+Math.cos(fpA)*6,y:P.y+Math.sin(fpA)*6};return aimTouch?screenToWorld(aimTouch.x,aimTouch.y):screenToWorld(mouse.x,mouse.y);}
+function aimWorld(){if(FPV)return{x:P.x+Math.cos(fpA)*6,y:P.y+Math.sin(fpA)*6};if(PAD.on&&PAD.aim!=null)return{x:P.x+Math.cos(PAD.aim)*6,y:P.y+Math.sin(PAD.aim)*6};return aimTouch?screenToWorld(aimTouch.x,aimTouch.y):screenToWorld(mouse.x,mouse.y);}
 function fire(st){
   const w=C().equip[0];if(!w)return;const b=WB[w.kind],a=aimWorld(),ang=Math.atan2(a.y-P.y,a.x-P.x);
   P.face=Math.cos(ang+camA)<0?-1:1;P.thrust=1;
@@ -2478,13 +2528,13 @@ function tpTarget(){const a=aimWorld(),t=C().equip[1].tier,max=7+t*0.4;let dx=a.
   const lockedDoors=MAP&&MAP.doors&&MAP.doors.length&&MAP.sol[MAP.doors[0].y*MAP.w+MAP.doors[0].x]===1;
   for(let k=L;k>=0.5;k-=0.25){const x=P.x+dx/d*k,y=P.y+dy/d*k;if(blocked(x,y,0.3))continue;if(lockedDoors&&MAP.arena&&inArena(x,y)!==inArena(P.x,P.y))continue;return{x,y};}return null;}
 function abilityInfo(it){const t=it.tier,rel=t>=7,m=S().mult;return{
-  casque:`Berserk ${3+0.5*t} s : +50 % vitesse d'attaque, +${20+5*t} % dégâts${rel?' · invulnérable 2 s':''}`,
+  casque:`Rage ${3+0.5*t} s : +50 % vitesse d'attaque, +${20+5*t} % dégâts${rel?' · invulnérable 2 s':''}`,
   sort:`Explosion : 16 × ${Math.round((35+22*t)*m)} dégâts${rel?' · lancée 3 fois au même endroit':''}`,
   carquois:rel?`Flèches dans toutes les directions : ${Math.round((110+65*6)*m)} dégâts + 50 % de la vie du monstre (15 % pour un boss)`:`Flèche perçante : ${Math.round((110+65*t)*m)} dégâts`,
   tome:`Soigne ${70+35*t} PV dans un rayon de ${(3+0.7*t).toFixed(1)} cases${rel?' · les monstres à l\'écran subissent +50 % de dégâts pendant 6 s':''}`,
   prisme:`Téléportation jusqu'à ${(7+t*0.4).toFixed(1)} cases · recharge ${Math.max(0.8,3.5-0.4*t).toFixed(1)} s${rel?' · laisse une bombe au départ':''}`,
   voile:`Invisible pour les monstres pendant ${(rel?7:2.5+0.6*t).toFixed(1)} s${rel?' · invulnérable pendant ce temps':''}`}[it.kind]||'';}
-// chance qu'un monstre du Royaume ouvre un portail de donjon (seulement les deux dernières zones ; le Terrier des Gobelins tombe à part sur la plage et les plaines)
+// chance qu'un monstre des Plaines Sauvages ouvre un portail de donjon (seulement les deux dernières zones ; le Terrier des Gobelins tombe à part sur la plage et les plaines)
 const DUN_RATE=[1/25,1/22,1/20,1/18,1/16,1/14,1/12];
 function dunChance(m){const r=m.r!=null&&m.r>=0&&m.r<7?m.r:(ZONES[5].pool.includes(m.key)?5:ZONES[6].pool.includes(m.key)?6:0);return r>=5?DUN_RATE[r]:0;}
 // mort (« Continuer ») : on perd 20 % de ses niveaux (au moins 1), jamais sous le niveau 1
@@ -2500,7 +2550,7 @@ function useAbility(){
     if(rel){bombs.push({x:ox,y:oy,t:0.9,dm:Math.round((150+50*t)*st.mult),own:true});sendEv('b',ox,oy);}
     P.x=g.x;P.y=g.y;burst(P.x,P.y,'#ff4fd8',16,3);vfx.push({k:'halo',x:P.x,y:P.y,t:0,life:0.3,col:'#2ab8a8'});sfx('portal',0.6);if(!rel)sendEv('t',ox,oy);sendPresence();return;}
   P.mp-=it.cost;P.acd=0.5;sfx('ability');TU.abil=1;
-  if(it.kind==='casque'){P.berserk=3+0.5*t;ft(P.x,P.y-0.8,'Berserk !','#ff9a3c',true);burst(P.x,P.y,'#ff9a3c',18);if(rel){P.invul=2;ft(P.x,P.y-1.3,'Invulnérable !','#ffd23f',true);}}
+  if(it.kind==='casque'){P.berserk=3+0.5*t;ft(P.x,P.y-0.8,'Rage !','#ff9a3c',true);burst(P.x,P.y,'#ff9a3c',18);if(rel){P.invul=2;ft(P.x,P.y-1.3,'Invulnérable !','#ffd23f',true);}}
   else if(it.kind==='sort'){const a=aimWorld();let dx=a.x-P.x,dy=a.y-P.y;const d=Math.hypot(dx,dy);if(d>7){dx*=7/d;dy*=7/d;}const cx=P.x+dx,cy=P.y+dy;const dm=Math.round((35+22*t)*st.mult);
     castSort(cx,cy,dm);if(rel){P.castQ.push({t:0.35,x:cx,y:cy,dm},{t:0.7,x:cx,y:cy,dm});}sendEv(rel?'S':'s',cx,cy);}
   else if(it.kind==='carquois'){const a=aimWorld(),an=Math.atan2(a.y-P.y,a.x-P.x);
@@ -2533,14 +2583,14 @@ const PAT={
   b_luciole:(m,a)=>{m.phase=(m.phase||0)+1;const p=m.phase%3;if(p===0){for(let arm=0;arm<3;arm++)for(let i=0;i<6;i++)shoot(m,a+arm*TAU/3+i*0.25,{bs:3+i*0.5,r:0.24,col:'#ffe27a'});}else if(p===1){for(let k=-1;k<=1;k++)shoot(m,a+k*0.6,{bs:3,r:0.3,col:'#7ed957',hom:1.3,life:4.5});}else{const gap=Math.random()*TAU;for(let i=0;i<20;i++){const an=i*TAU/20;if(Math.abs(((an-gap+Math.PI*3)%TAU)-Math.PI)<0.55)continue;shoot(m,an,{bs:4.2,r:0.24,col:'#ffd23f'});}}},
   b_mine:(m,a)=>{m.phase=(m.phase||0)+1;const p=m.phase%3;if(p===0){for(let i=-3;i<=3;i++)shoot(m,a+i*0.15,{bs:6+Math.abs(i)*0.3,r:0.36,col:'#8a7a6a'});}else if(p===1){if(Math.hypot(P.x-m.x,P.y-m.y)<15){strikes.push({x:P.x,y:P.y,t:1.1,r:1.5,dmg:m.d.dmg,src:m.d.nom,rock:1});for(let k=0;k<3;k++)strikes.push({x:P.x+rnd(-3,3),y:P.y+rnd(-3,3),t:1.2+k*0.2,r:1.3,dmg:m.d.dmg,src:m.d.nom,rock:1});}}else{for(let i=0;i<14;i++)shoot(m,i*TAU/14,{bs:4,r:0.3,col:'#c8a060'});}},
   b_forge:(m,a)=>{m.phase=(m.phase||0)+1;const p=m.phase%3;if(p===0){for(let i=0;i<10;i++)shoot(m,a+i*TAU/10,{bs:4.5,r:0.26,col:'#ff9a3c',wave:0.7,wf:5});}else if(p===1){for(let i=-4;i<=4;i++)shoot(m,a+i*0.1,{bs:7,r:0.2,col:'#ffd23f'});}else{const gap=Math.random()*TAU;for(let i=0;i<24;i++){const an=i*TAU/24;if(Math.abs(((an-gap+Math.PI*3)%TAU)-Math.PI)<0.5)continue;shoot(m,an,{bs:3.8,r:0.26,col:'#ff5a1a'});}}},
-  // Le Dieu Fou : folie — spirales de crânes, murs miroirs, yeux qui suivent, zones de démence
+  // Le Roi Bouffon : folie — spirales de crânes, murs miroirs, yeux qui suivent, zones de démence
   dieu_fou:(m,a,tg)=>{m.phase=(m.phase||0)+1;const p=m.phase%6;
     if(p===0||p===3){for(let arm=0;arm<4;arm++)for(let i=0;i<7;i++)shoot(m,a+arm*TAU/4+i*0.16,{bs:3+i*0.5,r:0.26,col:arm%2?'#ff4fd8':'#b16cff',life:4});}
     else if(p===1){for(let i=-6;i<=6;i++){shoot(m,a+i*0.14,{bs:6,r:0.22,col:'#f4f1e8'});shoot(m,a+Math.PI+i*0.14,{bs:6,r:0.22,col:'#f4f1e8'});}}
     else if(p===2){for(let k=0;k<5;k++)shoot(m,a+(k-2)*0.5,{bs:3.2,r:0.34,col:'#3ff0ff',hom:1.6,life:5});}
     else if(p===4){if(Math.hypot(P.x-m.x,P.y-m.y)<16){strikes.push({x:P.x,y:P.y,t:1.1,r:1.6,dmg:m.d.dmg,src:m.d.nom});for(let k=0;k<4;k++)strikes.push({x:P.x+rnd(-4,4),y:P.y+rnd(-4,4),t:1.2+k*0.15,r:1.4,dmg:m.d.dmg,src:m.d.nom});}}
     else{const gap=Math.random()*TAU;for(let i=0;i<32;i++){const an=i*TAU/32;if(Math.abs(((an-gap+Math.PI*3)%TAU)-Math.PI)<0.45)continue;shoot(m,an,{bs:4.5,r:0.24,col:'#ffd23f'});}}},
-  // Le Colosse d'Obsidienne : onde de choc, jets de rochers, geysers de lave
+  // Le Béhémoth d'Obsidienne : onde de choc, jets de rochers, geysers de lave
   colosse:(m,a,tg)=>{m.phase=(m.phase||0)+1;const p=m.phase%5;
     if(p===0){for(let w=0;w<3;w++)for(let i=0;i<28;i++)shoot(m,i*TAU/28+w*0.11,{bs:3+w*1.2,r:0.3,col:'#ff7a1a',life:4});}
     else if(p===1){for(let i=-3;i<=3;i++)shoot(m,a+i*0.2,{bs:7+Math.abs(i)*0.4,r:0.45,col:'#4a4058',life:2.4});}
@@ -2631,7 +2681,7 @@ function handleDeath(id,key,x,y){
   if(scene==='dungeon'&&key===MAP.bossKey){exitOpen=true;MAP.bossExit={x,y};setFight(2);
     if(dungeonT==='o'&&MAP.bubbles&&MAP.mech){const r=5.5;MAP.bubbles.push({x,y,r});for(let yy=Math.floor(y-r);yy<=y+r;yy++)for(let xx=Math.floor(x-r);xx<=x+r;xx++){if(xx<0||yy<0||xx>=MAP.w||yy>=MAP.h)continue;const i=yy*MAP.w+xx;if(!MAP.sol[i]&&Math.hypot(xx+.5-x,yy+.5-y)<=r)MAP.mech[i]=1;}
       setTimeout(()=>showBanner('Une poche d\'air apparaît !','Respire, vérifie ton sac, puis prends le portail','#3ff0ff'),1800);}}
-  if(scene==='tuto'&&key==='tuteur'){TU.boss=1;exitOpen=true;MAP.bossExit={x,y};for(const q of monsters)if(q.key==='invoc')q.hp=0;setTimeout(()=>showBanner('Bravo !','Le portail Nexus est ouvert : il termine le tutoriel','#7ed957'),1500);}
+  if(scene==='tuto'&&key==='tuteur'){TU.boss=1;exitOpen=true;MAP.bossExit={x,y};for(const q of monsters)if(q.key==='invoc')q.hp=0;setTimeout(()=>showBanner('Bravo !','Le portail Village est ouvert : il termine le tutoriel','#7ed957'),1500);}
   const mine=dmgTot.has(id)||Math.hypot(x-P.x,y-P.y)<12;
   if(!mine)return;
   {const Q=dailyQuests();if(Q[0].k===key)questAdd(0,1);if(scene==='dungeon'&&MAP.bossKey===key&&Q[2].k===dungeonT)questAdd(2,1);}
@@ -2640,7 +2690,7 @@ function handleDeath(id,key,x,y){
   if(Math.random()<d.drop){const n=d.n&&d.boss?d.n:1;for(let i=0;i<n;i++){let t=ri(d.loot[0],d.loot[1]);if(Math.random()<0.08)t=Math.min(6,t+1);items.push(randomItem(t));}}
   if(d.rel&&(key==='devoreur'||Math.random()<d.rel)){const it=randomItem(7);items.push(it);showBanner('RELIQUE !',it.name,'#3ff0ff');burst(x,y,'#3ff0ff',50,5);burst(x,y,'#ff4fd8',40,4);sfx('relic');sendChat('✦ a trouvé une Relique : '+it.name+' !');}
   if(Math.random()<(d.boss?1:0.12))items.push(mkItem(Math.random()<0.6?'pvie':'pmana',0));
-  if(Math.random()<0.001){items.push(mkItem('egg',0));showBanner('Un œuf de familier !','Va le faire éclore chez l\'éleveur du Nexus','#f0dca0');sfx('relic');sendChat('🥚 a trouvé un Œuf de familier !');}
+  if(Math.random()<0.001){items.push(mkItem('egg',0));showBanner('Un œuf de familier !','Va le faire éclore chez l\'éleveur du Village','#f0dca0');sfx('relic');sendChat('🥚 a trouvé un Œuf de familier !');}
   if(d.midBoss||['liche','pharaon','leviathan','archange','abysses','reine','devoreur'].includes(key)){addToBag(x-0.7,y+0.3,[mkItem('sp_'+pick(SK),0)],false);ft(x,y-1.8,'Potion de caractéristique garantie !','#ff9a3c',true);}
   {const sp=statDrops(key,d);if(sp.length){addToBag(x+0.7,y+0.3,sp.map(k=>mkItem('sp_'+k,0)),false);ft(x,y-1.4,'Potion de caractéristique !','#ff9a3c',true);sfx('relic',0.5);}}
   if(items.length){addToBag(x,y,items,false);sfx('loot',0.8);}
@@ -2698,7 +2748,7 @@ function die(src){
   $('#dPermaTxt').textContent='Ce héros repart de zéro. Tu gagnes '+g+' prestige (niveau '+ch.lvl+' + '+Math.floor((ch.kills||0)/25)+' pour les monstres + '+2*spT+' pour les potions + '+3*(ch.bosses||0)+' pour les boss'+(ch.gp?' + '+GLORY_PRES*ch.gp+' pour '+ch.gp+' point'+(ch.gp>1?'s':'')+' de gloire':'')+').';
   permaArm=0;$('#dPerma').classList.remove('arm');deathEl.hidden=false;sfx('boss');
 }
-$('#dContinue').addEventListener('click',()=>{const ch=C(),old=ch.lvl;ch.lvl=deathLvl(old);ch.xp=0;ch.gxp=0;persist();statsDirty=true;invDirty=true;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;deathEl.hidden=true;paused=false;showBanner('Retour au Nexus',ch.lvl<old?'Niveau '+old+' → niveau '+ch.lvl+' · équipement et potions conservés':'Équipement et potions conservés','#ff5a6a');cv.focus();});
+$('#dContinue').addEventListener('click',()=>{const ch=C(),old=ch.lvl;ch.lvl=deathLvl(old);ch.xp=0;ch.gxp=0;persist();statsDirty=true;invDirty=true;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;deathEl.hidden=true;paused=false;showBanner('Retour au Village',ch.lvl<old?'Niveau '+old+' → niveau '+ch.lvl+' · équipement et potions conservés':'Équipement et potions conservés','#ff5a6a');cv.focus();});
 $('#dPerma').addEventListener('click',()=>{
   const b=$('#dPerma');if(Date.now()-permaArm>4000){permaArm=Date.now();b.classList.add('arm');b.querySelector('b').textContent='Clique encore pour confirmer';return;}
   const g=prestigeGain(C());save.prestige+=g;save.stats.presTot=(save.stats.presTot||0)+g;save.chars[save.current]=newChar(save.current);persist();
@@ -2729,7 +2779,7 @@ function withdraw(i){const f=freeInv();if(f<0){note('Sac à dos plein');return;}
 function moveItem(a,b){
   if(!a||!b||(a.w===b.w&&a.i===b.i))return;
   const A=lget(a),B=lget(b);if(!A)return;
-  if(!fits(A,b)){note(b.w==='inv'?'Emplacement verrouillé : achète un 2e sac au Nexus':A.slot==='conso'?'Une potion ne s\'équipe pas':!usable(A)?'Ta classe ne peut pas l\'équiper':'Mauvais emplacement : '+(SLOT_NOM[SLOT_IDX[A.slot]]||'?'));return;}
+  if(!fits(A,b)){note(b.w==='inv'?'Emplacement verrouillé : achète un 2e sac au Village':A.slot==='conso'?'Une potion ne s\'équipe pas':!usable(A)?'Ta classe ne peut pas l\'équiper':'Mauvais emplacement : '+(SLOT_NOM[SLOT_IDX[A.slot]]||'?'));return;}
   if(!fits(B,a)){note('Échange impossible : '+B.name+' ne va pas à cet emplacement');return;}
   lset(b,A);lset(a,B);sfx('item');
   if(groundBag){groundBag.items=groundBag.items.filter(Boolean);if(!groundBag.items.length){bags=bags.filter(x=>x!==groundBag);groundBag=null;}else groundBag.kind=bagKind(groundBag.items);}
@@ -2753,7 +2803,7 @@ function dropLoc(l){
   lset(l,null);addToBag(P.x,P.y,[it],true);SEL=null;done();
 }
 function drink(i){
-  const ch=C(),it=ch.inv[i];if(!it||it.slot!=='conso')return;if(KINDS[it.kind].egg){note('Apporte cet œuf à l\'éleveur du Nexus pour le faire éclore');return;}if(KINDS[it.kind].food){note('La croquette sert à faire évoluer un familier, dans le parc de ta maison');return;}const st=S();
+  const ch=C(),it=ch.inv[i];if(!it||it.slot!=='conso')return;if(KINDS[it.kind].egg){note('Apporte cet œuf à l\'éleveur du Village pour le faire éclore');return;}if(KINDS[it.kind].food){note('La croquette sert à faire évoluer un familier, dans le parc de ta maison');return;}const st=S();
   const spk=KINDS[it.kind].sp;
   if(spk){ch.sp=ch.sp||{};const d=SP_DEF[spk];if((ch.sp[spk]||0)>=d.n){note(SL[spk]+' : maximum atteint ('+d.n+' potions)');sfx('deny');return;}ch.sp[spk]=(ch.sp[spk]||0)+1;ft(P.x,P.y-0.9,'+'+d.step+' '+SL[spk]+' (définitif)',d.col,true);burst(P.x,P.y,d.col,26,3);sfx('level');const s2=S();if(spk==='vie')P.hp=Math.min(s2.tot.vie,P.hp+d.step);if(spk==='mana')P.mp=Math.min(s2.tot.mana,P.mp+d.step);}
   else if(it.kind==='pvie'){if(P.hp>=st.tot.vie){note('Vie déjà pleine');return;}P.hp=Math.min(st.tot.vie,P.hp+120);ft(P.x,P.y-0.8,'+120','#ff6b74',true);}
@@ -2799,7 +2849,7 @@ function renderDetail(){
   if(it.slot==='arme'){const avg=(it.dmg[0]+it.dmg[1])/2,e=eqd&&eqd.dmg?(eqd.dmg[0]+eqd.dmg[1])/2:null,d=e!=null?Math.round(avg-e):0;h+=`<li><span>Dégâts</span><span>${it.dmg[0]}–${it.dmg[1]}${e!=null&&d?` <em class="${d>0?'up':'down'}">(${d>0?'+':''}${d})</em>`:''}</span></li>`;h+=`<li><span>Projectiles</span><span>${WB[it.kind].shots+(it.extra||0)}${it.extra?' <em class="up">(+1 relique)</em>':''}</span></li>`;}
   if(it.slot==='armure'){const a=armorOf(it),e=eqd?armorOf(eqd):null,d=e!=null?a-e:0;h+=`<li><span>Armure</span><span>+${a}${e!=null&&d?` <em class="${d>0?'up':'down'}">(${d>0?'+':''}${d})</em>`:''}</span></li>`;}
   if(it.slot==='capa'){const desc=abilityInfo(it);if(it.stats.mreg)h+=`<li><span>Régénération de mana</span><span>+${it.stats.mreg}/s</span></li>`;h+=`<li><span>${desc}</span></li><li><span>Coût</span><span>${it.cost} mana</span></li>`;}
-  if(it.slot==='conso'&&K.egg){h+=`<li><span>Fais-le éclore chez l'éleveur du Nexus : un des 6 familiers, au hasard (même chance pour tous)</span></li>`;}
+  if(it.slot==='conso'&&K.egg){h+=`<li><span>Fais-le éclore chez l'éleveur du Village : un des 6 familiers, au hasard (même chance pour tous)</span></li>`;}
   else if(it.slot==='conso'&&K.food){h+=`<li><span>Fais évoluer un familier dans le parc de ta maison : 3 familiers identiques + 1 croquette = 1 familier du tier supérieur</span></li>`;}
   else if(it.slot==='conso'){const spk=K.sp;if(spk){const d=SP_DEF[spk],n=(ch.sp&&ch.sp[spk])||0;h+=`<li><span>+${d.step} ${SL[spk]} définitif</span></li><li><span>Déjà bues</span><span class="${n>=d.n?'down':''}">${n} / ${d.n}</span></li>`;}else h+=`<li><span>${it.kind==='pvie'?'Rend 120 points de vie':'Rend 120 points de mana'}</span></li>`;}
   const ks=new Set([...Object.keys(it.stats),...(eqd?Object.keys(eqd.stats):[])]);
@@ -2834,7 +2884,7 @@ function renderStats(){
   stEl.innerHTML=`
   <div class="st hpc"><span class="l">Vie</span><span class="v">${st.tot.vie}</span><span class="n">base ${base.vie}${bn('vie')} · régén ${(1+st.tot.vie/150).toFixed(1)}/s</span></div>
   <div class="st dmc"><span class="l">Dégâts</span><span class="v">${st.dmg[0]}–${st.dmg[1]}</span><span class="n">par projectile${shots>1?' · ×'+shots+' projectiles':''} · arme ${w?w.dmg[0]+'–'+w.dmg[1]:'aucune'}</span></div>
-  <div class="st dxc"><span class="l">Vitesse d'attaque</span><span class="v">${st.tot.vatt}</span><span class="n">${st.rate.toFixed(2)} tirs/s · base ${base.vatt}${bn('vatt')}${P.berserk>0?' · <b>Berserk</b>':''}</span></div>
+  <div class="st dxc"><span class="l">Vitesse d'attaque</span><span class="v">${st.tot.vatt}</span><span class="n">${st.rate.toFixed(2)} tirs/s · base ${base.vatt}${bn('vatt')}${P.berserk>0?' · <b>Rage</b>':''}</span></div>
   <div class="st spc"><span class="l">Vitesse de déplacement</span><span class="v">${st.tot.vdep}</span><span class="n">${st.spd.toFixed(1)} cases/s · base ${base.vdep}${bn('vdep')}</span></div>
   <div class="st mpc"><span class="l">Mana</span><span class="v">${st.tot.mana}</span><span class="n">base ${base.mana}${bn('mana')} · régén ${(2+st.tot.mana/40).toFixed(1)}/s</span></div>
   <div class="st arc"><span class="l">Armure</span><span class="v">${st.tot.armure}</span><span class="n">retire ${st.tot.armure} dégâts à chaque coup (au moins 15 % passent) · base ${base.armure}${b.armure?` <b>+${b.armure} équipement</b>`:''}${pb('armure')}</span></div>
@@ -2844,11 +2894,11 @@ function renderStats(){
 const tabInv=$('#tabInv');
 tabInv.addEventListener('click',e=>{
   const bt=e.target.closest('[data-bt]');
-  if(bt){const n=+bt.dataset.bt;if(C().inv.length<=n*8){note('Achète le '+(n+1)+'e sac chez le marchand du Nexus');return;}bagTab=n;invDirty=true;return;}
+  if(bt){const n=+bt.dataset.bt;if(C().inv.length<=n*8){note('Achète le '+(n+1)+'e sac chez le marchand du Village');return;}bagTab=n;invDirty=true;return;}
   const s=e.target.closest('.slot');
   if(s){
     const loc={w:s.dataset.w,i:+s.dataset.i};
-    if(s.classList.contains('lockd')){note('Achète le 2e sac chez le marchand du Nexus');return;}
+    if(s.classList.contains('lockd')){note('Achète le 2e sac chez le marchand du Village');return;}
     const target=lget(loc);
     if(SEL&&lget(SEL)&&!(SEL.w===loc.w&&SEL.i===loc.i)&&(!target||loc.w==='eq')){moveItem(SEL,loc);return;}
     SEL=target?loc:null;invDirty=true;return;
@@ -3035,7 +3085,7 @@ function renderQuests(){const Q=dailyQuests(),st=questState(),box=$('#qList');bo
     let ic;if(q.t==='kill'){ic=document.createElement('img');ic.src=MON_IMG[q.k]||(MON_IMG[q.k]=MSPR[q.k].toDataURL());}else{ic=document.createElement('div');ic.className='qicon';ic.textContent=q.t==='walk'?'👣':'🌀';}
     const mid=document.createElement('div');const b=document.createElement('b');b.textContent=q.txt;const r=document.createElement('span');r.className='qr';r.textContent=q.sub+' · '+Math.floor(st.prog[i]).toLocaleString('fr-FR')+' / '+q.n.toLocaleString('fr-FR')+' · récompense : '+q.g+' pièces';
     const bar=document.createElement('div');bar.className='qbar';const f=document.createElement('i');f.style.width=Math.min(100,st.prog[i]/q.n*100)+'%';bar.append(f);mid.append(b,r,bar);
-    const bt=document.createElement('button');bt.type='button';bt.className='act'+(done&&!st.got[i]?' main':'');bt.textContent=st.got[i]?'Récupérée':done?(questRemote?'À récupérer au Nexus':'Récupérer '+q.g):'En cours';bt.disabled=!done||st.got[i]||questRemote;
+    const bt=document.createElement('button');bt.type='button';bt.className='act'+(done&&!st.got[i]?' main':'');bt.textContent=st.got[i]?'Récupérée':done?(questRemote?'À récupérer au Village':'Récupérer '+q.g):'En cours';bt.disabled=!done||st.got[i]||questRemote;
     bt.onclick=()=>{if(questRemote||st.got[i]||st.prog[i]<q.n)return;st.got[i]=true;save.gold+=q.g;sfx('buy');burst(P.x,P.y,'#ffd96a',18,3);note('+'+q.g+' pièces');
       if(!st.bonus&&st.got.every(Boolean)){st.bonus=true;save.cursite+=50;showBanner('Les 3 quêtes du jour sont terminées !','+50 Cursite','#7df0e0');sfx('relic');}persist();invDirty=true;renderQuests();};
     row.append(ic,mid,bt);box.append(row);});
@@ -3143,7 +3193,7 @@ function renderPets(){const eggs=$('#petEggs'),list=$('#petList'),evo=$('#petEvo
     for(const [txt,fn,main,dis] of btns){const bt=document.createElement('button');bt.type='button';bt.className='act'+(main?' main':'');bt.textContent=txt;bt.disabled=!!dis;bt.onclick=fn;c.append(bt);}return c;};
   // œufs
   const eggIdx=[];C().inv.forEach((it,i)=>{if(it&&KINDS[it.kind]&&KINDS[it.kind].egg)eggIdx.push(i);});
-  if(eggIdx.length){const c=document.createElement('div');c.className='pcard';const im=document.createElement('img');im.src=icon(mkItem('egg',0));const b=document.createElement('b');b.textContent='Œuf de familier ×'+eggIdx.length;const sp=document.createElement('span');sp.textContent=atBreeder?'Un des 6 familiers au hasard':'Fais-les éclore chez l\'éleveur du Nexus';c.append(im,b,sp);
+  if(eggIdx.length){const c=document.createElement('div');c.className='pcard';const im=document.createElement('img');im.src=icon(mkItem('egg',0));const b=document.createElement('b');b.textContent='Œuf de familier ×'+eggIdx.length;const sp=document.createElement('span');sp.textContent=atBreeder?'Un des 6 familiers au hasard':'Fais-les éclore chez l\'éleveur du Village';c.append(im,b,sp);
     if(atBreeder){const bt=document.createElement('button');bt.type='button';bt.className='act main';bt.textContent='Faire éclore';bt.onclick=()=>hatch(eggIdx[0]);c.append(bt);}eggs.append(c);}
   else{const p=document.createElement('p');p.className='hint';p.textContent='Aucun œuf. Les œufs tombent très rarement (0,1 %) sur tous les monstres du jeu.';eggs.append(p);}
   // évolutions (3 identiques + 1 croquette)
@@ -3156,7 +3206,7 @@ function renderPets(){const eggs=$('#petEggs'),list=$('#petList'),evo=$('#petEvo
   [...pets].sort((a,b)=>a.k.localeCompare(b.k)||(b.t||0)-(a.t||0)).forEach(p=>{const on=p.id===save.petEq;list.append(card(p.k,p.t||0,PET_DEF[p.k].nom,PET_TXT(p.k,p.t)+' (au-delà du maximum)'+(on?' · te suit':' · dans le parc'),[[on?'Renvoyer au parc':'Équiper',()=>{save.petEq=on?null:p.id;persist();statsDirty=true;renderPets();sendPresence();note(on?PET_DEF[p.k].nom+' retourne au parc':PET_DEF[p.k].nom+' te suit !');},!on]],on));});
   if(!pets.length){const p=document.createElement('p');p.className='hint';p.textContent='Tu n\'as pas encore de familier.';list.append(p);}
   $('#petFoot').textContent=pets.length+' familier'+(pets.length>1?'s':'')+' · '+cro+' croquette'+(cro>1?'s':'')+' · 1 seul équipé à la fois';}
-function evolvePet(k,t){if(scene!=='vault'||CASE)return;const pets=save.pets||[],same=pets.filter(p=>p.k===k&&(p.t||0)===t);if(same.length<3||t>=2)return;const ci=C().inv.findIndex(it=>it&&it.kind==='croquette');if(ci<0){note('Il faut une croquette (marchand du Nexus, 500 pièces)');sfx('deny');return;}
+function evolvePet(k,t){if(scene!=='vault'||CASE)return;const pets=save.pets||[],same=pets.filter(p=>p.k===k&&(p.t||0)===t);if(same.length<3||t>=2)return;const ci=C().inv.findIndex(it=>it&&it.kind==='croquette');if(ci<0){note('Il faut une croquette (marchand du Village, 500 pièces)');sfx('deny');return;}
   same.sort((a,b)=>(a.id===save.petEq)-(b.id===save.petEq));const used=same.slice(0,3),wasEq=used.some(p=>p.id===save.petEq);
   save.pets=pets.filter(p=>!used.includes(p));C().inv[ci]=null;const np={id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),k,t:t+1};save.pets.push(np);{const cur=eqPet();if(wasEq||!cur||(cur.k===k&&(cur.t||0)<np.t))save.petEq=np.id;}
   persist();invDirty=true;statsDirty=true;renderPets();sendPresence();
@@ -3181,6 +3231,19 @@ function drawParkPets(){for(const q of parkPets)drawPet(q.k,q.x,q.y,q.x,q.t);}
 // décoration de la maison
 const houseEl=$('#houseWin');
 const presEl=$('#presWin');
+// ---- Boutique (aperçu admin) ----
+let authMode='login';
+function setAuthMode(md){authMode=md;$('#authTabLog').classList.toggle('on',md==='login');$('#authTabReg').classList.toggle('on',md==='register');$('#authMdp2Row').hidden=md!=='register';$('#authGo').textContent=md==='login'?'Se connecter':'Créer mon compte';$('#authMdp').autocomplete=md==='login'?'current-password':'new-password';}
+$('#authTabLog').addEventListener('click',()=>setAuthMode('login'));$('#authTabReg').addEventListener('click',()=>setAuthMode('register'));
+$('#authGo').addEventListener('click',()=>authSend(authMode));
+for(const id of ['authNom','authMdp','authMdp2'])$('#'+id).addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')authSend(authMode);});
+if(ONLINE)showAuth('Connexion au serveur…');
+const GSHOP_PACKS=[[500,'4,99 €'],[1200,'9,99 €'],[2600,'19,99 €'],[5500,'39,99 €']];
+function openGShop(){const box=$('#gshopPacks');box.textContent='';for(const [n,p] of GSHOP_PACKS){const c=document.createElement('div');c.className='shop-card';c.innerHTML='<i class="cur" style="display:block;width:22px;height:22px;background:#3ff0ff;transform:rotate(45deg);margin:6px;grid-row:1/3"></i><div class="sc-t"><b>'+n.toLocaleString('fr-FR')+' Cursite</b><span>'+p+'</span></div><button type="button" class="act" disabled>Bientôt</button>';box.append(c);}
+  $('#gshopCur').textContent=(save.cursite||0).toLocaleString('fr-FR');$('#gshopWin').hidden=false;paused=true;keys.clear();mouse.down=false;sfx('coin');}
+function closeGShop(){$('#gshopWin').hidden=true;paused=false;cv.focus();}
+$('#gshopBtn').addEventListener('click',openGShop);$('#logoutBtn').addEventListener('click',()=>{closeOpts();logout();});setInterval(()=>{const e=$('#acctName');if(e)e.textContent=AUTH.ok?AUTH.nom:'';},1000);$('#gshopClose').addEventListener('click',closeGShop);$('#gshopSkins').addEventListener('click',()=>{closeGShop();openSkins();});
+setInterval(()=>{const b=$('#gshopBtn');const on=devMode&&scene==='nexus'&&!!save.current;if(b.hidden===on)b.hidden=!on;},400);
 function openPresWin(){presEl.hidden=false;paused=true;keys.clear();mouse.down=false;$('#presMsg').textContent='';renderPresWin();sfx('item');}
 function closePresWin(){presEl.hidden=true;paused=false;cv.focus();}
 function renderPresWin(){const cap=maxLvl(),box=$('#presList');box.textContent='';$('#presNow').textContent='Niveau maximum : '+cap+' · Prestige : '+(save.prestige||0).toLocaleString('fr-FR');
@@ -3251,7 +3314,7 @@ function closeFishWin(){fishEl.hidden=true;paused=false;cv.focus();}
 function renderFishWin(){document.querySelectorAll('#fishTabs button').forEach(b=>b.classList.toggle('on',b.dataset.f===fishTab));const g=$('#fishGrid');g.textContent='';const got=save.fish||{};
   for(const f of FISHES.filter(q=>q.site===fishTab)){const rec=got[f.id],R=FISH_RAR[f.r],c=document.createElement('div');c.className='fcard'+(rec?'':' no');c.style.setProperty('--fc',R.col);
     const im=document.createElement('img');im.src=fishURL(f.id);const b=document.createElement('b');b.textContent=rec?f.nom:'???';const r=document.createElement('span');r.className='fr';r.textContent=R.nom;const w=document.createElement('span');w.className='fw';w.textContent=rec?'Record : '+fmtKg(rec.best)+' · pêché ×'+rec.n:'Poids : '+fmtKg(f.min)+' à '+fmtKg(f.max);c.append(im,b,r,w);g.append(c);}
-  const n=Object.keys(got).length;$('#fishFoot').textContent=n+' / 20 espèces pêchées · '+(fishTab==='lac'?'pêche au bord du lac de ta maison':'pêche au bord de la mer, sur la plage du Royaume');}
+  const n=Object.keys(got).length;$('#fishFoot').textContent=n+' / 20 espèces pêchées · '+(fishTab==='lac'?'pêche au bord du lac de ta maison':'pêche au bord de la mer, sur la plage des Plaines Sauvages');}
 $('#fishTabs').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){fishTab=b.dataset.f;renderFishWin();}});
 $('#fishClose').addEventListener('click',closeFishWin);fishEl.addEventListener('click',e=>{if(e.target===fishEl)closeFishWin();});
 /* ================= groupe ================= */
@@ -3260,7 +3323,7 @@ function groupMates(){return [...remotes.values()].filter(r=>r.p&&myGid&&r.p.gi=
 function inviteGroup(peer){const r=remotes.get(peer);if(!r||!r.p)return;if(!myGid)myGid=Math.random().toString(36).slice(2,10);if(groupMates().length>=5){note('Groupe complet (6 joueurs)');return;}
   room&&room.raw&&room.raw({t:'tr',to:peer,k:'gpinv',h:myGid});note('Invitation de groupe envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');sendPresence();}
 function leaveGroup(){if(!myGid)return;myGid=null;note('Tu as quitté le groupe');sendPresence();plSig='';}
-// en entrant dans le Royaume, on arrive à côté d'un membre du groupe déjà sur place
+// en entrant dans les Plaines Sauvages, on arrive à côté d'un membre du groupe déjà sur place
 function groupSpawn(){if(!myGid)return;const m=groupMates().find(r=>r.p.s==='r');if(!m)return;for(let k=0;k<16;k++){const a=k*TAU/16,d=k<8?1:1.8,x=m.x+Math.cos(a)*d,y=m.y+Math.sin(a)*d;if(!solidAt(x,y)&&!solidAt(x-.3,y)&&!solidAt(x+.3,y)&&!solidAt(x,y-.3)&&!solidAt(x,y+.3)){P.x=x;P.y=y;note('Tu rejoins ton groupe : '+(clean(m.p.n).slice(0,16)||'Joueur'));return;}}}
 /* ---------- menu d'un joueur (clic sur son nom) ---------- */
 const pmEl=$('#pmenu');
@@ -3420,7 +3483,7 @@ function drawGHall(x0,x1,y0,y1){const u=TS/16;
   // portail du raid + jauge du Titan
   if(raidOn())drawPortal(GH.raid.x,GH.raid.y,'#8a1a10','#ff7a1a','Raid',dragonUp()?'Dragon · '+raidLeft():'Dragon dans '+spawnLeft()+' s',{scale:1.1,world:true});else{const X=sx(GH.raid.x),Y=sy(GH.raid.y);ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(X,Y+TS*0.6,TS*0.9,TS*0.25,0,0,TAU);ctx.fill();R(X-TS*0.8,Y-TS*0.9,TS*1.6,TS*1.5,'#2a2438');R(X-TS*0.65,Y-TS*0.75,TS*1.3,TS*1.2,'#141020');label('Portail du raid',X,Y-TS*1.2,'#dcd8e4',Math.round(TS*0.3));label('fermé',X,Y,'#8a8494',Math.round(TS*0.28));}
   if(GUILD&&GUILD.raid&&raidOn()){label('Dégâts de ta guilde : '+GUILD.raid.guilde.toLocaleString('fr-FR'),sx(GH.raid.x),sy(GH.raid.y+2.2),'#ffd23f',Math.round(TS*0.28));}
-  drawPortal(GH.back.x,GH.back.y,'#3f7fe0','#8fd0ff','Nexus');}
+  drawPortal(GH.back.x,GH.back.y,'#3f7fe0','#8fd0ff','Village');}
 function drawRaid(x0,x1,y0,y1){const u=TS/16,d=MAP;
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const X=Math.floor(sx(tx)),Y=Math.floor(sy(ty));if(tx<0||ty<0||tx>=d.w||ty>=d.h){R(X,Y,TS+1,TS+1,'#0b0706');continue;}const v=Math.floor(h2(tx,ty)*4),i=ty*d.w+tx;
     if(d.lava[i]){ // lave animée
@@ -3465,7 +3528,7 @@ function renderGuild(){const B=$('#gdBody');B.textContent='';
   [...G.membres].sort((a,b)=>b.dmg-a.dmg).forEach(m=>{const row=document.createElement('div');row.className='grow'+(m.moi?' moi':'');const im=document.createElement('img');if(heroURL[m.c])im.src=heroURL[m.c];const n=document.createElement('span');n.textContent=(m.chef?'👑 ':'')+m.n+' · niv. '+m.l+((m.moi||online.has(m.n))?' · en ligne':'');const e=document.createElement('em');e.textContent=m.dmg.toLocaleString('fr-FR')+' dégâts';row.append(im,n,e);
     if(G.chef&&!m.moi){const k=document.createElement('button');k.type='button';k.className='act';k.textContent='Exclure';k.onclick=()=>{if(k.dataset.arm){room.raw(Object.assign(gMsg('kick'),{k:m.k}));}else{k.dataset.arm=1;k.textContent='Sûr ?';}};row.append(k);}else row.append(document.createElement('span'));L.append(row);});B.append(L);
   const acts=document.createElement('div');acts.style.cssText='display:flex;gap:8px;margin-top:10px;flex-wrap:wrap';
-  if(scene!=='ghall'){const go=document.createElement('button');go.type='button';go.className='act main';go.textContent='Aller au hall de guilde';go.onclick=()=>{closeGuildWin();if(scene==='nexus'||scene==='vault'||scene==='hub')enterGuildHall();else note('Passe par le portail « Guilde » du Nexus');};acts.append(go);}
+  if(scene!=='ghall'){const go=document.createElement('button');go.type='button';go.className='act main';go.textContent='Aller au hall de guilde';go.onclick=()=>{closeGuildWin();if(scene==='nexus'||scene==='vault'||scene==='hub')enterGuildHall();else note('Passe par le portail « Guilde » du Village');};acts.append(go);}
   const lv=document.createElement('button');lv.type='button';lv.className='act';lv.textContent='Quitter la guilde';lv.onclick=()=>{if(lv.dataset.arm){room.raw(gMsg('leave'));}else{lv.dataset.arm=1;lv.textContent='Clique encore pour quitter';}};acts.append(lv);B.append(acts);
   $('#gdFoot').textContent=G.chef?'Tu es le chef de la guilde':'Clic sur un nom de joueur pour l\'inviter';}
 $('#gdClose').addEventListener('click',closeGuildWin);guildEl.addEventListener('click',e=>{if(e.target===guildEl)closeGuildWin();});
@@ -3533,7 +3596,7 @@ function renderDevPlayers(){
       mk(armed?'Confirmer le ban':'Bannir IP',()=>{if(banArm!==r.peer){banArm=r.peer;setTimeout(()=>{if(banArm===r.peer){banArm='';renderDevPlayers();}},4000);renderDevPlayers();return;}banArm='';devSend(r.peer,'ban');},'danger'));
     row.append(nm,acts);box.append(row);}
 }
-const EFF_LIST=[['par','P','Paralysé'],['poi','O','Empoisonné'],['slow','L','Ralenti'],['blind','A','Aveuglé'],['burn','F','Enflammé'],['rage','R','Enragé'],['invul','I','Invulnérable'],['sonic','S','Sonic'],['clear',null,'Retirer tout']];
+const EFF_LIST=[['par','P','Paralysé'],['poi','O','Empoisonné'],['slow','L','Ralenti'],['blind','A','Aveuglé'],['burn','F','Enflammé'],['rage','R','Enragé'],['invul','I','Invulnérable'],['sonic','S','Véloce'],['clear',null,'Retirer tout']];
 function screenPlayers(){const k=sceneKey(),rw=W/2/TS+1,rh=H/2/TS+1;return [...remotes.values()].filter(r=>r.p&&activeIn(r,k)&&Math.abs(r.x-P.x)<rw&&Math.abs(r.y-P.y)<rh);}
 function renderEffGrid(){const g=$('#effGrid');g.textContent='';for(const [e,ic,nm] of EFF_LIST){const b=document.createElement('button');b.type='button';b.className='act'+(e==='clear'?' danger':'');if(ic){const im=document.createElement('img');im.src=ST_URL[ic]||(ST_URL[ic]=ST_ICON[ic].toDataURL());im.alt='';b.append(im);}b.append(document.createTextNode(nm));
     b.onclick=()=>{const tg=$('#effTgt').value,t=clamp(+$('#effDur').value||8,1,60);let n=0;if(tg!=='scr'){adminEff(e,t);n++;}if(tg!=='me')for(const r of screenPlayers()){adminReq('eff',r.peer,{e,t});n++;}note(n?nm+' · '+n+' cible'+(n>1?'s':''):'Aucun joueur à l\'écran');};g.append(b);}
@@ -3548,7 +3611,7 @@ function renderBans(){const box=$('#devBans');box.textContent='';
     const bt=document.createElement('button');bt.type='button';bt.className='act';bt.textContent='Débannir';bt.onclick=()=>adminReq('unban',b.id);row.append(nm,bt);box.append(row);}}
 function updItTarget(){const el=$('#itTarget');const r=admGiveTo&&remotes.get(admGiveTo);if(r&&r.p){el.innerHTML='';const b=document.createElement('b');b.textContent='Envoi à '+(clean(r.p.n).slice(0,16)||'Joueur')+' : clic sur un objet pour le lui donner. ';const c=document.createElement('button');c.type='button';c.className='act';c.textContent='Revenir à mon sac';c.onclick=()=>{admGiveTo=null;updItTarget();};el.append(b,c);}else{admGiveTo=null;el.textContent='Clic sur un objet : il arrive dans ton sac à dos.';}}
 const MON_IMG={};
-function monZone(k){for(let i=0;i<ZONES.length;i++)if(ZONES[i].pool.includes(k))return ZONES[i].nom;for(const t in DTYPES){const T=DTYPES[t];if((T.pool||[]).includes(k)||T.bk===k)return T.nom;}if(ASTRAL_POOL.includes(k)||GARDIENS.includes(k)||k==='devoreur')return DTYPES.a.nom;if(MON[k].tuto)return 'Tutoriel';if(k==='dieu_fou'||k==='colosse')return 'Centre du Royaume';return 'Autre';}
+function monZone(k){for(let i=0;i<ZONES.length;i++)if(ZONES[i].pool.includes(k))return ZONES[i].nom;for(const t in DTYPES){const T=DTYPES[t];if((T.pool||[]).includes(k)||T.bk===k)return T.nom;}if(ASTRAL_POOL.includes(k)||GARDIENS.includes(k)||k==='devoreur')return DTYPES.a.nom;if(MON[k].tuto)return 'Tutoriel';if(k==='dieu_fou'||k==='colosse')return 'Centre des Plaines Sauvages';return 'Autre';}
 function renderMonsters(){const box=$('#monGrid'),q=clean($('#monSearch').value).toLowerCase();box.textContent='';
   for(const k of MKEYS){const d=MON[k];const z=monZone(k);if(q&&!(d.nom.toLowerCase().includes(q)||z.toLowerCase().includes(q)))continue;
     const row=document.createElement('div');row.className='monrow';const im=document.createElement('img');im.alt='';im.src=MON_IMG[k]||(MON_IMG[k]=MSPR[k].toDataURL());
@@ -3587,7 +3650,7 @@ function tradeSend(o){if(TR&&room&&room.raw)room.raw(Object.assign({t:'tr',to:TR
 function requestTrade(peer){const r=remotes.get(peer);if(!canTradeWith(r)){note('Rapproche-toi du joueur pour échanger');return;}if(TR){note('Tu as déjà un échange en cours');return;}
   room.raw({t:'tr',to:peer,k:'req'});note('Demande d\'échange envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');}
 let treqKind='trade',treqKey='';
-function showTradeReq(peer,kind,key){const r=remotes.get(peer);if(!r||!r.p)return;treqFrom=peer;treqT=20;treqKind=kind||'trade';treqKey=key||'';const nm=clean(r.p.n).slice(0,16)||'Joueur';$('#treqT').textContent=treqKind==='group'?'👥 Invitation de groupe':treqKind==='guild'?'🏰 Invitation de guilde':treqKind==='tp'?'↗ Invitation':treqKind==='duel'?'⚔ Défi en duel !':'Proposition d\'échange';$('#treqS').textContent=treqKind==='group'?nm+' t\'invite dans son groupe : vous arriverez ensemble dans le Royaume.':treqKind==='guild'?nm+' t\'invite dans la guilde '+(gInvite?'['+gInvite.tag+'] '+gInvite.nom:'')+'.':treqKind==='tp'?nm+' t\'invite à le rejoindre dans le Royaume (téléportation).':treqKind==='duel'?nm+' te défie dans l\'arène. Vous choisirez ensuite : duel entre amis ou duel à mort.':nm+' veut échanger avec toi.';treqEl.style.borderColor=treqKind==='duel'?'#c8102e':treqKind==='tp'?'#3ff0ff':'';treqEl.hidden=false;sfx(treqKind==='duel'?'boss':'coin',0.5);}
+function showTradeReq(peer,kind,key){const r=remotes.get(peer);if(!r||!r.p)return;treqFrom=peer;treqT=20;treqKind=kind||'trade';treqKey=key||'';const nm=clean(r.p.n).slice(0,16)||'Joueur';$('#treqT').textContent=treqKind==='group'?'👥 Invitation de groupe':treqKind==='guild'?'🏰 Invitation de guilde':treqKind==='tp'?'↗ Invitation':treqKind==='duel'?'⚔ Défi en duel !':'Proposition d\'échange';$('#treqS').textContent=treqKind==='group'?nm+' t\'invite dans son groupe : vous arriverez ensemble dans les Plaines Sauvages.':treqKind==='guild'?nm+' t\'invite dans la guilde '+(gInvite?'['+gInvite.tag+'] '+gInvite.nom:'')+'.':treqKind==='tp'?nm+' t\'invite à le rejoindre dans les Plaines Sauvages (téléportation).':treqKind==='duel'?nm+' te défie dans l\'arène. Vous choisirez ensuite : duel entre amis ou duel à mort.':nm+' veut échanger avec toi.';treqEl.style.borderColor=treqKind==='duel'?'#c8102e':treqKind==='tp'?'#3ff0ff':'';treqEl.hidden=false;sfx(treqKind==='duel'?'boss':'coin',0.5);}
 function hideTradeReq(){treqEl.hidden=true;treqFrom=null;}
 $('#treqOk').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();if(treqKind==='group'){myGid=treqKey;room.raw({t:'tr',to:p,k:'gpans',ok:true});note('Tu as rejoint le groupe');plSig='';sendPresence();return;}if(treqKind==='guild'){room.raw(Object.assign(gMsg('join'),{gid:treqKey}));return;}if(treqKind==='tp'){joinPlayer(p);return;}if(treqKind==='duel'){acceptDuel(p,treqKey);return;}const r=remotes.get(p);if(!canTradeWith(r)){note('Le joueur est trop loin');room&&room.raw&&room.raw({t:'tr',to:p,k:'ans',ok:false});return;}if(TR){room.raw({t:'tr',to:p,k:'ans',ok:false});return;}room.raw({t:'tr',to:p,k:'ans',ok:true});openTrade(p);cv.focus();});
 $('#treqNo').addEventListener('click',()=>{const p=treqFrom;hideTradeReq();if(treqKind!=='guild')room&&room.raw&&room.raw({t:'tr',to:p,k:treqKind==='duel'?'dans':treqKind==='tp'?'tpans':treqKind==='group'?'gpans':'ans',ok:false});cv.focus();});
@@ -3615,12 +3678,12 @@ function tryFinishTrade(){if(!TR||!TR.okMe||!TR.okThem)return;const mine=offerIt
   for(const i of TR.mine)ch.inv[i]=null;for(const it of TR.theirs){const f=ch.inv.indexOf(null);if(f>=0)ch.inv[f]=it;}
   const n=TR.theirs.length,g=mine.length,nm=TR.name;TR=null;trEl.hidden=true;persist();invDirty=true;sfx('buy');burst(P.x,P.y,'#ffd96a',20,3);
   showBanner('Échange réussi',g+' objet'+(g>1?'s':'')+' donné'+(g>1?'s':'')+' · '+n+' reçu'+(n>1?'s':'')+' · avec '+nm,'#ffd96a');cv.focus();}
-/* ---------- invitation de téléportation (Royaume) ---------- */
+/* ---------- invitation de téléportation (Plaines Sauvages) ---------- */
 const tpInvT={};
-function inviteTp(peer){const r=remotes.get(peer);if(!r||!r.p){note('Joueur introuvable');return;}if(scene!=='realm'){note('Tu dois être dans le Royaume pour inviter');return;}
+function inviteTp(peer){const r=remotes.get(peer);if(!r||!r.p){note('Joueur introuvable');return;}if(scene!=='realm'){note('Tu dois être dans les Plaines Sauvages pour inviter');return;}
   if(tpInvT[peer]&&Date.now()-tpInvT[peer]<10000){note('Invitation déjà envoyée, patiente un peu');return;}tpInvT[peer]=Date.now();
   room.raw({t:'tr',to:peer,k:'tpinv'});note('Invitation envoyée à '+(clean(r.p.n).slice(0,16)||'Joueur'));sfx('item');}
-function joinPlayer(peer){const r=remotes.get(peer);if(!r||!r.p||r.p.s!=='r'||Date.now()-r.upd>6000){note('Le joueur n\'est plus dans le Royaume');return;}
+function joinPlayer(peer){const r=remotes.get(peer);if(!r||!r.p||r.p.s!=='r'||Date.now()-r.upd>6000){note('Le joueur n\'est plus dans les Plaines Sauvages');return;}
   if(DU||scene==='arena'||scene==='tuto'){note('Impossible pendant un duel ou le tutoriel');return;}
   if(scene!=='realm')enterRealm();
   let x=r.x,y=r.y;for(let k=0;k<16;k++){const a=k*TAU/16,d=k<8?0.9:1.6,nx=r.x+Math.cos(a)*d,ny=r.y+Math.sin(a)*d;if(!solidAt(nx,ny)&&!solidAt(nx-.3,ny)&&!solidAt(nx+.3,ny)&&!solidAt(nx,ny-.3)&&!solidAt(nx,ny+.3)){x=nx;y=ny;break;}}
@@ -3697,7 +3760,7 @@ function renderDuel(){const box=$('#duelBox');if(!DU||scene!=='arena'){box.hidde
   else if(DU.state==='end'){$('#duelT').textContent=DU.won?'🏆 Victoire !':'Défaite';$('#duelS').textContent=DU.mode==='mort'?(DU.won?'+1 pièce de sang':'Ton héros va repartir de zéro…'):'Le duel est terminé. Vous pouvez discuter ou recommencer.';
     if(DU.mode==='amis'){btn('Relancer le duel',()=>{DU.state='choose';DU.me=null;DU.them=null;duelSend({k:'dagain'});renderDuel();});}
     if(DU.mode==='amis'||DU.won)btn('Quitter l\'arène',()=>{if(leaveArena()!==false)enterNexus();});}
-  else if(DU.state==='gone'){$('#duelT').textContent='Ton adversaire est parti';$('#duelS').textContent='';btn('Retour au Nexus',()=>{DU=null;enterNexus();});}}
+  else if(DU.state==='gone'){$('#duelT').textContent='Ton adversaire est parti';$('#duelS').textContent='';btn('Retour au Village',()=>{DU=null;enterNexus();});}}
 function kickedScreen(code){const k=$('#kicked');if(!k.hidden)return;k.hidden=false;paused=true;keys.clear();mouse.down=false;$('#kickT').textContent=code===4003?'Tu es banni':'Tu as été expulsé';$('#kickS').textContent=code===4003?'Un modérateur a banni ton adresse de ce serveur.':'Un modérateur t\'a déconnecté. Recharge la page pour revenir.';}
 function devSend(peer,cmd,arg){if(!adminReq(cmd,peer,arg)){note('Active d\'abord le mode admin avec /god');return;}$('#devMsg').textContent='Envoi…';}
 $('#devSearch').addEventListener('input',renderDevPlayers);
@@ -3752,7 +3815,7 @@ optEl.addEventListener('click',e=>{if(e.target===optEl)closeOpts();});
 /* ================= sélection de classe ================= */
 const selEl=$('#select');
 function openSelect(){
-  paused=true;selEl.hidden=false;$('#pseudoIn').value=pseudo;{const locked=!!save.pseudoSet;$('#pseudoIn').disabled=locked;$('#pseudoHint').textContent=locked?'Pour le changer, va au pupitre du Nexus.':'Choisis-le bien : tu pourras le changer une fois gratuitement au pupitre du Nexus.';}
+  paused=true;selEl.hidden=false;$('#pseudoIn').value=pseudo;{const locked=!!save.pseudoSet;$('#pseudoIn').disabled=locked;$('#pseudoHint').textContent=locked?'Pour le changer, va au pupitre du Village.':'Choisis-le bien : tu pourras le changer une fois gratuitement au pupitre du Village.';}
   $('#cards').innerHTML=Object.keys(CLASSES).map(k=>{const c=CLASSES[k],ch=save.chars[k];return `<button type="button" class="card${save.current===k?' cur':''}" data-c="${k}"><img src="${heroURL[k]}" alt=""><b>${c.nom}</b><span class="r">${c.role}</span><span class="mst"><span>Vie ${c.base.vie}</span><span>Mana ${c.base.mana}</span><span>Vit. ${c.base.vdep}</span></span><span class="lv">${ch?'Niveau '+ch.lvl:'Nouveau héros'}</span></button>`;}).join('');
 }
 $('#cards').addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;choose(c.dataset.c);});
@@ -3765,14 +3828,14 @@ function choose(k){
 let resetArm=0;
 $('#resetBtn').addEventListener('click',()=>{const b=$('#resetBtn');if(Date.now()-resetArm<4000){save={current:null,chars:{},gold:0};persist();b.textContent='Sauvegarde effacée';openSelect();resetArm=0;}else{resetArm=Date.now();b.textContent='Clique encore pour confirmer';setTimeout(()=>{b.textContent='Effacer la sauvegarde';},4000);}});
 const plEl=$('#plist'),nsEl=$('#netState');
-function sceneLabel(s){return typeof s==='string'&&s[0]==='G'?'Hall de guilde':typeof s==='string'&&s[0]==='W'?'Raid de guilde':s==='n'?'Nexus':s==='r'?'Royaume':typeof s==='string'&&s[0]==='d'?'Donjon':typeof s==='string'&&s[0]==='v'?'Maison':typeof s==='string'&&s[0]==='h'?'Salle d\'essai':typeof s==='string'&&s[0]==='u'?'Tutoriel':typeof s==='string'&&s[0]==='x'?'Arène':'?';}
+function sceneLabel(s){return typeof s==='string'&&s[0]==='G'?'Hall de guilde':typeof s==='string'&&s[0]==='W'?'Raid de guilde':s==='n'?'Village':s==='r'?'Plaines Sauvages':typeof s==='string'&&s[0]==='d'?'Donjon':typeof s==='string'&&s[0]==='v'?'Maison':typeof s==='string'&&s[0]==='h'?'Salle d\'essai':typeof s==='string'&&s[0]==='u'?'Tutoriel':typeof s==='string'&&s[0]==='x'?'Arène':'?';}
 let plSig='';
 function renderPlayers(){
   const on=!!room&&netOn;nsEl.textContent=!room?'Solo':on?'En ligne · salle '+salleNom:'Connexion…';nsEl.classList.toggle('on',on);
   const hk=hostKey();
   {const sig=[myGid,GUILD&&GUILD.tag,save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r,Math.hypot(r.x-P.x,r.y-P.y)<8,r.p.gi,r.p.gt].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
   plEl.textContent='';
-  const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';{const rr=peer&&remotes.get(peer),tg=me?(GUILD?GUILD.tag:''):(rr&&rr.p&&typeof rr.p.gt==='string'?clean(rr.p.gt).slice(0,4):'');sn.textContent=((me&&myGid)||(rr&&rr.p&&myGid&&rr.p.gi===myGid)?'👥 ':'')+(tg?'['+tg+'] ':'')+n+(me?' (toi)':'')+' · niv. '+l;}const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);li.dataset.pm=peer||'me';li.classList.add('clk');li.title='Clic : groupe, échange, duel, guilde…';{const rr=peer&&remotes.get(peer);if(rr&&rr.p&&myGid&&rr.p.gi===myGid)li.classList.add('grp');if(!peer&&myGid)li.classList.add('grp');}if(false&&peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄';b.title='Proposer un échange';li.append(b);const d2=document.createElement('button');d2.type='button';d2.className='tbtn dbtn';d2.dataset.duel=peer;d2.textContent='⚔';d2.title='Défier en duel';li.append(d2);}if(false){const r=remotes.get(peer);if(r&&r.p&&!(r.p.s==='r'&&Math.hypot(r.x-P.x,r.y-P.y)<8)){const t=document.createElement('button');t.type='button';t.className='tbtn tpbtn';t.dataset.tpinv=peer;t.textContent='↗';t.title='Inviter à te rejoindre (téléportation dans le Royaume)';li.append(t);}}{const nb=li.querySelectorAll('button').length;if(nb)li.style.gridTemplateColumns='22px 1fr auto'+' auto'.repeat(nb);}plEl.append(li);};
+  const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';{const rr=peer&&remotes.get(peer),tg=me?(GUILD?GUILD.tag:''):(rr&&rr.p&&typeof rr.p.gt==='string'?clean(rr.p.gt).slice(0,4):'');sn.textContent=((me&&myGid)||(rr&&rr.p&&myGid&&rr.p.gi===myGid)?'👥 ':'')+(tg?'['+tg+'] ':'')+n+(me?' (toi)':'')+' · niv. '+l;}const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);li.dataset.pm=peer||'me';li.classList.add('clk');li.title='Clic : groupe, échange, duel, guilde…';{const rr=peer&&remotes.get(peer);if(rr&&rr.p&&myGid&&rr.p.gi===myGid)li.classList.add('grp');if(!peer&&myGid)li.classList.add('grp');}if(false&&peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄';b.title='Proposer un échange';li.append(b);const d2=document.createElement('button');d2.type='button';d2.className='tbtn dbtn';d2.dataset.duel=peer;d2.textContent='⚔';d2.title='Défier en duel';li.append(d2);}if(false){const r=remotes.get(peer);if(r&&r.p&&!(r.p.s==='r'&&Math.hypot(r.x-P.x,r.y-P.y)<8)){const t=document.createElement('button');t.type='button';t.className='tbtn tpbtn';t.dataset.tpinv=peer;t.textContent='↗';t.title='Inviter à te rejoindre (téléportation dans les Plaines Sauvages)';li.append(t);}}{const nb=li.querySelectorAll('button').length;if(nb)li.style.gridTemplateColumns='22px 1fr auto'+' auto'.repeat(nb);}plEl.append(li);};
   if(save.current)add(save.current,pseudo,C().lvl,sceneLabel(sceneKey())+(!safe()&&amHost&&othersInScene()?' ★':''),true);
   let n=0;for(const r of remotes.values()){if(!r.p||r.p.v!==NETV||Date.now()-r.upd>4000||r.p.hid)continue;n++;add(CLASSES[r.p.c]?r.p.c:'',clean(r.p.n).slice(0,16)||'Joueur',clamp(num(r.p.l,1)|0,1,25),sceneLabel(r.p.s)+(hk.r===r?' ★':''),false,r.peer);}
   if(!n){const li=document.createElement('li');li.className='empty';li.textContent=!room?'Page ouverte sans serveur : tu joues en solo. Lance « npm start » et ouvre l\'adresse du serveur.':netOn?'Personne d\'autre pour l\'instant. Envoie le lien de cette page à tes amis.':'Connexion au serveur… (sur Render gratuit, le premier chargement peut prendre une minute)';plEl.append(li);}
@@ -3781,7 +3844,7 @@ function updWho(){if(!save.current)return;$('#avatar').src=heroURL[save.current]
 function updZone(){
   let z=scene==='ghall'?105:scene==='raid'?106:scene==='nexus'?-1:scene==='vault'?101:scene==='hub'?102:scene==='tuto'?103:scene==='arena'?104:scene==='dungeon'?100:regionAt(P.x,P.y);if(z<0&&scene==='realm')z=0;
   if(z!==curZone){curZone=z;
-    if(z===-1){$('#zone').textContent='Nexus';$('#zoneLvl').textContent='Zone sûre · la fontaine soigne';}
+    if(z===-1){$('#zone').textContent='Village';$('#zoneLvl').textContent='Zone sûre · la fontaine soigne';}
     else if(z===105){$('#zone').textContent='Hall de guilde';$('#zoneLvl').textContent=GUILD?'['+GUILD.tag+'] '+GUILD.nom:'';}
     else if(z===106){$('#zone').textContent='Raid de guilde';$('#zoneLvl').textContent='Dragon de Guilde · 5 minutes';}
     else if(z===101){$('#zone').textContent='Ta maison';$('#zoneLvl').textContent='Coffres · parc des familiers';}
@@ -3840,7 +3903,7 @@ function interact(){
 const KB_ACTS=[
   ['Déplacement'],['up','Aller en haut'],['down','Aller en bas'],['left','Aller à gauche'],['right','Aller à droite'],
   ['Combat'],['shoot','Tirer (maintenir, vers la souris)'],['ability','Capacité de classe'],['auto','Tir automatique on/off'],['hp','Potion de vie'],['mp','Potion de mana'],
-  ['Actions'],['interact','Interagir (portail, marchand, autel…)'],['pickup','Tout ramasser (butin au sol)'],['nexus','Retour au Nexus'],['chat','Écrire dans le chat'],
+  ['Actions'],['interact','Interagir (portail, marchand, autel…)'],['pickup','Tout ramasser (butin au sol)'],['nexus','Retour au Village'],['chat','Écrire dans le chat'],
   ['Menus'],['inv','Inventaire'],['stats','Statistiques'],['lb','Classement'],['opts','Options']];
 const KB_DEF={up:['KeyW','ArrowUp'],down:['KeyS','ArrowDown'],left:['KeyA','ArrowLeft'],right:['KeyD','ArrowRight'],shoot:['Mouse0',null],ability:['Space',null],auto:['KeyT',null],hp:['KeyF',null],mp:['KeyV',null],
   interact:['KeyE',null],pickup:['KeyG',null],nexus:['KeyR',null],chat:['Enter','NumpadEnter'],inv:['KeyI',null],stats:['KeyC',null],lb:['KeyL',null],opts:['KeyO',null]};
@@ -3863,8 +3926,8 @@ function kn(a){return keyName(BINDS[a][0]||BINDS[a][1]);}
 function kn2(a){return BINDS[a].filter(Boolean).map(keyName).join(' / ')||'—';}
 function saveBinds(){rebuildMap();try{localStorage.setItem(KB_KEY,JSON.stringify(BINDS));}catch(e){}updHelp();}
 function updHelp(){const dl=$('#helpDl');if(!dl)return;const rows=[[['up','left','down','right'].map(kn).join(''),'se déplacer'],[kn2('shoot'),'maintenir pour tirer vers la souris'],[kn2('auto'),'tir automatique on/off'],[kn2('ability'),'capacité de classe (mana)'],
-  [kn2('interact'),'portail, autel, marchand'],[kn2('pickup'),'tout ramasser (butin au sol)'],[kn('hp')+' / '+kn('mp'),'potion de vie / de mana'],[kn2('nexus'),'retour au Nexus (seul moyen de quitter le Royaume)'],[kn('inv')+' / '+kn('stats'),'inventaire / statistiques'],
-  [kn2('chat'),'écrire aux autres joueurs'],[kn2('opts'),'options : son, musique, curseur, touches'],[kn2('lb'),'classement des joueurs'],['Glisser','déplacer un objet (ou clic, puis clic sur une case vide)']];
+  [kn2('interact'),'portail, autel, marchand'],[kn2('pickup'),'tout ramasser (butin au sol)'],[kn('hp')+' / '+kn('mp'),'potion de vie / de mana'],[kn2('nexus'),'retour au Village (seul moyen de quitter les Plaines Sauvages)'],[kn('inv')+' / '+kn('stats'),'inventaire / statistiques'],
+  [kn2('chat'),'écrire aux autres joueurs'],[kn2('opts'),'options : son, musique, curseur, touches'],[kn2('lb'),'classement des joueurs'],['Manette','stick gauche : bouger · stick droit : viser/tirer · A : interagir · X : capacité · Y/LB : potions · B : ramasser · Start : options'],['Glisser','déplacer un objet (ou clic, puis clic sur une case vide)']];
   dl.textContent='';for(const [k,t] of rows){const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=t;dl.append(dt,dd);}
   const set=(id,a)=>{const b=document.querySelector(id+' kbd');if(b)b.textContent=kn(a);};set('#tabInvBtn','inv');{const t=$('#takeAll');if(t)t.textContent='Tout ramasser · '+kn('pickup');}set('#tabStBtn','stats');set('#lbBtn','lb');}
 // fenêtre de réglage
@@ -3889,6 +3952,20 @@ window.addEventListener('contextmenu',e=>{if(KB_CAP||!kbWin.hidden)e.preventDefa
 updHelp();$('#kbOpen').addEventListener('click',openKb);$('#kbClose').addEventListener('click',closeKb);
 $('#kbReset').addEventListener('click',()=>{BINDS=JSON.parse(JSON.stringify(KB_DEF));saveBinds();renderKb();note('Touches par défaut rétablies');});
 // exécution d'une action (clavier ou souris)
+/* ================= manette (Gamepad API) =================
+   stick gauche : se déplacer · stick droit : viser et tirer · A : interagir · X / LT : capacité · Y : potion de vie · LB : potion de mana
+   B : ramasser / fermer une fenêtre · RB / RT : tirer · Start : options · Select : stats · croix bas : retour au Village */
+const PAD={on:false,prev:[],aim:null,fire:false,mx:0,my:0,rx:0};
+window.addEventListener('gamepadconnected',e=>{note('Manette connectée : '+String(e.gamepad.id).slice(0,30));});
+function padPoll(dt){const gps=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const x of gps)if(x&&x.connected){g=x;break;}if(!g){PAD.on=false;PAD.fire=false;PAD.aim=null;return;}
+  PAD.on=true;const dz=v=>Math.abs(v||0)<0.22?0:v;PAD.mx=dz(g.axes[0]);PAD.my=dz(g.axes[1]);const ax=dz(g.axes[2]),ay=dz(g.axes[3]);PAD.rx=ax;
+  PAD.aim=Math.hypot(ax,ay)>0.4?Math.atan2(ay,ax):null;const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),press=i=>b(i)&&!PAD.prev[i];
+  PAD.fire=(!FPV&&PAD.aim!=null)||b(5)||b(7);
+  const anyWin=[...document.querySelectorAll('.overlay')].some(o=>!o.hidden);
+  if(press(9)){optEl.hidden?openOpts():closeOpts();}
+  else if(anyWin){if(press(1))window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape'}));}
+  else if(save.current&&!paused){if(press(0))doAct('interact');if(press(2)||press(6))doAct('ability');if(press(3))doAct('hp');if(press(4))doAct('mp');if(press(1))doAct('pickup');if(press(13))doAct('nexus');if(press(8))doAct('stats');}
+  PAD.prev=g.buttons.map(x=>x.pressed);}
 function doAct(a,e){
   if(a==='shoot'){mouse.down=true;return;}
   if(a==='ability')useAbility();
@@ -3904,7 +3981,7 @@ function doAct(a,e){
 }
 const MOVE_ACTS=['up','down','left','right'];
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!presEl.hidden){closePresWin();return;}if(!$('#inspWin').hidden){closeInspect();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
+  if(e.key==='Escape'){if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!presEl.hidden){closePresWin();return;}if(!$('#gshopWin').hidden){closeGShop();return;}if(!$('#inspWin').hidden){closeInspect();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
   const A=actsOf(e.code);
   if(!kbWin.hidden)return;
@@ -3973,9 +4050,11 @@ function update(dt){
   if(paused||!save.current)return;
   const st=S();
   // déplacement
-  let mx=0,my=0;
+  let mx=0,my=0;padPoll(dt);
   if(held('up'))my-=1;if(held('down'))my+=1;
   if(held('left'))mx-=1;if(held('right'))mx+=1;
+  if(PAD.on&&(PAD.mx||PAD.my)){mx=PAD.mx;my=PAD.my;}
+  if(FPV&&PAD.on&&PAD.rx)fpA+=PAD.rx*dt*3;
   if(joy.id!==null){const dx=joy.x-joy.ox,dy=joy.y-joy.oy,d=Math.hypot(dx,dy);if(d>8){const k=Math.min(1,d/50);mx=dx/d*k;my=dy/d*k;}}
   if(FPV){const f=-my,st_=mx,c=Math.cos(fpA),s_=Math.sin(fpA);mx=c*f-s_*st_;my=s_*f+c*st_;if(document.pointerLockElement!==cv&&mouse.x!=null){const ex=(mouse.x-W/2)/(W/2);if(Math.abs(ex)>0.6)fpA+=Math.sign(ex)*(Math.abs(ex)-0.6)*dt*4;}}
   const ml=Math.hypot(mx,my);if(ml>1){mx/=ml;my/=ml;}
@@ -4000,7 +4079,7 @@ function update(dt){
   // tir
   petTick(dt);fishTick(dt);raidTick(dt);if(scene==='realm'){fogT-=dt;if(fogT<=0){fogT=0.2;fogReveal();}}P.cd-=dt;P.acd-=dt;if(P.berserk>0)P.berserk-=dt;abilityTick(dt);if(save.current)fxTick(dt,S());introTick(dt);partyTick(dt);if(DU)duelTick(dt);if(scene==='tuto')tutoTick(dt);
   P.thrust=Math.max(0,(P.thrust||0)-dt*8);for(const r of remotes.values())if(r.thrust)r.thrust=Math.max(0,r.thrust-dt*8);
-  const wants=mouse.down||P.auto||!!aimTouch;
+  const wants=mouse.down||P.auto||!!aimTouch||PAD.fire;
   if(!safe()&&wants&&P.cd<=0){fire(st);P.cd=1/st.rate;P.lastShot=time;if(P.backProt){P.backProt=0;P.invul=0;}}
   // régénération
   P.hp=Math.min(st.tot.vie,P.hp+(1+st.tot.vie/150)*dt);P.mp=Math.min(st.tot.mana,P.mp+(2+st.tot.mana/40+(st.mreg||0))*dt);
@@ -4192,13 +4271,13 @@ function groundTex(z,v){return mkTex('g'+z+'_'+v,(x,y)=>{const sd=z*10+v,n=hx(x,
     case 5:{ // terres brûlées : cendres, braises, fissures
       if(v>=2&&crackSet(v).has(x+','+y))return '#6b2a1a';if(v>=2&&(crackSet(v).has((x-1)+','+y)||crackSet(v).has((x+1)+','+y)))return '#2e2220';
       if(n<0.08)return '#55453f';if(n>0.985)return '#8a2a1a';return pk(['#3d2f2c','#382a28','#43332f'],n2);}
-    case 6:{ // terres du Dieu Fou : dalles, runes
+    case 6:{ // terres du Roi Bouffon : dalles, runes
       if(x===0||y===0)return '#3c374b';if(x===1||y===1)return '#67617e';
       if(v===3&&hx(1,1,146)>0.0){const dx=Math.abs(x-8),dy=Math.abs(y-8);if(dx+dy===3||(dx+dy===0))return '#7a2442';}
       if(n<0.05)return '#4a4460';if(n>0.96)return '#6e688a';return ['#57516a','#524c64','#5c566f','#55506a'][v];}
   }});}
 function waterTex(f,v){return mkTex('w'+f+'_'+v,(x,y)=>{const k=(x+f*3+(y>>2)*5+v*4)%12;if(y%4===1&&k===1)return '#4a7ab0';if(y%4===1&&k<3)return '#2f5a86';return v<2?'#1b3656':'#1e3a5d';});}
-// Nexus
+// Village
 const nexFloor=(c,v)=>mkTex('nf'+c+v,(x,y)=>{const n=hx(x,y,70+v);if(x===0||y===0)return '#48426a';if(x===15||y===15)return '#26223a';if(v===3&&Math.abs(x-y-2)<0.6&&x>3&&x<12)return '#2a2640';if(n<0.05)return '#2e2a42';if(n>0.97)return '#4a4466';return c?'#34304a':'#3a3551';});
 const nexWall=v=>mkTex('nw'+v,(x,y)=>{if(y<4)return y===0?'#4a4468':'#3a3452';const row=y>>2,bx=(x+(row%2)*4)%8;if(y%4===3||bx===7)return '#1b1828';return hx(Math.floor((x+(row%2)*4)/8)+v*3,row,80)<0.5?'#231f33':'#28233b';});
 const carpetTex=side=>mkTex('cp'+side,(x,y)=>{const edge=side==='L'?x<2:side==='R'?x>13:false;if(edge)return (side==='L'?x===0:x===15)?'#8a6a2a':'#c9973c';if((x+y)%8===0||(x-y+16)%8===0)return '#7a2a3e';return '#6b2334';});
@@ -4423,7 +4502,7 @@ function drawDungeon(x0,x1,y0,y1){
     if(Math.hypot(P.x-(g0.x+1.5),P.y-(g0.y+1.5))<9)label('Porte céleste · '+starCount(stars)+'/4 étoiles',gx,gy+TS*0.6,'#ffd23f',Math.round(TS*0.3));}
   if(fight===1&&d.doors)for(const dr of d.doors){const X=Math.floor(sx(dr.x)),Y=Math.floor(sy(dr.y));R(X,Y,TS+1,TS+1,'#1a0f2a');
     for(let i=0;i<4;i++){const gl=0.55+0.45*Math.sin(time*6+i+dr.x+dr.y);ctx.globalAlpha=gl;R(X+i*2*u+u*0.5,Y,u,TS+1,'#ff4fd8');}ctx.globalAlpha=1;R(X,Y,TS+1,u*0.7,'#b45aff');R(X,Y+TS-u*0.7,TS+1,u*0.7,'#b45aff');}
-  drawPortal(d.exitPortal.x,d.exitPortal.y,'#3f7fe0','#8fd0ff','Nexus');
+  drawPortal(d.exitPortal.x,d.exitPortal.y,'#3f7fe0','#8fd0ff','Village');
   if(exitOpen&&d.bossExit)drawPortal(d.bossExit.x,d.bossExit.y,'#7ed957','#e8ffe0','Sortie');}
 }
 function drawArena(x0,x1,y0,y1){const u=TS/16,d=MAP;
@@ -4444,7 +4523,7 @@ function drawTuto(x0,x1,y0,y1){
     T16(tx>=50?plankTex(v):nexFloor((tx+ty)&1,v),X,Y);}
   for(const tx of [4,11,21,28,40,53,60])drawTorch(sx(tx+.5),sy((tx>=50?1:tx>=36?3:2)+0.75),tx);
   for(const sg of d.signs)drawSign(sg.x,sg.y,sg.l);
-  if(exitOpen&&d.bossExit)drawPortal(d.bossExit.x,d.bossExit.y,'#3f7fe0','#8fd0ff','Nexus','fin du tutoriel');
+  if(exitOpen&&d.bossExit)drawPortal(d.bossExit.x,d.bossExit.y,'#3f7fe0','#8fd0ff','Village','fin du tutoriel');
 }
 function drawSign(x,y,lines){up(x,y,()=>{const X=sx(x),Y=sy(y),fs=Math.round(TS*0.3),lh=fs*1.35;ctx.font=`400 ${fs}px "DotGothic16", monospace`;let w=0;for(const l of lines)w=Math.max(w,ctx.measureText(l).width);w+=fs*1.4;const h=lines.length*lh+fs*0.8;
   R(X-w/2-4,Y-h/2-4,w+8,h+8,'#4a2e18');R(X-w/2,Y-h/2,w,h,'#f0e2c0');R(X-w/2,Y-h/2,w,3,'#fff6dc');R(X-w/2,Y+h/2-3,w,3,'#c8b088');
@@ -4463,7 +4542,7 @@ function drawHub(x0,x1,y0,y1){
     const v=Math.floor(h2(tx,ty)*4);if(tx===0||ty===0||tx===HW-1||ty===HH-1){T16(nexWall(v),X,Y);continue;}
     T16(nexFloor((tx+ty)&1,v),X,Y);if(ty>=5&&ty<=6)T16(runnerTex,X,Y);}
   for(const p of HPORTS){const T=DTYPES[p.t];drawPortal(p.x,p.y,T.col[0],T.col[1],T.nom,p.t==='a'?'très difficile':T.niv.replace('Donjon · ',''),p.t==='a'?{scale:1.15,world:true,th:'a'}:{th:p.t});}
-  drawPortal(HBACK.x,HBACK.y,'#3f7fe0','#8fd0ff','Nexus');
+  drawPortal(HBACK.x,HBACK.y,'#3f7fe0','#8fd0ff','Village');
   label('Salle d\'essai des donjons',sx(HW/2),sy(1.3),'#ffd23f',Math.round(TS*0.42),700);
 }
 // statues grises précalculées une seule fois (ctx.filter à chaque image est très lent sur Edge)
@@ -4512,7 +4591,7 @@ function drawNexus(x0,x1,y0,y1){
       for(let i=0;i<4;i++){const ph=(time*0.35+i/4)%1;ctx.globalAlpha=(1-ph)*0.45;ctx.fillStyle='#e8e4f0';ctx.beginPath();ctx.arc(X+(118+Math.sin(ph*6+i)*4)*k,Y+(6-ph*26)*k,(2.5+ph*5)*k,0,TAU);ctx.fill();}ctx.globalAlpha=1;
       const gl=0.55+0.25*Math.sin(time*3);ctx.globalAlpha=gl*0.35;ctx.fillStyle='#ffd27a';ctx.beginPath();ctx.arc(X+96*k,Y+38*k,7*k,0,TAU);ctx.fill();ctx.globalAlpha=1;
       label('Cabane du pêcheur',X+img.width*k/2,Y-4*k,'#ffd96a',Math.round(TS*0.28));}
-    label('Étang du Nexus · pêche (E)',sx(16),sy(35.2),'#9fe0ff',Math.round(TS*0.28));}
+    label('Étang du Village · pêche (E)',sx(16),sy(35.2),'#9fe0ff',Math.round(TS*0.28));}
   // flambeaux
   for(const tx of [3,8,23,28])drawTorch(sx(tx+.5),sy(0.75),tx);
   for(const ty of [6,12,21,27]){drawTorch(sx(0.9),sy(ty+.5),ty);drawTorch(sx(30.1),sy(ty+.5),ty+3);}
@@ -4568,12 +4647,12 @@ function drawNexus(x0,x1,y0,y1){
     label('Échoppe',sx(31.5),sy(14.3),'#ffd96a',Math.round(TS*0.32));label('Marchand',sx(37.5),sy(9.9),'#ffd96a',Math.round(TS*0.33));}
   // portes monumentales autour des deux portails
   drawGate(NPORT.x,NPORT.y,'#a45be8','#ff7bf2');drawGate(VPORT.x,VPORT.y,'#b8862b','#ffd96a');
-  drawPortal(NPORT.x,NPORT.y,'#a45be8','#ff7bf2','Royaume','',{frame:false});
+  drawPortal(NPORT.x,NPORT.y,'#a45be8','#ff7bf2','Plaines Sauvages','',{frame:false});
   drawPortal(VPORT.x,VPORT.y,'#b8862b','#ffd96a','Maison','',{frame:false});
   drawPortal(GPORT.x,GPORT.y,'#6a3ab0','#ffd23f','Guilde',GUILD?'['+GUILD.tag+']':'créer ou rejoindre',{scale:0.85});
 }
 const ICON_IMG={};
-// porte de pierre fixe autour d'un portail du Nexus : deux colonnes, linteau, clé de voûte en cristal, runes
+// porte de pierre fixe autour d'un portail du Village : deux colonnes, linteau, clé de voûte en cristal, runes
 function drawGate(x,y,c1,c2){const u=TS/16,L=sx(x-2),Rr=sx(x+1),Yb=sy(y+0.9),top=sy(y-3.1),glow=0.5+0.5*Math.sin(time*2);
   for(const X of [L,Rr]){R(X,top+TS*0.5,TS,Yb-top-TS*0.5,'#5b5570');R(X,top+TS*0.5,u*2,Yb-top-TS*0.5,'#8a86a8');R(X+TS-u*2,top+TS*0.5,u*2,Yb-top-TS*0.5,'#3a3650');
     for(let k=0;k<4;k++){const ry=top+TS*0.9+k*(Yb-top-TS*1.2)/4;ctx.globalAlpha=0.4+0.6*Math.max(0,Math.sin(time*3+k+X*0.01));R(X+TS*0.35,ry,TS*0.3,u*1.5,c2);}ctx.globalAlpha=1;
@@ -4622,7 +4701,7 @@ function drawVault(x0,x1,y0,y1){const HS=houseSkin();
       label(i===save.vault.n?VAULT_PRICES[i]+' pièces':'🔒',X,Y+TS*0.75,i===save.vault.n?'#ffd96a':'#8a8494',Math.round(TS*0.3));}
     label('Coffre '+(i+1),X,Y-TS*0.8,unl?'#ffe0a0':'#8a8494',Math.round(TS*0.28));
   });
-  drawPortal(VBACK.x,VBACK.y,'#3f7fe0','#8fd0ff','Nexus');
+  drawPortal(VBACK.x,VBACK.y,'#3f7fe0','#8fd0ff','Village');
   // tableau de pêche
   {const X=sx(FBOARD.x),Y=sy(FBOARD.y);R(X-u,Y,u*2,7*u,'#5a3a22');R(X-9*u,Y-10*u,18*u,11*u,'#6a4424');R(X-8*u,Y-9*u,16*u,9*u,'#2a3a4a');const fs=fishSpr('gardon');ctx.drawImage(fs,X-6*u,Y-8*u,7*u,7*u);ctx.drawImage(fishSpr('brochet'),X,Y-7*u,7*u,7*u);
     const n=Object.keys(save.fish||{}).length;label('Pêche · '+n+'/20',X,Y-TS*0.95,'#8fd0ff',Math.round(TS*0.28));}
@@ -4824,7 +4903,7 @@ function drawAura(kind,x,y,t,front){
     orbit(7,0.6,1.1,CP(['#ffe27a','#ffffff','#fff1a0']),u*1.8);orbit(4,0.38,-1.8,CP(['#ffffff']),u*1.2,0.4);orbit(5,0.85,0.7,CP(['#fff1a0','#ffffff']),u*1.3,0.7);
     if(Math.random()<0.6)parts.push({x:x+rnd(-.5,.5),y:y+rnd(0,.4),vx:0,vy:rnd(-1,-0.5),life:rnd(.5,.9),col:pick(CP(['#ffe27a','#ffffff'])),s:rnd(0.04,0.08)});}
 }
-function heroAim(isMe,sh){if(sh!=null)return sh;if(isMe&&!safe()&&(mouse.down||P.auto||aimTouch)){const a=aimWorld();return Math.atan2(a.y-P.y,a.x-P.x);}return null;}
+function heroAim(isMe,sh){if(sh!=null)return sh;if(isMe&&!safe()&&(mouse.down||P.auto||aimTouch||PAD.fire)){const a=aimWorld();return Math.atan2(a.y-P.y,a.x-P.x);}return null;}
 function titleLabel(k,x,y){const T=TITLES[k];ctx.globalAlpha=0.8+0.2*Math.sin(time*4);label(T.t,sx(x),sy(y-0.7),T.c,Math.round(TS*0.27),700);ctx.globalAlpha=1;}
 
 /* ================= vue 1re personne (test admin, raycasting sur la grille) ================= */
@@ -4929,7 +5008,7 @@ function drawSpriteAt(img,x,y,size,flip,flash,bob,squash){
 /* ================= états (joueurs et monstres) =================
    P paralysé · O empoisonné · L ralenti · A aveuglé · F enflammé · R enragé · I invulnérable · S sonic */
 const ST_ORDER='PAOFLRIS';
-const ST_INFO={P:'Paralysé',O:'Empoisonné',L:'Ralenti',A:'Aveuglé',F:'Enflammé',R:'Enragé',I:'Invulnérable',S:'Sonic'};
+const ST_INFO={P:'Paralysé',O:'Empoisonné',L:'Ralenti',A:'Aveuglé',F:'Enflammé',R:'Enragé',I:'Invulnérable',S:'Véloce'};
 const ST_ICON=(()=>{const D={
   P:[['.Y...Y..','.YY..YY.','YY..YY..','YYYYYYY.','..YY..YY','.YY..YY.','.Y...Y..','........'],{Y:'#ffe14a'}],
   O:[['..VVV...','.VWVVV..','VVVVVVV.','VVVVVWVV','.VVVVVV.','..G..G..','.G..G...','........'],{V:'#9a4ad8',W:'#d8a8ff',G:'#7ed957'}],
@@ -5122,14 +5201,14 @@ function render(){
   if(scene==='tuto')drawTutoHud();
   let prompt=null;
   if(scene==='nexus'&&Math.hypot(P.x-GPORT.x,P.y-GPORT.y)<1.5)prompt=GUILD?'E · Hall de guilde ['+GUILD.tag+']':'E · Guildes : créer ou rejoindre';
-  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans le Royaume';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
-  else if(scene==='vault'){const c=nearChest();if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Nexus';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt='E · Changer la décoration de la maison';else if(Math.hypot(P.x-PRESNPC.x,P.y-PRESNPC.y)<1.6)prompt='E · Gardien du Prestige (niveau maximum)';else if(Math.hypot(P.x-FBOARD.x,P.y-FBOARD.y)<1.5)prompt='E · Tableau de pêche';else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';else if(Math.hypot(P.x-PSIGN.x,P.y-PSIGN.y)<1.6||inPark(P.x,P.y))prompt='E · Gérer mes familiers';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Nexus (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}
-  else if(scene==='ghall'){if(Math.hypot(P.x-GH.back.x,P.y-GH.back.y)<1.4)prompt='E · Retour au Nexus';else if(Math.hypot(P.x-GH.raid.x,P.y-GH.raid.y)<1.6)prompt=raidOn()&&raidCdLeft()>0?'Retour au combat dans '+raidCdLeft()+' s':raidOn()?(dragonUp()?'E · Raid : affronter le Dragon ('+raidLeft()+')':'E · Raid : le Dragon arrive dans '+spawnLeft()+' s'):'Portail du raid fermé · le Dragon est annoncé par les admins';else if(Math.hypot(P.x-GH.board.x,P.y-GH.board.y)<1.6)prompt='E · Tableau de guilde';else if(Math.hypot(P.x-GH.chest.x,P.y-GH.chest.y)<1.6)prompt=GUILD&&GUILD.raid&&GUILD.raid.dernier&&GUILD.raid.dernier.part&&!GUILD.raid.dernier.recu&&!raidOn()?'E · Récupérer la récompense du raid !':'Coffre du raid · récompense selon le classement de ta guilde';}
+  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans les Plaines Sauvages';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
+  else if(scene==='vault'){const c=nearChest();if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt='E · Changer la décoration de la maison';else if(Math.hypot(P.x-PRESNPC.x,P.y-PRESNPC.y)<1.6)prompt='E · Gardien du Prestige (niveau maximum)';else if(Math.hypot(P.x-FBOARD.x,P.y-FBOARD.y)<1.5)prompt='E · Tableau de pêche';else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';else if(Math.hypot(P.x-PSIGN.x,P.y-PSIGN.y)<1.6||inPark(P.x,P.y))prompt='E · Gérer mes familiers';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
+  else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Village (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}
+  else if(scene==='ghall'){if(Math.hypot(P.x-GH.back.x,P.y-GH.back.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-GH.raid.x,P.y-GH.raid.y)<1.6)prompt=raidOn()&&raidCdLeft()>0?'Retour au combat dans '+raidCdLeft()+' s':raidOn()?(dragonUp()?'E · Raid : affronter le Dragon ('+raidLeft()+')':'E · Raid : le Dragon arrive dans '+spawnLeft()+' s'):'Portail du raid fermé · le Dragon est annoncé par les admins';else if(Math.hypot(P.x-GH.board.x,P.y-GH.board.y)<1.6)prompt='E · Tableau de guilde';else if(Math.hypot(P.x-GH.chest.x,P.y-GH.chest.y)<1.6)prompt=GUILD&&GUILD.raid&&GUILD.raid.dernier&&GUILD.raid.dernier.part&&!GUILD.raid.dernier.recu&&!raidOn()?'E · Récupérer la récompense du raid !':'Coffre du raid · récompense selon le classement de ta guilde';}
   else if(scene==='raid'){if(Math.hypot(P.x-RA.back.x,P.y-RA.back.y)<1.4)prompt='E · Retour au hall de guilde';}
-  else if(scene==='hub'){const p=nearHubPort();if(Math.hypot(P.x-HBACK.x,P.y-HBACK.y)<1.4)prompt='E · Retour au Nexus';else if(p)prompt='E · Tester : '+DTYPES[p.t].nom;}
+  else if(scene==='hub'){const p=nearHubPort();if(Math.hypot(P.x-HBACK.x,P.y-HBACK.y)<1.4)prompt='E · Retour au Village';else if(p)prompt='E · Tester : '+DTYPES[p.t].nom;}
   else if(scene==='realm'){const d=nearDPortal();if(d)prompt='E · Entrer : '+DTYPES[d.t||'c'].nom+(d.t==='a'?' (très difficile)':'');else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher en mer';}
-  else if(scene==='dungeon'){if(Math.hypot(P.x-MAP.exitPortal.x,P.y-MAP.exitPortal.y)<1.4||(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6))prompt=dunFrom==='hub'?'E · Retour au Nexus':'E · Retour au Royaume';
+  else if(scene==='dungeon'){if(Math.hypot(P.x-MAP.exitPortal.x,P.y-MAP.exitPortal.y)<1.4||(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6))prompt=dunFrom==='hub'?'E · Retour au Village':'E · Retour aux Plaines Sauvages';
     else if(nearSwitch())prompt='E · Actionner l\'interrupteur (éclaire la salle)';
     else if(dungeonT==='k'&&MAP.shrines&&MAP.shrines.some(q=>Math.hypot(P.x-q.x,P.y-q.y)<1.8))prompt='E · Prier à l\'autel (+30 % de dégâts pendant 20 s)';
     else if(fight===0&&Math.hypot(P.x-MAP.altar.x,P.y-MAP.altar.y)<2.2)prompt=MAP.needStars&&stars!==15?'La porte céleste est scellée : '+starCount(stars)+'/4 étoiles':'E ou clic sur l\'autel · Invoquer '+DTYPES[dungeonT].boss+' (les portes se fermeront)';
