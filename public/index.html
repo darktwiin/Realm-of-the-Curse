@@ -100,6 +100,7 @@ h3{font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:
 .st.hpc{box-shadow:inset 3px 0 0 var(--hp)} .st.mpc{box-shadow:inset 3px 0 0 var(--mp)} .st.atc{box-shadow:inset 3px 0 0 #ff9a3c}
 .st.dmc{box-shadow:inset 3px 0 0 #e8e0c8} .st.dxc{box-shadow:inset 3px 0 0 #c86bff} .st.spc{box-shadow:inset 3px 0 0 #58d6c8}
 .foot{color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.lbrow{display:grid;grid-template-columns:1fr 1fr;gap:6px}.lbrow .lb-btn{width:100%;margin:0}#questDot{color:#0b0a12;background:#ffd23f;border-radius:50%;width:16px;height:16px;line-height:16px;display:inline-block;text-align:center;font-weight:700;margin-left:6px;font-size:12px}#questDot[hidden]{display:none}
 details.help{border-top:2px solid var(--line);padding-top:8px}
 details.help summary{cursor:pointer;font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 details.help dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0}
@@ -639,7 +640,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       <button type="button" data-tab="inv" class="on" id="tabInvBtn">Inventaire<kbd>I</kbd></button>
       <button type="button" data-tab="stats" id="tabStBtn">Statistiques<kbd>C</kbd></button>
     </nav>
-    <button type="button" class="lb-btn" id="lbBtn">🏆 Classement des joueurs<kbd>L</kbd></button>
+    <div class="lbrow"><button type="button" class="lb-btn" id="lbBtn">🏆 Classement<kbd>L</kbd></button><button type="button" class="lb-btn" id="questBtn">📜 Quêtes<span id="questDot" hidden>!</span></button></div>
     <button type="button" class="lb-btn devk" id="devKill2" hidden>💀 Tuer les monstres à l'écran (admin)</button>
     <section id="tabInv">
       <h3>Équipement</h3>
@@ -660,7 +661,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <section id="tabStats" hidden>
       <div class="stats" id="stats"></div>
     </section>
-    <details class="help" open>
+    <details class="help">
       <summary>Commandes</summary>
       <dl id="helpDl">
         <dt>ZQSD</dt><dd>se déplacer (WASD, flèches)</dd>
@@ -3024,15 +3025,18 @@ function questReady(){const Q=dailyQuests(),st=questState();return Q.some((q,i)=
 let walkAcc=0;
 function questWalk(d){walkAcc+=d;if(walkAcc>=1){const n=Math.floor(walkAcc);walkAcc-=n;const Q=dailyQuests();if(Q[1].t==='walk')questAdd(1,n);}}
 const qEl=$('#quests');
-function openQuests(){qEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderQuests();sfx('item');}
+$('#questBtn').addEventListener('click',()=>{if(!save.current)return;openQuests(true);});
+setInterval(()=>{try{$('#questDot').hidden=!(save.current&&questReady());}catch(e){}},1000);
+let questRemote=false;
+function openQuests(remote){questRemote=!!remote;qEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderQuests();sfx('item');}
 function closeQuests(){qEl.hidden=true;paused=false;cv.focus();}
 function renderQuests(){const Q=dailyQuests(),st=questState(),box=$('#qList');box.textContent='';
   Q.forEach((q,i)=>{const done=st.prog[i]>=q.n,row=document.createElement('div');row.className='qrow'+(done?' done':'')+(st.got[i]?' got':'');
     let ic;if(q.t==='kill'){ic=document.createElement('img');ic.src=MON_IMG[q.k]||(MON_IMG[q.k]=MSPR[q.k].toDataURL());}else{ic=document.createElement('div');ic.className='qicon';ic.textContent=q.t==='walk'?'👣':'🌀';}
     const mid=document.createElement('div');const b=document.createElement('b');b.textContent=q.txt;const r=document.createElement('span');r.className='qr';r.textContent=q.sub+' · '+Math.floor(st.prog[i]).toLocaleString('fr-FR')+' / '+q.n.toLocaleString('fr-FR')+' · récompense : '+q.g+' pièces';
     const bar=document.createElement('div');bar.className='qbar';const f=document.createElement('i');f.style.width=Math.min(100,st.prog[i]/q.n*100)+'%';bar.append(f);mid.append(b,r,bar);
-    const bt=document.createElement('button');bt.type='button';bt.className='act'+(done&&!st.got[i]?' main':'');bt.textContent=st.got[i]?'Récupérée':done?'Récupérer '+q.g:'En cours';bt.disabled=!done||st.got[i];
-    bt.onclick=()=>{if(st.got[i]||st.prog[i]<q.n)return;st.got[i]=true;save.gold+=q.g;sfx('buy');burst(P.x,P.y,'#ffd96a',18,3);note('+'+q.g+' pièces');
+    const bt=document.createElement('button');bt.type='button';bt.className='act'+(done&&!st.got[i]?' main':'');bt.textContent=st.got[i]?'Récupérée':done?(questRemote?'À récupérer au Nexus':'Récupérer '+q.g):'En cours';bt.disabled=!done||st.got[i]||questRemote;
+    bt.onclick=()=>{if(questRemote||st.got[i]||st.prog[i]<q.n)return;st.got[i]=true;save.gold+=q.g;sfx('buy');burst(P.x,P.y,'#ffd96a',18,3);note('+'+q.g+' pièces');
       if(!st.bonus&&st.got.every(Boolean)){st.bonus=true;save.cursite+=50;showBanner('Les 3 quêtes du jour sont terminées !','+50 Cursite','#7df0e0');sfx('relic');}persist();invDirty=true;renderQuests();};
     row.append(ic,mid,bt);box.append(row);});
   const mid=new Date();mid.setHours(24,0,0,0);const h=Math.max(0,Math.floor((mid-Date.now())/3600000)),m=Math.max(0,Math.floor((mid-Date.now())%3600000/60000));
