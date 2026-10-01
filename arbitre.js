@@ -37,6 +37,7 @@ function chargerRegles(html) {
   R.SELL_PRICE = nombres(/SELL_PRICE=(\[[^\]]*\])/, [0, 0, 0, 1, 3, 5, 10, 25]);
   { const m = html.match(/const need=l=>([^;\n]+);/); try { R.need = new Function('l', 'return ' + (m ? m[1] : '(40+l*l*8+l*20)*(l>=20?2:1)')); } catch { R.need = l => (40 + l * l * 8 + l * 20) * (l >= 20 ? 2 : 1); } }
   { const m = html.match(/GLORY_XP=(\d+)/); R.GLORY_XP = m ? +m[1] : 4000; }
+  { const m = html.match(/BOOST_PRIX=(\d+)/); R.BOOST_PRIX = m ? +m[1] : 100; }
   R.PET_KEYS = ['vie', 'mana', 'puissance', 'vatt', 'vdep', 'armure'];
   return R;
 }
@@ -192,7 +193,12 @@ function verifier(ancien, nouveau, ctx) {
 
   // --- Cursite : jamais créée par le joueur ---
   const skins0 = Object.keys(ancien.skins || {}).length, skins1 = Object.keys(nouveau.skins || {}).length;
-  const cursiteDepenseMin = Math.max(0, skins1 - skins0) * 100;
+  let cursiteDepenseMin = Math.max(0, skins1 - skins0) * 100;
+  // boost d'expérience acheté en Cursite (1 h)
+  if ((+nouveau.boostXP || 0) > (+ancien.boostXP || 0) + 1000) {
+    cursiteDepenseMin += R.BOOST_PRIX;
+    if (!(+nouveau.boostXP <= Date.now() + 3600000 + 10 * 60000)) pb.push('boost d\'XP trafiqué');
+  }
   if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
   if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 6 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
 

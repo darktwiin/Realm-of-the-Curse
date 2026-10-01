@@ -27,8 +27,8 @@ function potionsCarac(R, key, d, scene) {
   for (const t in DUN_POT) if (R.DTYPES[t] && R.DTYPES[t].bk === key) { const [st, ch] = DUN_POT[t]; return Math.random() < ch ? [st === '*' ? pick(R.SK) : st] : []; }
   if (d.star != null || key === 'devoreur') { const n = ri(1, 2), o = []; for (let i = 0; i < n; i++) o.push(pick(R.SK)); return o; }
   if (key === 'dieu_fou' || key === 'colosse') return Math.random() < 0.2 ? [pick(R.SK)] : [];
-  // deux dernières zones des Plaines : 3 % de chance d'une potion de caractéristique au hasard
-  if (scene === 'realm') { if ((R.ZONES[5].pool.includes(key) || R.ZONES[6].pool.includes(key)) && Math.random() < 0.03) return [pick(R.SK)]; }
+  // avant-dernière zone 0,8 %, dernière zone 1,1 % d'une potion de caractéristique au hasard
+  if (scene === 'realm') { if (R.ZONES[5].pool.includes(key) && Math.random() < 0.008) return [pick(R.SK)]; if (R.ZONES[6].pool.includes(key) && Math.random() < 0.011) return [pick(R.SK)]; }
   return [];
 }
 function tirer(R, key, cls, scene) {
@@ -78,7 +78,7 @@ function nettoyer(dons) { const lim = Date.now() - 20 * 60000; for (const k in d
 // ctx : { salle (nom), membres (Map de la salle), dons, rythme, envoyer }
 function reclamer(moi, m, ctx) {
   const R = arbitre.regles(); if (!R || !R.MON || !moi.compte) return;
-  const non = raison => { moi.killRefus = (moi.killRefus || 0) + 1; if (moi.killRefus <= 5 || moi.killRefus % 50 === 0) console.log(`[butin] refusé pour ${moi.compte.nom} : ${raison} (${moi.killRefus})`); if (moi.killRefus === 25 && ctx.signaler) ctx.signaler(['25 monstres réclamés refusés (dernier : ' + raison + ')']); ctx.envoyer(moi.ws, { t: 'butin', id: m.id, refus: 1 }); };
+  const non = raison => { if (ctx.onRefus) try { ctx.onRefus(raison); } catch {} moi.killRefus = (moi.killRefus || 0) + 1; if (moi.killRefus <= 5 || moi.killRefus % 50 === 0) console.log(`[butin] refusé pour ${moi.compte.nom} : ${raison} (${moi.killRefus})`); if (moi.killRefus === 25 && ctx.signaler) ctx.signaler(['25 monstres réclamés refusés (dernier : ' + raison + ')']); ctx.envoyer(moi.ws, { t: 'butin', id: m.id, refus: 1 }); };
   const id = Math.floor(Number(m.id)), key = String(m.k || ''), s = String(m.s || ''), d = R.MON[key];
   if (!(id > 0) || !d) return non('monstre inconnu');
   if (!s || /^[nvhGx]/.test(s)) return non('scène sans monstres');
@@ -125,6 +125,7 @@ function reclamer(moi, m, ctx) {
   // tirage
   const cls = R.CLASSES[m.c] ? String(m.c) : String((moi.etat && moi.etat.c) || '');
   const r = tirer(R, key, cls, s === 'r' ? 'realm' : 'dungeon');
+  if (ctx.boost && Date.now() < ctx.boost) r.xp = Math.round(r.xp * 1.3); // boost d'expérience (Cursite)
   const dons = ctx.dons; nettoyer(dons);
   dons.xp += r.xp; dons.kills += 1; dons.boss += r.b; dons.or += r.or;
   for (const it of [...r.it, ...r.spg, ...r.sp]) noter(dons, it);

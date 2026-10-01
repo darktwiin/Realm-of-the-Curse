@@ -1,5 +1,20 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.17 (server.js, gardien.js, butin.js et arbitre.js modifiés)
+- Dash pour toutes les classes : Maj gauche (modifiable dans Options → Touches, clic du stick gauche à la manette). Bond d'environ 1,5 case dans la direction où l'on marche (ou vers la souris), recharge de 3 s affichée sous la barre de vie.
+- Compteur de DPS au hall de guilde : un mannequin d'entraînement (à droite du hall) et un panneau qui apparaît dès qu'on le frappe. Il affiche les DPS des 3 dernières secondes, les DPS moyens, les dégâts et la durée de la session (une session se termine après 4 s sans frapper), la session précédente et le total depuis l'arrivée au hall. Bouton « Remettre à zéro ».
+- Échoppe du Village : nouvel onglet Cursite, avec l'œuf de familier à 50 Cursite et un boost d'expérience à 100 Cursite (+30 % d'XP pour tous les héros du compte pendant 1 h, temps restant affiché en haut de l'écran).
+- Passeur des mondes, nouveau PNJ du Village (à droite de la fontaine) : choix entre 3 serveurs, Roi Bouffon, Léviathan et Dévoreur d'Étoiles, avec le nombre de joueurs en ligne sur chacun. Tout le monde arrive sur Roi Bouffon au lancement. Chaque serveur a ses propres Plaines gardées par le serveur, et la progression suit le compte partout.
+- Admin : nouvel onglet « Suspects », mis à jour toutes les 5 s. Il note chaque compte selon ses sauvegardes refusées, ses monstres refusés, ses dégâts au-delà de son équipement, ses coups de trop loin, ses longues séries près d'un boss sans perdre de vie et ses déplacements impossibles. Un compte qui passe au rouge est aussi noté dans l'onglet Triche.
+
+## ver.0.0.16 (server.js et gardien.js modifiés)
+- Anti-triche, étape 4 : chaque donjon occupé a maintenant son propre Gardien, une copie invisible du jeu lancée par le serveur, qui en est l'hôte.
+  - C'est lui qui décide de la mort des monstres et des boss. Même seul dans un donjon, un joueur ne peut plus inventer de monstres.
+  - Les dégâts sont plafonnés selon l'équipement, comme dans les Plaines.
+  - Le Gardien d'un donjon s'en va 45 secondes après le départ du dernier joueur.
+- Raid du Dragon : les dégâts comptés pour chaque joueur sont plafonnés selon son équipement (un tricheur ne peut plus faire gagner sa guilde).
+- Potions de caractéristique dans les Plaines : 0,8 % par monstre dans les Terres Brûlées, 1,1 % dans les Terres Désolées.
+
 ## ver.0.0.15 (server.js modifié + nouveau fichier gardien.js, butin.js et arbitre.js modifiés)
 - Anti-triche, étape 3 : le Gardien des Plaines. Le serveur fait tourner en permanence une copie invisible du jeu, qui est l'hôte des Plaines Sauvages.
   - Le monde ne se réinitialise plus quand on sort d'un donjon : monstres, boss et portails continuent de vivre même quand personne n'est là.

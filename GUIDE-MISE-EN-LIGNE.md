@@ -132,5 +132,5 @@ Aujourd'hui, la progression est **gardée** sur le serveur, mais c'est encore le
 1. ✅ **Économie** (ver.0.0.13) : chaque sauvegarde est vérifiée par l'arbitre (`arbitre.js`). Toute modification incohérente est refusée.
 2. ✅ **Butin et XP** (ver.0.0.14) : le serveur tire le butin, l'XP et les pièces à la mort de chaque monstre (`butin.js`) et refuse tout ce qu'il n'a pas donné.
 3. ✅ **Plaines Sauvages** (ver.0.0.15) : le Gardien (`gardien.js`), une copie du jeu sans affichage lancée par le serveur, est l'hôte permanent des Plaines. Il décide de la mort des monstres et plafonne les dégâts des joueurs. Reste à faire : vérifier les dégâts que les joueurs *reçoivent*.
-4. **Donjons et raid** : même chose pour chaque donjon et pour le Dragon.
-5. **Plusieurs serveurs** au choix (« Europe 1 », « Europe 2 »…) quand il y aura du monde.
+4. ✅ **Donjons et raid** (ver.0.0.16) : un Gardien par donjon occupé (12 au maximum en même temps, réglable avec `GARDIEN_MAX_DONJONS`), dégâts du raid plafonnés.
+5. ✅ **Plusieurs serveurs** (ver.0.0.17) : Roi Bouffon (salle `principal`), Léviathan et Dévoreur d'Étoiles, sur la même machine, choisis auprès du Passeur des mondes. Le Gardien des Plaines d'un serveur secondaire démarre à la première connexion et s'arrête après 10 minutes sans joueur.
