@@ -1,5 +1,18 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.18 (server.js inchangé, arbitre.js modifié)
+- Dash retravaillé : un vrai bond quasi instantané de 1,5 case (au lieu d'une courte accélération), avec une traînée d'images du héros, et que les ralentissements n'affectent plus.
+- Quêtes de la semaine : 3 objectifs longs, les mêmes pour tout le monde, du lundi au dimanche (tuer 600 à 1 000 monstres, vaincre 20 à 30 boss, terminer 10 à 15 donjons, pêcher 25 à 40 poissons ou parcourir 60 000 à 100 000 cases). Récompenses en pièces, et +150 Cursite quand les 3 sont terminées. Elles sont dans la fenêtre des quêtes, sous les quêtes du jour.
+- Succès : nouveau bouton sous Classement et Quêtes. Chaque succès débloque un titre :
+  - Pêcheur maudit : pêcher au moins une fois chaque poisson des deux mondes ;
+  - Tueur d'étoiles : vaincre 10 fois le Dévoreur d'Étoiles (Observatoire Céleste) ;
+  - Maître des héros : tous les héros au niveau 20 en même temps ;
+  - Fléau des monstres : tuer 10 000 monstres.
+- Pêche : les poissons verts deviennent « Peu commun », les bleus « Rare », les violets « Épique ». Nouveau rang Légendaire, en jaune, avec un poisson par monde : la Carpe koï d'or maudite (lac) et le Poisson-lune doré des abysses (mer). Ils sont très rares et demandent deux touches réussies d'affilée dans une zone plus petite.
+- Échoppe : l'offre du jour (skin à −50 %) apparaît aussi dans l'onglet Cursite.
+- Le bouton doré de l'admin s'appelle maintenant CURSITE, avec le logo de la Cursite.
+- Monnaies sous la carte : une ligne par monnaie, avec le nombre aligné à droite.
+
 ## ver.0.0.17 (server.js, gardien.js, butin.js et arbitre.js modifiés)
 - Dash pour toutes les classes : Maj gauche (modifiable dans Options → Touches, clic du stick gauche à la manette). Bond d'environ 1,5 case dans la direction où l'on marche (ou vers la souris), recharge de 3 s affichée sous la barre de vie.
 - Compteur de DPS au hall de guilde : un mannequin d'entraînement (à droite du hall) et un panneau qui apparaît dès qu'on le frappe. Il affiche les DPS des 3 dernières secondes, les DPS moyens, les dégâts et la durée de la session (une session se termine après 4 s sans frapper), la session précédente et le total depuis l'arrivée au hall. Bouton « Remettre à zéro ».

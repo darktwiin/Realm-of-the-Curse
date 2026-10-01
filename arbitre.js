@@ -38,6 +38,7 @@ function chargerRegles(html) {
   { const m = html.match(/const need=l=>([^;\n]+);/); try { R.need = new Function('l', 'return ' + (m ? m[1] : '(40+l*l*8+l*20)*(l>=20?2:1)')); } catch { R.need = l => (40 + l * l * 8 + l * 20) * (l >= 20 ? 2 : 1); } }
   { const m = html.match(/GLORY_XP=(\d+)/); R.GLORY_XP = m ? +m[1] : 4000; }
   { const m = html.match(/BOOST_PRIX=(\d+)/); R.BOOST_PRIX = m ? +m[1] : 100; }
+  { const m = html.match(/WQ_BONUS=(\d+)/); R.WQ_BONUS = m ? +m[1] : 150; }
   R.PET_KEYS = ['vie', 'mana', 'puissance', 'vatt', 'vdep', 'armure'];
   return R;
 }
@@ -181,6 +182,12 @@ function verifier(ancien, nouveau, ctx) {
   // --- bonus des 3 quêtes du jour (+50 Cursite, une fois par jour) ---
   if (nouveau.quests && nouveau.quests.bonus && !(ancien.quests && ancien.quests.bonus && ancien.quests.day === nouveau.quests.day)) {
     if (Math.abs((nouveau.quests.day | 0) - today) > 1) pb.push('quêtes d\'un autre jour'); else bonusCursite += 50;
+  }
+
+  // --- bonus des 3 quêtes de la semaine (+150 Cursite, une fois par semaine) ---
+  if (nouveau.wquests && nouveau.wquests.bonus && !(ancien.wquests && ancien.wquests.bonus && ancien.wquests.week === nouveau.wquests.week)) {
+    const d0 = new Date(), sem = Math.floor((Math.floor((d0.getTime() - d0.getTimezoneOffset() * 60000) / 86400000) + 3) / 7);
+    if (Math.abs((nouveau.wquests.week | 0) - sem) > 1) pb.push('quêtes d\'une autre semaine'); else bonusCursite += R.WQ_BONUS;
   }
 
   // --- prestige : seulement par une mort définitive (calcul exact) ou un don du serveur ---
