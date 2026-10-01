@@ -92,6 +92,8 @@ Le but : tu envoies un changement sur GitHub et, 30 secondes plus tard, il est e
    - `VPS_CLE` : le contenu complet de la **clé privée**. Affiche-la avec `type $env:USERPROFILE\.ssh\deploiement_royaume` et copie tout, lignes BEGIN et END comprises.
 4. C'est tout. À chaque envoi sur la branche `main`, l'onglet **Actions** de GitHub montre la mise en ligne. Une coche verte veut dire que c'est en ligne.
 
+> Avant de redémarrer, le script prévient les joueurs : un compte à rebours de 30 secondes s'affiche en haut de leur écran. Pour changer ce délai une fois, lance par exemple `sudo DELAI_MAJ=60 bash /opt/royaume/deploy/mettre-a-jour.sh`.
+
 > Tu peux aussi mettre à jour à la main : connecte-toi au VPS et tape `sudo bash /opt/royaume/deploy/mettre-a-jour.sh`.
 
 ## Étape 6 — Le lanceur .exe

@@ -10,6 +10,7 @@ const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 const MAX_JOUEURS_PAR_SALLE = 16;
+const MAX_MEMBRES_GUILDE = 3; // compétition de raid à 3 (les guildes déjà plus grandes gardent leurs membres mais ne recrutent plus)
 // Les serveurs proposés par le Passeur des mondes (PNJ du Village) : une salle chacun, sur la même machine
 const SERVEURS = [['principal', 'Roi Bouffon'], ['leviathan', 'Léviathan'], ['devoreur', "Dévoreur d'Étoiles"]];
 const SERVEURS_IDS = new Set(SERVEURS.map(s => s[0]));
@@ -62,6 +63,11 @@ const server = http.createServer((req, res) => {
   if (url === '/' || url === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(INDEX);
+  } else if (url === '/__annonce' && req.method === 'POST') {
+    // appelé par deploy/annoncer.js juste avant un redémarrage : compte à rebours chez tous les joueurs
+    const q = new URL(req.url, 'http://local').searchParams;
+    if (!req.headers['x-forwarded-for'] && q.get('cle') === CLE_ANNONCE) { const sec = Math.max(5, Math.min(300, Math.floor(Number(q.get('s')) || 30))); annoncerMaj(sec); res.writeHead(200, { 'Content-Type': 'text/plain' }); res.end('ok ' + sec); }
+    else { res.writeHead(403); res.end('non'); }
   } else if (url === '/sante') {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('ok');
@@ -313,7 +319,7 @@ function actionGuilde(moi, salle, m) {
     if (!g) return;
     const cible = salle.get(String(m.to || ''));
     if (!cible || cible === moi) return;
-    if (Object.keys(g.membres).length >= 20) { rep({ a: 'err', msg: 'Guilde complète (20 membres)' }); return; }
+    if (Object.keys(g.membres).length >= MAX_MEMBRES_GUILDE) { rep({ a: 'err', msg: 'Guilde complète (' + MAX_MEMBRES_GUILDE + ' membres)' }); return; }
     invitesGuilde.set(cible.peer, { gid, t: Date.now() });
     envoyer(cible.ws, { t: 'g', a: 'invite', gid, nom: g.nom, tag: g.tag, from: moi.peer });
     rep({ a: 'ok', msg: 'Invitation de guilde envoyée' }); return;
@@ -322,7 +328,7 @@ function actionGuilde(moi, salle, m) {
     if (g) { rep({ a: 'err', msg: 'Quitte d\'abord ta guilde actuelle' }); return; }
     const inv = invitesGuilde.get(moi.peer), cg = guildes[String(m.gid || '')];
     if (!inv || inv.gid !== String(m.gid || '') || Date.now() - inv.t > 120000 || !cg) { rep({ a: 'err', msg: 'Invitation expirée' }); return; }
-    if (Object.keys(cg.membres).length >= 20) { rep({ a: 'err', msg: 'Guilde complète' }); return; }
+    if (Object.keys(cg.membres).length >= MAX_MEMBRES_GUILDE) { rep({ a: 'err', msg: 'Guilde complète' }); return; }
     invitesGuilde.delete(moi.peer); cg.membres[pid] = infosMembre(); guildesModif = true; diffuserGuilde(inv.gid, true); return;
   }
   if (!g) return;
@@ -429,6 +435,7 @@ wss.on('connection', (ws, req) => {
       if (cmd === 'bye') { moi.admin = 0; res(true, ''); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} quitte le mode admin`); return; }
       if (!moi.admin) { moi.admin = Date.now(); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} (${masquer(moi.ip)}) passe admin`); }
       if (cmd === 'hello') { res(true, ''); return; }
+      if (cmd === 'annonce') { const sec = Math.max(5, Math.min(300, Math.floor(Number(m.arg) || 30))); annoncerMaj(sec); res(true, 'Annonce envoyée : compte à rebours de ' + sec + ' s (le serveur ne redémarre pas tout seul)'); return; }
       if (cmd === 'suspects') { res(true, '', { suspects: listeSuspects() }); return; }
       if (cmd === 'anomalies') { res(true, '', { anomalies: sql.anoListe.all().map(r => ({ n: r.nom, t: r.quand, r: JSON.parse(r.raisons || '[]') })) }); return; }
       if (cmd === 'admins') { const out = []; for (const s of salles.values()) for (const j of s.values()) if (j.admin) out.push({ n: String((j.etat && j.etat.n) || 'Joueur').slice(0, 16), ip: masquer(j.ip), t: j.admin, s: String((j.etat && j.etat.s) || ''), moi: j === moi }); res(true, '', { admins: out }); return; }
@@ -543,6 +550,13 @@ setInterval(() => {
   }
 }, 15000);
 
+// ---- Annonce de mise à jour : la clé est écrite dans le dossier des données, lisible seulement sur le serveur ----
+const CLE_ANNONCE = crypto.randomBytes(16).toString('hex');
+try { fs.writeFileSync(path.join(DATA_DIR, 'annonce.json'), JSON.stringify({ port: PORT, cle: CLE_ANNONCE }), { mode: 0o600 }); } catch (e) { console.error('[annonce]', e.message); }
+function annoncerMaj(sec) {
+  console.log(`[annonce] mise à jour dans ${sec} s`);
+  for (const j of tousLesSockets()) if (!j.gardien) envoyer(j.ws, { t: 'maj', s: sec });
+}
 server.listen(PORT, () => {
   console.log(`Royaume Maudit en ligne sur http://localhost:${PORT}`);
   lancerGardien();

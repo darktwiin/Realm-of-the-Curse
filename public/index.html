@@ -104,6 +104,9 @@ h3{font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:
 .foot{color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .lbrow{display:grid;grid-template-columns:1fr 1fr;gap:6px}.lbrow .lb-btn{width:100%;margin:0}#questDot{color:#0b0a12;background:#ffd23f;border-radius:50%;width:16px;height:16px;line-height:16px;display:inline-block;text-align:center;font-weight:700;margin-left:6px;font-size:12px}#questDot[hidden]{display:none}
 details.help{border-top:2px solid var(--line);padding-top:8px}
+details.evt{margin-bottom:8px}.evtban{position:relative;margin-top:6px;border:2px solid #ff9a3c;box-shadow:0 0 14px rgba(255,120,30,.35);overflow:hidden;line-height:0;cursor:pointer}.evtban canvas{width:100%;height:auto;image-rendering:pixelated;display:block}
+.evtxt{position:absolute;left:10px;top:8px;bottom:8px;display:flex;flex-direction:column;justify-content:center;gap:3px;line-height:1.1;text-shadow:2px 2px 0 #000}.evtxt .evk{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#ffd23f}.evtxt b{font-family:var(--display);font-size:22px;color:#fff;letter-spacing:.03em}.evtxt .evd{font-size:13px;color:#ffe9c0}.evtxt .evc{font-size:12px;color:#7df0e0}
+.evp{font-size:12px;color:var(--muted);line-height:1.4;margin:6px 0 0}.evp b{color:#ffd23f}
 details.help summary{cursor:pointer;font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 details.help dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0}
 details.help dt{color:var(--gold)} details.help dd{margin:0}
@@ -391,7 +394,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.18"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.20"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -407,7 +410,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.18</div>
+    <div class="verTag" id="verTag">ver.0.0.20</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -567,7 +570,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.18</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.20</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -609,7 +612,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.18</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.20</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -656,6 +659,10 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       <b style="color:#ffd23f;font-size:14px">Compteur de DPS</b> <span id="dpsState" style="float:right;color:#7ed957;font-size:12px"></span>
       <div id="dpsBody"></div>
       <button type="button" class="act" id="dpsReset" style="margin-top:6px;width:100%">Remettre à zéro</button>
+    </div>
+    <div id="majBar" hidden style="position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:40;pointer-events:none;text-align:center;background:rgba(20,8,10,.92);border:3px solid #ffd23f;box-shadow:0 0 24px rgba(255,210,63,.55),4px 4px 0 #000;padding:10px 26px;min-width:min(560px,80%)">
+      <div style="font-family:var(--display);font-size:30px;line-height:1.1;color:#ffd23f;letter-spacing:.03em" id="majTitre">MISE À JOUR DANS 30 S</div>
+      <div style="font-size:14px;color:#ebe6f6;margin-top:4px" id="majTxt">Le jeu va redémarrer : termine ton combat ou mets-toi à l'abri. Ta progression est sauvegardée.</div>
     </div>
     <div class="overlay" id="succWin" hidden>
       <div class="shop-inner" role="dialog" aria-label="Succès">
@@ -714,6 +721,20 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <section id="tabStats" hidden>
       <div class="stats" id="stats"></div>
     </section>
+    <details class="help evt" id="evtBox" open>
+      <summary>Événements <span id="evtDot" style="color:#0b0a12;background:#ff7a1a;border-radius:8px;padding:0 6px;font-size:11px;margin-left:6px">1</span></summary>
+      <div class="evtban" id="evtBan">
+        <canvas id="evtCv" width="232" height="104"></canvas>
+        <div class="evtxt">
+          <span class="evk">Événement de guilde</span>
+          <b>RAID DU DRAGON</b>
+          <span class="evd">Jeudi 8 octobre 2026</span>
+          <span class="evc" id="evtCd"></span>
+        </div>
+      </div>
+      <p class="evp">Compétition de guildes : la guilde qui inflige le plus de dégâts au Dragon l'emporte. <b>3 joueurs maximum par guilde.</b> Récompenses pour toutes les guildes classées : pièces, Cursite, œufs et croquettes.</p>
+      <p class="evp" id="evtGuilde"></p>
+    </details>
     <details class="help">
       <summary>Commandes</summary>
       <dl id="helpDl">
@@ -1902,7 +1923,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000018;let newerWarned=false;
+const NETV=2,BUILD=2600000020;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1945,7 +1966,7 @@ function makeNetRoom(){
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'||m.t==='butin'||m.t==='serveurs'){for(const f of rawH)f(m);}};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'||m.t==='butin'||m.t==='serveurs'||m.t==='maj'){for(const f of rawH)f(m);}};
     ws.onclose=e=>{if(e.code===4004){setConn(false);others.clear();me=null;emitPeers();authKicked();return;}if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
@@ -1962,7 +1983,7 @@ async function initRoom(){
   if(window.claude&&typeof window.claude.use==='function'){let r=null;try{r=await window.claude.use('room');}catch(e){r=null;}if(r)room=r;}
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
-  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}if(m.t==='butin'){onButin(m);return;}if(m.t==='serveurs'){srvData=m;if(!srvEl.hidden)renderServeurs();return;}
+  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}if(m.t==='butin'){onButin(m);return;}if(m.t==='maj'){onMaj(m);return;}if(m.t==='serveurs'){srvData=m;if(!srvEl.hidden)renderServeurs();return;}
     if(m.t==='tr'){tradeMsg(m);return;}
     if(m.t==='g'){guildMsg(m);return;}
     if(m.t==='dev'&&m.cmd==='party'){startParty(m.arg);return;}
@@ -2997,6 +3018,34 @@ $('#takeAll').addEventListener('click',takeAll);
 function setTab(t){tab=t;$('#tabInv').hidden=t!=='inv';$('#tabStats').hidden=t!=='stats';$('#tabInvBtn').classList.toggle('on',t==='inv');$('#tabStBtn').classList.toggle('on',t==='stats');statsDirty=true;invDirty=true;}
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
 
+/* ================= événements (panneau de droite) ================= */
+const EVT={date:new Date(2026,9,8)}; // jeudi 8 octobre 2026
+function drawEvtBanner(){const cv2=document.getElementById('evtCv');if(!cv2)return;const g=cv2.getContext('2d'),Wb=cv2.width,Hb=cv2.height;g.imageSmoothingEnabled=false;
+  const gr=g.createLinearGradient(0,0,Wb,Hb);gr.addColorStop(0,'#1a0608');gr.addColorStop(0.55,'#4a0e12');gr.addColorStop(1,'#b83a12');g.fillStyle=gr;g.fillRect(0,0,Wb,Hb);
+  // lueur et braises
+  const rg=g.createRadialGradient(Wb*0.78,Hb*0.55,4,Wb*0.78,Hb*0.55,Hb*0.9);rg.addColorStop(0,'rgba(255,170,40,.75)');rg.addColorStop(1,'rgba(255,120,20,0)');g.fillStyle=rg;g.fillRect(0,0,Wb,Hb);
+  const R0=mulberry(2026);for(let i=0;i<46;i++){const x=R0()*Wb,y=R0()*Hb,s2=R0()<0.3?2:1;g.fillStyle=['#ffd23f','#ff9a3c','#ff5a1a'][Math.floor(R0()*3)];g.globalAlpha=0.35+R0()*0.6;g.fillRect(Math.floor(x),Math.floor(y),s2,s2);}g.globalAlpha=1;
+  // un bout de la tête du Dragon (gueule ouverte), en très gros, qui dépasse à droite
+  try{const d=makeDragonFrame(2,'all'),k=4;g.drawImage(d,46,-192,d.width*k,d.height*k);}catch(e){}
+  // dégradé sombre à gauche pour la lisibilité du texte
+  const lg=g.createLinearGradient(0,0,Wb*0.7,0);lg.addColorStop(0,'rgba(11,4,6,.92)');lg.addColorStop(1,'rgba(11,4,6,0)');g.fillStyle=lg;g.fillRect(0,0,Wb,Hb);}
+function updEvt(){const el=document.getElementById('evtCd');if(!el)return;const now=new Date(),j=Math.ceil((EVT.date-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+  el.textContent=j>1?'Dans '+j+' jours':j===1?'Demain !':j===0?'C\'est aujourd\'hui !':'Événement terminé';document.getElementById('evtDot').hidden=j<0;
+  const eg=document.getElementById('evtGuilde');eg.textContent=typeof GUILD!=='undefined'&&GUILD?'Ta guilde : ['+GUILD.tag+'] '+GUILD.nom+' ('+GUILD.membres.length+'/3). Le portail du raid est dans le hall de guilde.':'Tu n\'as pas encore de guilde : crée-la ou rejoins-en une au portail Guilde du Village.';}
+try{drawEvtBanner();}catch(e){}setInterval(()=>{try{updEvt();}catch(e){}},2000);
+document.getElementById('evtBan').addEventListener('click',()=>{if(save.current)openGuildWin();});
+/* ================= annonce de mise à jour (compte à rebours envoyé par le serveur) ================= */
+let MAJ=null;
+function onMaj(m){const sec=clamp(Math.floor(+m.s)||30,5,300);MAJ={fin:Date.now()+sec*1000,coupe:false,sauve:false};const el=document.getElementById('majBar');el.hidden=false;sfx('boss');pushChat({n:'Serveur',t:'Mise à jour du jeu dans '+sec+' secondes',life:14,col:'#ffd23f'});majTick();}
+function majTick(){if(!MAJ)return;const el=document.getElementById('majBar'),r=Math.ceil((MAJ.fin-Date.now())/1000);
+  if(r>0){document.getElementById('majTitre').textContent='MISE À JOUR DANS '+r+' S';document.getElementById('majTitre').style.color=r<=10?'#ff5a6a':'#ffd23f';if(r<=10&&r!==MAJ.bip){MAJ.bip=r;sfx('deny',0.5);}if(r<=3&&!MAJ.sauve){MAJ.sauve=true;try{persist();pushSave(true);}catch(e){}}}
+  else{document.getElementById('majTitre').textContent='MISE À JOUR EN COURS…';document.getElementById('majTxt').textContent='Reconnexion automatique dans quelques secondes.';
+    if(!netOn)MAJ.coupe=true;
+    // le serveur est revenu : on recharge la page pour prendre la nouvelle version
+    if(MAJ.coupe&&netOn){MAJ=null;sessionStorage.setItem('rm-reload','1');location.reload();return;}
+    // annonce sans redémarrage (ou redémarrage annulé) : on retire le bandeau au bout d'une minute
+    if(Date.now()-MAJ.fin>60000){MAJ=null;el.hidden=true;}}}
+setInterval(majTick,250);
 /* ================= serveurs (Passeur des mondes) ================= */
 const SRV_NOMS={principal:'Roi Bouffon',leviathan:'Léviathan',devoreur:"Dévoreur d'Étoiles"};
 const srvEl=$('#srvWin');let srvData=null,srvT=null;
@@ -3667,14 +3716,14 @@ function renderGuild(){const B=$('#gdBody');B.textContent='';
       <button type="button" class="act main" id="gdCreate">Fonder la guilde · ${GUILD_COST} pièces</button>`;
     for(const id of ['gdNom','gdTag'])$('#'+id).addEventListener('keydown',e=>e.stopPropagation());
     $('#gdCreate').onclick=()=>{if(save.gold<GUILD_COST){note('Il faut '+GUILD_COST+' pièces');sfx('deny');return;}room.raw(Object.assign(gMsg('create'),{nom:$('#gdNom').value,tag:$('#gdTag').value}));};
-    $('#gdFoot').textContent='20 membres maximum par guilde';return;}
+    $('#gdFoot').textContent='3 membres maximum par guilde';return;}
   const G=GUILD,r=G.raid||{};$('#gdTitle').textContent='['+G.tag+'] '+G.nom;
   const rd=document.createElement('div');rd.className='graid';const d=r.dernier;
   rd.innerHTML=`<b>🐉 Raid de guilde · Dragon</b><br><span class="hint">${raidOn()?`<b style="color:#ff7a1a">EN COURS · ${raidLeft()} restantes</b> · dégâts de ta guilde : <b>${r.guilde.toLocaleString('fr-FR')}</b> · les tiens : <b>${r.part.toLocaleString('fr-FR')}</b>`:'Une fois par semaine, le Dragon apparaît 5 minutes. Il est invulnérable : les guildes sont classées selon leurs dégâts.'}</span>
     ${r.top&&r.top.length?'<div class="hint" style="margin-top:6px">'+r.top.map((t,i)=>(i+1)+'. ['+t.tag+'] '+t.nom+' · '+Number(t.dmg).toLocaleString('fr-FR')).join('<br>')+'</div>':''}
     ${!raidOn()&&d?`<div class="hint" style="margin-top:6px">Dernier raid : ta guilde est <b>${d.rang?d.rang+(d.rang===1?'re':'e')+' / '+d.nb:'non classée'}</b>${d.gain?` · récompense : ${d.gain.or} pièces, ${d.gain.cu} Cursite${d.gain.oeufs?', '+d.gain.oeufs+' œuf(s)':''}${d.gain.cro?', '+d.gain.cro+' croquette(s)':''}`:''} · ${!d.part?'tu n\'as pas participé':d.recu?'récupérée ✓':'<b style="color:#ffd23f">à récupérer au coffre du hall</b>'}</div>`:''}
     <div class="hint" style="margin-top:6px">Récompenses : 🥇 1000 pièces, 100 Cursite, 2 œufs, 2 croquettes · 🥈 700, 70, 1, 2 · 🥉 500, 50, 1, 1 · autres : 250, 25, 1 croquette.</div>`;B.append(rd);
-  const h=document.createElement('h3');h.textContent='Membres ('+G.membres.length+'/20)';B.append(h);const L=document.createElement('div');L.className='glist';
+  const h=document.createElement('h3');h.textContent='Membres ('+G.membres.length+'/3)';B.append(h);const L=document.createElement('div');L.className='glist';
   const online=new Set([...remotes.values()].filter(q=>q.p&&q.p.gt===G.tag&&Date.now()-q.upd<6000).map(q=>clean(q.p.n).slice(0,16)));
   [...G.membres].sort((a,b)=>b.dmg-a.dmg).forEach(m=>{const row=document.createElement('div');row.className='grow'+(m.moi?' moi':'');const im=document.createElement('img');if(heroURL[m.c])im.src=heroURL[m.c];const n=document.createElement('span');n.textContent=(m.chef?'👑 ':'')+m.n+' · niv. '+m.l+((m.moi||online.has(m.n))?' · en ligne':'');const e=document.createElement('em');e.textContent=m.dmg.toLocaleString('fr-FR')+' dégâts';row.append(im,n,e);
     if(G.chef&&!m.moi){const k=document.createElement('button');k.type='button';k.className='act';k.textContent='Exclure';k.onclick=()=>{if(k.dataset.arm){room.raw(Object.assign(gMsg('kick'),{k:m.k}));}else{k.dataset.arm=1;k.textContent='Sûr ?';}};row.append(k);}else row.append(document.createElement('span'));L.append(row);});B.append(L);
@@ -4869,7 +4918,7 @@ function drawVault(x0,x1,y0,y1){const HS=houseSkin();
   drawPortal(VBACK.x,VBACK.y,'#3f7fe0','#8fd0ff','Village');
   // tableau de pêche
   {const X=sx(FBOARD.x),Y=sy(FBOARD.y);R(X-u,Y,u*2,7*u,'#5a3a22');R(X-9*u,Y-10*u,18*u,11*u,'#6a4424');R(X-8*u,Y-9*u,16*u,9*u,'#2a3a4a');const fs=fishSpr('gardon');ctx.drawImage(fs,X-6*u,Y-8*u,7*u,7*u);ctx.drawImage(fishSpr('brochet'),X,Y-7*u,7*u,7*u);
-    const n=Object.keys(save.fish||{}).length;label('Pêche · '+n+'/20',X,Y-TS*0.95,'#8fd0ff',Math.round(TS*0.28));}
+    const n=FISHES.filter(f=>(save.fish||{})[f.id]).length;label('Pêche · '+n+'/'+FISHES.length,X,Y-TS*0.95,'#8fd0ff',Math.round(TS*0.28));}
   // pupitre de décoration
   {const X=sx(PRESNPC.x),Y=sy(PRESNPC.y),gl=0.5+0.5*Math.sin(time*2);ctx.fillStyle='rgba(255,210,63,'+(0.12+0.1*gl)+')';ctx.beginPath();ctx.ellipse(X,Y+TS*0.3,TS*0.8,TS*0.3,0,0,TAU);ctx.fill();
     const g=heroSprite('pretre',null,'baguette',7,'idle'),kk=TS*1.05/52,b=Math.sin(time*1.6)*u;ctx.drawImage(g,X-26*kk,Y-34*kk-b,g.width*kk,g.height*kk);

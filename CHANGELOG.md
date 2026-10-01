@@ -1,5 +1,13 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.20 (server.js modifié)
+- Nouveau volet « Événements » dans le panneau de droite, juste au-dessus des Commandes : bannière du Raid du Dragon (jeudi 8 octobre 2026, compétition de guildes) avec le nombre de jours restants. Un clic sur la bannière ouvre la fenêtre de guilde.
+- Guildes limitées à 3 membres. Les guildes qui en ont déjà plus gardent leurs membres mais ne peuvent plus recruter.
+- Correction : le panneau de pêche du Village affichait encore « /20 » au lieu de 22 poissons.
+
+## ver.0.0.19 (server.js modifié + nouveau fichier deploy/annoncer.js, deploy/mettre-a-jour.sh modifié)
+- Annonce de mise à jour : avant chaque mise en ligne, un grand bandeau en haut de l'écran affiche un compte à rebours de 30 secondes (rouge sur les 10 dernières). La progression est sauvegardée juste avant la coupure, puis la page se recharge toute seule sur la nouvelle version dès que le serveur est revenu.
+
 ## ver.0.0.18 (server.js inchangé, arbitre.js modifié)
 - Dash retravaillé : un vrai bond quasi instantané de 1,5 case (au lieu d'une courte accélération), avec une traînée d'images du héros, et que les ralentissements n'affectent plus.
 - Quêtes de la semaine : 3 objectifs longs, les mêmes pour tout le monde, du lundi au dimanche (tuer 600 à 1 000 monstres, vaincre 20 à 30 boss, terminer 10 à 15 donjons, pêcher 25 à 40 poissons ou parcourir 60 000 à 100 000 cases). Récompenses en pièces, et +150 Cursite quand les 3 sont terminées. Elles sont dans la fenêtre des quêtes, sous les quêtes du jour.
