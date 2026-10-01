@@ -131,6 +131,6 @@ Aujourd'hui, la progression est **gardée** sur le serveur, mais c'est encore le
 
 1. ✅ **Économie** (ver.0.0.13) : chaque sauvegarde est vérifiée par l'arbitre (`arbitre.js`). Toute modification incohérente est refusée.
 2. ✅ **Butin et XP** (ver.0.0.14) : le serveur tire le butin, l'XP et les pièces à la mort de chaque monstre (`butin.js`) et refuse tout ce qu'il n'a pas donné.
-3. **Plaines Sauvages** : le serveur fait tourner les monstres, leurs tirs et les collisions. Le jeu du joueur n'envoie plus que ses touches et sa visée.
+3. ✅ **Plaines Sauvages** (ver.0.0.15) : le Gardien (`gardien.js`), une copie du jeu sans affichage lancée par le serveur, est l'hôte permanent des Plaines. Il décide de la mort des monstres et plafonne les dégâts des joueurs. Reste à faire : vérifier les dégâts que les joueurs *reçoivent*.
 4. **Donjons et raid** : même chose pour chaque donjon et pour le Dragon.
 5. **Plusieurs serveurs** au choix (« Europe 1 », « Europe 2 »…) quand il y aura du monde.

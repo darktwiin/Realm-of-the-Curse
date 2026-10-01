@@ -27,7 +27,8 @@ function potionsCarac(R, key, d, scene) {
   for (const t in DUN_POT) if (R.DTYPES[t] && R.DTYPES[t].bk === key) { const [st, ch] = DUN_POT[t]; return Math.random() < ch ? [st === '*' ? pick(R.SK) : st] : []; }
   if (d.star != null || key === 'devoreur') { const n = ri(1, 2), o = []; for (let i = 0; i < n; i++) o.push(pick(R.SK)); return o; }
   if (key === 'dieu_fou' || key === 'colosse') return Math.random() < 0.2 ? [pick(R.SK)] : [];
-  if (scene === 'realm') { const sansVie = R.SK.filter(k => k !== 'vie'); if (R.ZONES[5].pool.includes(key) && Math.random() < 0.001) return [pick(sansVie)]; if (R.ZONES[6].pool.includes(key) && Math.random() < 0.005) return [pick(sansVie)]; }
+  // deux dernières zones des Plaines : 3 % de chance d'une potion de caractéristique au hasard
+  if (scene === 'realm') { if ((R.ZONES[5].pool.includes(key) || R.ZONES[6].pool.includes(key)) && Math.random() < 0.03) return [pick(R.SK)]; }
   return [];
 }
 function tirer(R, key, cls, scene) {
@@ -101,8 +102,14 @@ function reclamer(moi, m, ctx) {
   const vus = moi.tues || (moi.tues = new Set()), cle = s + '|' + id;
   if (vus.has(cle)) return non('déjà compté');
   // à plusieurs : la mort doit avoir été annoncée par l'hôte (sauf si c'est lui l'hôte)
-  let autres = 0; for (const j of ctx.membres.values()) if (j !== moi && j.etat && j.etat.s === s) autres++;
-  if (autres) {
+  let autres = 0; for (const j of ctx.membres.values()) if (j !== moi && !j.gardien && j.etat && j.etat.s === s) autres++;
+  const G = ctx.gardien && ctx.gardien.etat && ctx.gardien.etat.s === s ? ctx.gardien : null;
+  if (G) {
+    // Plaines tenues par le Gardien du serveur : seule sa parole compte
+    const w = temoins.get(ctx.salle + '|' + cle);
+    if (!w || w.peer !== G.peer) return non('mort non confirmée par le Gardien');
+    if (w.k !== key) return non('mauvais monstre');
+  } else if (autres) {
     const w = temoins.get(ctx.salle + '|' + cle);
     if (w) { if (w.k !== key) return non('mauvais monstre'); }
     else { const h = hotes.get(ctx.salle + '|' + s); if (h && h.peer !== moi.peer && Date.now() - h.t < 4000) return non('mort non annoncée par l\'hôte'); }

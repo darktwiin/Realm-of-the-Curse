@@ -391,7 +391,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.14"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.15"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -407,7 +407,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.14</div>
+    <div class="verTag" id="verTag">ver.0.0.15</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -566,7 +566,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.14</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.15</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -608,7 +608,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.14</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.15</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1878,7 +1878,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000014;let newerWarned=false;
+const NETV=2,BUILD=2600000015;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1899,7 +1899,7 @@ let admInv=false,morphKey=null;
 // tous les joueurs de la scène, y compris invisibles (pour savoir quels monstres envoyer et où ne pas en faire apparaître)
 function sceneAll(){const a=[{x:P.x,y:P.y}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k))a.push({x:r.x,y:r.y});return a;}
 function scenePlayers(){const a=P.invis>0||admInv?[]:[{x:P.x,y:P.y,vx:P.vx||0,vy:P.vy||0,me:true}],k=sceneKey();for(const r of remotes.values())if(activeIn(r,k)&&!r.p.iv)a.push({x:r.x,y:r.y,vx:r.vx||0,vy:r.vy||0,me:false});return a;}
-function hostKey(){const k=sceneKey();if(safe())return{me:false,r:null};let best={rt:sceneT,peer:myPeer||'',me:true};for(const r of remotes.values()){if(!activeIn(r,k))continue;const rt=num(r.p.rt,Infinity);if(rt<best.rt||(rt===best.rt&&r.peer<best.peer))best={rt,peer:r.peer,me:false,r};}return best;}
+function hostKey(){const k=sceneKey();if(safe())return{me:false,r:null};if(window.GARDIEN_MODE)return{rt:0,peer:myPeer||'',me:true};for(const r of remotes.values())if(r.p&&r.p.gd===1&&activeIn(r,k))return{rt:0,peer:r.peer,me:false,r};let best={rt:sceneT,peer:myPeer||'',me:true};for(const r of remotes.values()){if(!activeIn(r,k))continue;const rt=num(r.p.rt,Infinity);if(rt<best.rt||(rt===best.rt&&r.peer<best.peer))best={rt,peer:r.peer,me:false,r};}return best;}
 function computeHostIsMe(){return !safe()&&hostKey().me;}
 function hostName(){const h=hostKey();return h.me?'Toi':clean(h.r.p.n).slice(0,16)||'Un joueur';}
 function othersInScene(){const k=sceneKey();for(const r of remotes.values())if(activeIn(r,k))return true;return false;}
@@ -1984,9 +1984,12 @@ function onPeers(peers){
   for(const k of [...remotes.keys()])if(!seen.has(k)){remotes.delete(k);applied.delete(k);}
 }
 function parseHits(s){const out=[];for(const e of s.split(';')){const [a,b]=e.split(':');const id=parseInt(a,36),t=parseInt(b,36);if(id>0&&t>0)out.push([id,t]);}return out.slice(0,60);}
+// Gardien des Plaines (serveur) : dégâts d'un joueur plafonnés selon son équipement, et seulement sur les monstres proches de lui
+const G_CAPS=new Map(),G_SEAU=new Map();window.__gcap=(p,c)=>{G_CAPS.set(p,c);};
+function gardienFiltre(peer,m,d){const r=remotes.get(peer);if(r&&Math.hypot(m.x-r.x,m.y-r.y)>18)return 0;const cap=G_CAPS.get(peer)||25000;let b=G_SEAU.get(peer);if(!b){b={v:cap*4,t:time};G_SEAU.set(peer,b);}b.v=Math.min(cap*4,b.v+cap*Math.max(0,time-b.t));b.t=time;const ok=Math.min(d,Math.max(0,b.v));b.v-=ok;return ok;}
 function applyHits(peer,s){
   let mp=applied.get(peer);if(!mp){mp=new Map();applied.set(peer,mp);}
-  for(const [id,tot] of parseHits(s)){const prev=mp.get(id)||0;if(tot<=prev)continue;mp.set(id,tot);const m=monsters.find(q=>q.id===id);if(!m||m.hp<=0)continue;m.hp-=Math.min(tot-prev,200000);if(m.key==='dragon')m.hp=m.max;m.flash=0.1;if(m.hp<=0)hostKill(m);}
+  for(const [id,tot] of parseHits(s)){const prev=mp.get(id)||0;if(tot<=prev)continue;mp.set(id,tot);const m=monsters.find(q=>q.id===id);if(!m||m.hp<=0)continue;let dd=Math.min(tot-prev,200000);if(window.GARDIEN_MODE)dd=gardienFiltre(peer,m,dd);m.hp-=dd;if(m.key==='dragon')m.hp=m.max;m.flash=0.1;if(m.hp<=0)hostKill(m);}
 }
 function deadBits(){const n=MAP.nInit|0,alive=new Set();for(const m of monsters)if(m.hp>0&&m.id<=n)alive.add(m.id);let out='';for(let i=1;i<=n;i+=4){let v=0;for(let j=0;j<4;j++)if(i+j<=n&&!alive.has(i+j))v|=1<<j;out+=v.toString(16);}return out;}
 let lastHostX=null;
@@ -2042,7 +2045,7 @@ function sendPresence(){
   if(!room||!save.current)return;
   const st=S(),ch=C(),w=ch.equip[0];
   const sh=(!safe()&&(mouse.down||P.auto||aimTouch)&&w)?(()=>{const a=aimWorld();return Math.round(Math.atan2(a.y-P.y,a.x-P.x)*100);})():null;
-  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,dd:scene==='arena'?Math.round((st.dmg[0]+st.dmg[1])/2*0.6):null,iv:P.invis>0||admInv?1:0,hid:admInv?1:0,bv:BUILD,gi:myGid,gt:GUILD?GUILD.tag:null,pe:eqPet()?eqPet().k:null,pt:eqPet()?(eqPet().t||0):0,ti:myTitle(),mo:morphKey,as:P.invis>0&&!admInv?1:0,sf:myStates()||null,fi:FISH?Math.round(FISH.bx*10)+','+Math.round(FISH.by*10):null,pz:parQ.length?parSeq+'|'+parQ.join(';'):null,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null,RB:scene==='realm'&&amHost?(()=>{const b=monsters.find(q=>CENTRAL.includes(q.key)&&q.hp>0);return b?b.key+','+Math.round(b.x*10)+','+Math.round(b.y*10):null;})():null,RK:scene==='realm'&&amHost?realmKills:null,X:scene==='dungeon'&&amHost&&MAP.nInit?deadBits():null};
+  const o={v:NETV,n:pseudo,c:save.current,l:ch.lvl,s:sceneKey(),rt:sceneT,tk:Math.floor(Date.now()/500),x:Math.round(P.x*10),y:Math.round(P.y*10),hp:Math.round(clamp(P.hp/st.tot.vie,0,1)*100),sh,w:w?w.kind:null,wt:w?w.tier:0,sk:mySkin(),au:myAura()?[save.aura.k,save.aura.s,save.aura.c,save.aura.o?1:0].join('|'):null,r:Math.round(st.rate*10),f:P.face,b:P.berserk>0?1:0,mv:P.moving?1:0,m:myMsg,hl:myHeal,ev:myEv,dd:scene==='arena'?Math.round((st.dmg[0]+st.dmg[1])/2*0.6):null,iv:P.invis>0||admInv?1:0,hid:admInv?1:0,gd:window.GARDIEN_MODE?1:null,bv:BUILD,gi:myGid,gt:GUILD?GUILD.tag:null,pe:eqPet()?eqPet().k:null,pt:eqPet()?(eqPet().t||0):0,ti:myTitle(),mo:morphKey,as:P.invis>0&&!admInv?1:0,sf:myStates()||null,fi:FISH?Math.round(FISH.bx*10)+','+Math.round(FISH.by*10):null,pz:parQ.length?parSeq+'|'+parQ.join(';'):null,h:!safe()&&!amHost?encHits():null,M:null,D:null,G:null,F:scene==='dungeon'&&amHost?fight:null,S:scene==='dungeon'&&amHost?stars:null,B:amHost&&bossBoardT>time?bossBoardStr:null,bq:scene==='dungeon'?bossReq:null,RB:scene==='realm'&&amHost?(()=>{const b=monsters.find(q=>CENTRAL.includes(q.key)&&q.hp>0);return b?b.key+','+Math.round(b.x*10)+','+Math.round(b.y*10):null;})():null,RK:scene==='realm'&&amHost?realmKills:null,X:scene==='dungeon'&&amHost&&MAP.nInit?deadBits():null};
   if(!safe()&&amHost&&othersInScene()){
     o.D=deaths.slice(-20).join(';');
     if(scene==='realm')o.G=dportals.map(d=>d.id.toString(36)+','+Math.round(d.x*10)+','+Math.round(d.y*10)+','+Math.ceil(d.life)+','+(d.t||'c')).join(';');
@@ -2718,7 +2721,7 @@ function statDrops(key,d){
   for(const t in DUN_POT)if(DTYPES[t]&&DTYPES[t].bk===key){const [st,ch]=DUN_POT[t];return Math.random()<ch?[st==='*'?pick(SK):st]:[];}
   if(d.star!=null||key==='devoreur'){const n=ri(1,2),o=[];for(let i=0;i<n;i++)o.push(pick(SK));return o;}
   if(key==='dieu_fou'||key==='colosse')return Math.random()<0.2?[pick(SK)]:[];
-  if(scene==='realm'){const noVie=SK.filter(k=>k!=='vie');if(ZONES[5].pool.includes(key)&&Math.random()<0.001)return [pick(noVie)];if(ZONES[6].pool.includes(key)&&Math.random()<0.005)return [pick(noVie)];}
+  if(scene==='realm'){if((ZONES[5].pool.includes(key)||ZONES[6].pool.includes(key))&&Math.random()<0.03)return [pick(SK)];}
   return [];
 }
 function randomItem(t){
@@ -2946,8 +2949,8 @@ const spOfDay=()=>SK[dayKey()%SK.length];
 const SHOP_SECS=[['pot','Potions'],['pet','Familiers'],['sac','Sacs à dos']];
 const SHOP_ITEMS=[
   {id:'spjour',sec:'pot',get nom(){return KINDS['sp_'+spOfDay()].noms[0]+' · du jour';},desc:'Potion de caractéristique (change chaque jour). 1 par jour.',prix:50,get img(){return icon(mkItem('sp_'+spOfDay(),0));},owned:()=>save.spDay===dayKey(),ownTxt:'Demain',buy:()=>{if(buyPotion('sp_'+spOfDay())===false)return false;save.spDay=dayKey();return true;}},
-  {id:'pvie',sec:'pot',nom:'Potion de vie',desc:'Rend 120 PV (touche F).',prix:10,img:icon(mkItem('pvie',0)),owned:()=>false,buy:()=>buyPotion('pvie')},
-  {id:'pmana',sec:'pot',nom:'Potion de mana',desc:'Rend 120 PM (touche V).',prix:10,img:icon(mkItem('pmana',0)),owned:()=>false,buy:()=>buyPotion('pmana')},
+  {id:'pvie',sec:'pot',nom:'Potion de vie',desc:'Rend 120 PV (touche F).',prix:5,img:icon(mkItem('pvie',0)),owned:()=>false,buy:()=>buyPotion('pvie')},
+  {id:'pmana',sec:'pot',nom:'Potion de mana',desc:'Rend 120 PM (touche V).',prix:5,img:icon(mkItem('pmana',0)),owned:()=>false,buy:()=>buyPotion('pmana')},
   {id:'egg',sec:'pet',nom:'Œuf de familier',desc:'À ouvrir dans le sac : un familier au hasard.',prix:300,img:icon(mkItem('egg',0)),owned:()=>false,buy:()=>buyPotion('egg')},
   {id:'croquette',sec:'pet',nom:'Croquette',desc:'3 familiers identiques + 1 croquette = tier supérieur (parc de la maison).',prix:500,img:icon(mkItem('croquette',0)),owned:()=>false,buy:()=>buyPotion('croquette')},
   {id:'sac2',sec:'sac',nom:'2e sac à dos',desc:'Onglet « Sac 2 » : 8 places de plus pour ce héros.',prix:250,img:backpackURL,owned:()=>C().inv.length>8,buy:()=>{const ch=C();while(ch.inv.length<16)ch.inv.push(null);bagTab=1;return true;}},
@@ -3849,7 +3852,7 @@ let plSig='';
 function renderPlayers(){
   const on=!!room&&netOn;nsEl.textContent=!room?'Solo':on?'En ligne · salle '+salleNom:'Connexion…';nsEl.classList.toggle('on',on);
   const hk=hostKey();
-  {const sig=[myGid,GUILD&&GUILD.tag,save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r,Math.hypot(r.x-P.x,r.y-P.y)<8,r.p.gi,r.p.gt].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
+  {const sig=[myGid,GUILD&&GUILD.tag,save.current,pseudo,C()&&C().lvl,sceneKey(),amHost,netOn,...[...remotes.values()].map(r=>r.p?[r.peer,r.p.n,r.p.l,r.p.s,r.p.c,Date.now()-r.upd<4000,canTradeWith(r),hk.r===r,Math.hypot(r.x-P.x,r.y-P.y)<8,r.p.gi,r.p.gt,r.p.hid].join(':'):'')].join('|');if(sig===plSig)return;plSig=sig;}
   plEl.textContent='';
   const add=(c,n,l,z,me,peer)=>{const li=document.createElement('li');if(me)li.className='me';const im=document.createElement('img');im.alt='';if(heroURL[c])im.src=heroURL[c];const sn=document.createElement('span');sn.className='pn';{const rr=peer&&remotes.get(peer),tg=me?(GUILD?GUILD.tag:''):(rr&&rr.p&&typeof rr.p.gt==='string'?clean(rr.p.gt).slice(0,4):'');sn.textContent=((me&&myGid)||(rr&&rr.p&&myGid&&rr.p.gi===myGid)?'👥 ':'')+(tg?'['+tg+'] ':'')+n+(me?' (toi)':'')+' · niv. '+l;}const sz=document.createElement('span');sz.className='pz';sz.textContent=z;li.append(im,sn,sz);li.dataset.pm=peer||'me';li.classList.add('clk');li.title='Clic : groupe, échange, duel, guilde…';{const rr=peer&&remotes.get(peer);if(rr&&rr.p&&myGid&&rr.p.gi===myGid)li.classList.add('grp');if(!peer&&myGid)li.classList.add('grp');}if(false&&peer&&canTradeWith(remotes.get(peer))){li.classList.add('hastb');const b=document.createElement('button');b.type='button';b.className='tbtn';b.dataset.trade=peer;b.textContent='⇄';b.title='Proposer un échange';li.append(b);const d2=document.createElement('button');d2.type='button';d2.className='tbtn dbtn';d2.dataset.duel=peer;d2.textContent='⚔';d2.title='Défier en duel';li.append(d2);}if(false){const r=remotes.get(peer);if(r&&r.p&&!(r.p.s==='r'&&Math.hypot(r.x-P.x,r.y-P.y)<8)){const t=document.createElement('button');t.type='button';t.className='tbtn tpbtn';t.dataset.tpinv=peer;t.textContent='↗';t.title='Inviter à te rejoindre (téléportation dans les Plaines Sauvages)';li.append(t);}}{const nb=li.querySelectorAll('button').length;if(nb)li.style.gridTemplateColumns='22px 1fr auto'+' auto'.repeat(nb);}plEl.append(li);};
   if(save.current)add(save.current,pseudo,C().lvl,sceneLabel(sceneKey())+(!safe()&&amHost&&othersInScene()?' ★':''),true);
@@ -5119,9 +5122,10 @@ function render(){
   for(const k of strikes){if(k.hit)continue;const X=sx(k.x),Y=sy(k.y),bl=Math.sin(time*(14+(1.1-k.t)*25))>0;ctx.globalAlpha=bl?0.55:0.25;ctx.fillStyle=k.rock?'#c8a060':k.fire?'#ff7a1a':'#ff2a2a';ctx.beginPath();ctx.arc(X,Y,TS*k.r*(1-Math.max(0,k.t)/2.2),0,TAU);ctx.fill();ctx.globalAlpha=0.9;ctx.strokeStyle='#ff5a5a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,TS*k.r,0,TAU);ctx.stroke();ctx.globalAlpha=1;if(k.rock){const fy=Math.max(0,k.t)*TS*4,u=TS/16;R(X-5*u,Y-fy-5*u,10*u,9*u,'#3a3028');R(X-4*u,Y-fy-4*u,8*u,7*u,'#6a5a4a');R(X-3*u,Y-fy-4*u,3*u,2*u,'#8a7a6a');}}
   const sk=sceneKey();
   const cA=Math.cos(camA),sA=Math.sin(camA),ry=(x,y)=>(x-P.x)*sA+(y-P.y)*cA;const ents=monsters.filter(m=>m.hp>0&&!m.pend&&Math.abs(m.x-P.x)<rw+3&&Math.abs(m.y-P.y)<rh+3).map(m=>({y:ry(m.x,m.y),m}));if(save.current)ents.push({y:0,p:true});
-  for(const r of remotes.values())if(activeIn(r,sk)&&CLASSES[r.p.c]&&!r.p.hid)ents.push({y:ry(r.x,r.y),o:r});
+  for(const r of remotes.values())if(activeIn(r,sk)&&CLASSES[r.p.c]){if(!r.p.hid)ents.push({y:ry(r.x,r.y),o:r});else if(r.bubble)ents.push({y:ry(r.x,r.y),hb:r});} // admin invisible : seule sa bulle de message se voit
   ents.sort((a,b)=>a.y-b.y);
-  for(const e of ents){const ex=e.p?P.x:e.o?e.o.x:e.m.x,ey=e.p?P.y:e.o?e.o.y:e.m.y;up(ex,ey,()=>{
+  for(const e of ents){const eo=e.o||e.hb,ex=e.p?P.x:eo?eo.x:e.m.x,ey=e.p?P.y:eo?eo.y:e.m.y;up(ex,ey,()=>{
+    if(e.hb){if(e.hb.bubble)bubble(e.hb.bubble.t,e.hb.x,e.hb.y);return;}
     if(e.p){
       {const pe=eqPet();if(pe&&P.px!=null&&!(P.invis>0||admInv))drawPet(pe.k,P.px,P.py,0,pe.t||0);}
       const spr=HERO_SPR[save.current];const hit=time-P.hitT<0.12;

@@ -123,6 +123,7 @@ function connecter(moi, c, ws) {
   const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
+  if (save) envoyerCapGardien(moi, save);
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
 }
 function actionCompte(moi, ws, m) {
@@ -174,6 +175,7 @@ function sauverCompte(moi, m) {
   } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
   sql.save.run(txt, Date.now(), moi.compte.id);
+  envoyerCapGardien(moi, m.data);
 }
 // ---- échanges : à la conclusion, le serveur note ce que chacun reçoit et ce que chacun doit perdre ----
 function conclureEchange(A, B) {
@@ -365,10 +367,12 @@ wss.on('connection', (ws, req) => {
   const nom = (params.get('salle') || 'principal').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 32) || 'principal';
   let salle = salles.get(nom);
   if (!salle) { salle = new Map(); salles.set(nom, salle); }
-  if (salle.size >= MAX_JOUEURS_PAR_SALLE) { ws.close(4001, 'Salle pleine'); return; }
+  const estGardien = params.get('gardien') === CLE_GARDIEN && (ip === '127.0.0.1' || ip === '::1');
+  if (!estGardien && [...salle.values()].filter(j => !j.gardien).length >= MAX_JOUEURS_PAR_SALLE) { ws.close(4001, 'Salle pleine'); return; }
 
   const peer = crypto.randomBytes(6).toString('hex');
-  const moi = { ws, peer, ip, etat: {}, vivant: true, msgs: 0 };
+  const moi = { ws, peer, ip, etat: {}, vivant: true, msgs: 0, gardien: estGardien };
+  if (estGardien) console.log(`[gardien] connecté à la salle ${nom}`);
   salle.set(peer, moi);
   console.log(`[${nom}] connexion ${peer} (${salle.size} joueur(s))`);
 
@@ -387,7 +391,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
-    if (m && m.t === 'kill') { if (moi.compte) butin.reclamer(moi, m, { salle: nom, membres: salle, dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } }); return; }
+    if (m && m.t === 'kill') { if (moi.compte) butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: gardienDe(salle), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } }); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {
       const cible = salle.get(String(m.to || ''));
@@ -476,10 +480,13 @@ wss.on('connection', (ws, req) => {
     }
     if (!m || m.t !== 'p' || !m.patch || typeof m.patch !== 'object' || Array.isArray(m.patch)) return;
     if (m.patch.s !== undefined && m.patch.s !== moi.etat.s) { moi.sAvant = moi.etat.s; moi.sT = Date.now(); }
+    // dans les Plaines, le Gardien reste l'hôte : personne ne peut annoncer une arrivée plus ancienne que lui
+    if (!moi.gardien && (m.patch.s === 'r' || (m.patch.s === undefined && moi.etat.s === 'r')) && gardienDe(salle)) m.patch.rt = 9e15;
     for (const k of Object.keys(m.patch).slice(0, 96)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
       let v = m.patch[k];
       if (k === 'ti' && v === 'admin' && !moi.admin) v = null; // titre ADMIN réservé aux admins vérifiés
+      if (k === 'gd' && !moi.gardien) v = null; // seul le vrai Gardien peut s'annoncer
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
       if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
       if (v === null) delete moi.etat[k]; else moi.etat[k] = v;
@@ -513,4 +520,27 @@ setInterval(() => {
 
 server.listen(PORT, () => {
   console.log(`Royaume Maudit en ligne sur http://localhost:${PORT}`);
+  lancerGardien();
 });
+
+// ---- Le Gardien des Plaines : une copie du jeu sans affichage, hôte permanent des Plaines Sauvages ----
+// (processus séparé : s'il plante, il est relancé ; GARDIEN=0 pour le couper)
+const { fork } = require('child_process');
+const CLE_GARDIEN = crypto.randomBytes(12).toString('hex');
+let gardienProc = null;
+function lancerGardien() {
+  if (process.env.GARDIEN === '0') return;
+  try {
+    gardienProc = fork(path.join(__dirname, 'gardien.js'), [], { env: Object.assign({}, process.env, { GARDIEN_PORT: String(PORT), GARDIEN_CLE: CLE_GARDIEN }) });
+    gardienProc.on('exit', code => { console.log(`[gardien] arrêté (${code}), relance dans 5 s`); gardienProc = null; setTimeout(lancerGardien, 5000); });
+    gardienProc.on('error', e => console.error('[gardien]', e.message));
+  } catch (e) { console.error('[gardien] impossible de démarrer :', e.message); }
+}
+// le Gardien plafonne les dégâts de chaque joueur : on lui donne le maximum possible avec son équipement
+function envoyerCapGardien(moi, save) {
+  if (!gardienProc || !moi.peer) return;
+  let cap = 25000; try { cap = arbitre.degatsMax(save); } catch {}
+  try { gardienProc.send({ t: 'cap', peer: moi.peer, cap }); } catch {}
+}
+process.on('exit', () => { try { gardienProc && gardienProc.kill(); } catch {} });
+function gardienDe(salle) { for (const j of salle.values()) if (j.gardien) return j; return null; }

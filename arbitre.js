@@ -26,10 +26,10 @@ function chargerRegles(html) {
     const c = html.indexOf('const MKEYS=Object.keys(MON);'), z0 = html.indexOf('const ZONES=['), z1 = html.indexOf('const DUNGEON_POOL='), d0 = html.indexOf('const DTYPES={'), d1 = html.indexOf('const REG_DUN=');
     if (c < 0 || z0 < 0 || z1 < 0 || d0 < 0 || d1 < 0) throw new Error('monstres introuvables');
     const code2 = code + '\n' + html.slice(b, c) + '\nconst MKEYS=Object.keys(MON);\n' + html.slice(z0, z1) + '\n' + html.slice(d0, d1);
-    R = new Function('__G', 'with(__G){' + code2 + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,MON,MKEYS,ZONES,DTYPES};}')(bac());
+    R = new Function('__G', 'with(__G){' + code2 + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,MON,MKEYS,ZONES,DTYPES,WB};}')(bac());
   } catch (e) {
     console.error('[arbitre] monstres non chargés (butin serveur désactivé) :', e.message);
-    R = new Function('__G', 'with(__G){' + code + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem};}')(bac());
+    R = new Function('__G', 'with(__G){' + code + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,WB};}')(bac());
   }
   const nombres = (re, def) => { const m = html.match(re); if (!m) return def; try { return JSON.parse(m[1].replace(/(\d+):/g, '"$1":')); } catch { return def; } };
   R.VAULT_PRICES = nombres(/const VAULT_PRICES=(\[[^\]]*\])/, [0, 50, 40, 60, 80, 100, 150, 200, 300, 500]);
@@ -289,4 +289,15 @@ function verifier(ancien, nouveau, ctx) {
   return { ok: true, reste, aPerdre: [] };
 }
 
-module.exports = { verifier, nouveauxSeaux, regles: () => R, objetValide, apprendre };
+// dégâts par seconde maximum d'un héros (avec rage, autel, familier et une bonne marge pour les zones et capacités)
+function degatsMax(s) {
+  const ch = s && s.chars && s.chars[s.current], c = ch && R.CLASSES[s.current]; if (!ch || !c) return 25000;
+  const lvl = Math.max(1, ch.lvl | 0), w = (ch.equip || [])[0];
+  const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30;
+  if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
+  const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5;
+  const tirs = R.WB[w.kind].shots + (w.extra || 0);
+  return Math.round(Math.max(3000, w.dmg[1] * mult * tirs * cadence * 3));
+}
+
+module.exports = { degatsMax, verifier, nouveauxSeaux, regles: () => R, objetValide, apprendre };

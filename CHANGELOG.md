@@ -1,5 +1,14 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.15 (server.js modifié + nouveau fichier gardien.js, butin.js et arbitre.js modifiés)
+- Anti-triche, étape 3 : le Gardien des Plaines. Le serveur fait tourner en permanence une copie invisible du jeu, qui est l'hôte des Plaines Sauvages.
+  - Le monde ne se réinitialise plus quand on sort d'un donjon : monstres, boss et portails continuent de vivre même quand personne n'est là.
+  - Dans les Plaines, seul le Gardien décide de la mort d'un monstre. Un joueur ne peut plus inventer de monstres, même seul.
+  - Les dégâts de chaque joueur sont plafonnés selon son équipement, et ne comptent que sur les monstres proches de lui.
+- Admin invisible : sa bulle de message s'affiche maintenant au-dessus de lui (le chat les montrait déjà), et il disparaît bien de la liste des joueurs.
+- Potions de caractéristique : 3 % de chance par monstre dans les deux dernières zones des Plaines (Terres Brûlées et Terres Désolées), au lieu de 0,1 % et 0,5 %.
+- Potions de vie et de mana à 5 pièces au lieu de 10 chez le marchand.
+
 ## ver.0.0.14 (server.js modifié + nouveau fichier butin.js, arbitre.js modifié)
 - Anti-triche, étape 2 : le butin, l'XP et les pièces des monstres sont maintenant tirés par le serveur. Le jeu signale chaque monstre tué et le serveur vérifie que c'est plausible : bonne zone, monstre près du joueur, compté une seule fois, rythme humain. À plusieurs, la mort doit avoir été annoncée par l'hôte.
 - Le serveur refuse tout équipement qu'il n'a pas donné lui-même (butin, récompense du jour, échange, cadeau admin, équipement de départ), ainsi que toute XP ou tout monstre tué qu'il n'a pas comptés.
