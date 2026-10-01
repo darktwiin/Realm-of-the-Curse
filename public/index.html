@@ -391,7 +391,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.12"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.13"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -407,7 +407,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.12</div>
+    <div class="verTag" id="verTag">ver.0.0.13</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -424,7 +424,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="admin" hidden>
       <div class="shop-inner admin-inner" role="dialog" aria-label="Administration">
         <h2>Administration</h2>
-        <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="monstres">Monstres</button><button type="button" data-at="filtre">Filtre</button><button type="button" data-at="admins">Admins</button><button type="button" data-at="etats">États</button></div>
+        <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="monstres">Monstres</button><button type="button" data-at="filtre">Filtre</button><button type="button" data-at="admins">Admins</button><button type="button" data-at="etats">États</button><button type="button" data-at="triche">Triche</button></div>
         <div class="admpane" data-ap="moi">
           <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Village)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (5 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
           <div class="killbox" id="killBox" hidden><b id="killTxt"></b><span class="acts"><button type="button" class="act danger" id="killYes">Oui, je confirme</button><button type="button" class="act" id="killNo">Annuler</button></span></div>
@@ -446,6 +446,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="admpane" data-ap="objets" hidden><p class="hint" id="itTarget">Clic sur un objet : il arrive dans ton sac à dos.</p><div id="itGrid" class="itgrid"></div></div>
         <div class="admpane" data-ap="monstres" hidden><p class="hint">Le monstre apparaît à côté de toi (Plaines Sauvages, donjons, tutoriel). Si tu n'es pas l'hôte ★, tu le deviens pour le faire apparaître.</p>
           <input id="monSearch" class="devsearch" placeholder="Chercher un monstre…" autocomplete="off"><div id="monGrid" class="mongrid"></div></div>
+        <div class="admpane" data-ap="triche" hidden><p class="hint">Sauvegardes refusées par le serveur (objets modifiés, monnaies injustifiées, progression trop rapide). Le joueur a été remis à sa dernière sauvegarde valide. Quelques refus isolés peuvent être des faux positifs ; beaucoup de refus pour le même compte = triche probable.</p><div id="devAno" class="devplayers"></div><div class="acts"><button type="button" class="act" id="devAnoRef">Actualiser</button></div></div>
         <div class="admpane" data-ap="etats" hidden>
           <p class="hint">Applique un état pour tester. « Joueurs à l'écran » = les joueurs visibles autour de toi, dans la même zone.</p>
           <div class="acts"><select id="effTgt" aria-label="Cible"><option value="me">Moi</option><option value="scr">Joueurs à l'écran</option><option value="all">Moi + joueurs à l'écran</option></select><label>Durée (s) <input type="number" id="effDur" class="admnum" value="8" min="1" max="60"></label></div>
@@ -565,7 +566,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.12</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.13</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -607,7 +608,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.12</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.13</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1596,6 +1597,9 @@ function lsSet(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.
 function showAuth(msg,err){const el=document.getElementById('authWin');if(!el)return;el.hidden=false;const m=document.getElementById('authMsg');m.textContent=msg||'';m.className='hint'+(err?' err':'');}
 function hideAuth(){const el=document.getElementById('authWin');if(el)el.hidden=true;}
 function onNetHello(){if(!ONLINE)return;const tk=lsGet(TOKEN_KEY);if(tk){AUTH.ok=false;room.raw({t:'auth',a:'token',token:tk});showAuth('Connexion à ton compte…');}else if(!AUTH.ok)showAuth('');}
+// le serveur a refusé une sauvegarde incohérente : on reprend sa version
+function onSaveFix(m){if(!m.save||!m.save.chars)return;AUTH.ok=false;lsSet(SAVE_KEY,JSON.stringify(m.save));sessionStorage.setItem('rm-reload','1');sessionStorage.setItem('rm-fix',(m.raisons||[]).join(' · ').slice(0,200));location.reload();}
+setTimeout(()=>{const f=sessionStorage.getItem('rm-fix');if(f){sessionStorage.removeItem('rm-fix');showBanner('Sauvegarde resynchronisée','Le serveur a refusé une modification incohérente ('+f+')','#ff9a3c');}},2500);
 function authKicked(){AUTH.ok=false;lsSet(TOKEN_KEY,null);showAuth('Ton compte vient de se connecter sur un autre appareil.',true);}
 function onAuthRes(m){
   if(m.t==='authout'){authKicked();return;}
@@ -1874,7 +1878,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000012;let newerWarned=false;
+const NETV=2,BUILD=2600000013;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -1884,7 +1888,7 @@ let deaths=[],dPrimed=false;
 const chatHist=[];function pushChat(c){chatLog.push(c);const d=new Date();chatHist.push({n:c.n,t:c.t,col:c.col,h:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')});if(chatHist.length>200)chatHist.shift();if(typeof chatForm!=='undefined'&&!chatForm.hidden)renderChatHist();}
 let chatLog=[],myMsg=null,msgSeq=0,myHeal=null,healSeq=0,lastHostM=null,lastHostD=null,lastHostG=null,sendT=0,plT=0;
 let pseudo='';
-try{pseudo=localStorage.getItem('royaume-maudit-pseudo')||'';}catch(e){}
+try{pseudo=localStorage.getItem('royaume-maudit-pseudo')||'';}catch(e){}if(save.pseudo&&typeof save.pseudo==='string')pseudo=save.pseudo;
 if(!pseudo)pseudo='Héros'+ri(10,99);
 const clean=s=>String(s==null?'':s).replace(/[\u0000-\u001f\u007f-\u009f­​-‏‪-‮⁠-⁯﻿-]/g,'').trim();
 const num=(v,d)=>typeof v==='number'&&isFinite(v)?v:d;
@@ -1917,7 +1921,7 @@ function makeNetRoom(){
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'){for(const f of rawH)f(m);}};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'){for(const f of rawH)f(m);}};
     ws.onclose=e=>{if(e.code===4004){setConn(false);others.clear();me=null;emitPeers();authKicked();return;}if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
@@ -1934,7 +1938,7 @@ async function initRoom(){
   if(window.claude&&typeof window.claude.use==='function'){let r=null;try{r=await window.claude.use('room');}catch(e){r=null;}if(r)room=r;}
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
-  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}
+  if(room.onRaw)room.onRaw(m=>{if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}
     if(m.t==='tr'){tradeMsg(m);return;}
     if(m.t==='g'){guildMsg(m);return;}
     if(m.t==='dev'&&m.cmd==='party'){startParty(m.arg);return;}
@@ -1949,7 +1953,7 @@ async function initRoom(){
       else if(m.cmd==='fp'){setFPV(!!m.arg);}
       else if(m.cmd==='gold'){const n=clamp(Math.floor(m.arg)||0,0,10000000);save.gold+=n;persist();invDirty=true;showBanner('+'+n.toLocaleString('fr-FR')+' pièces','Cadeau d\'un développeur','#ffd23f');sfx('coin');}
       else if(m.cmd==='cursite'){const n=clamp(Math.floor(m.arg)||0,0,1000000);save.cursite+=n;persist();showBanner('+'+n.toLocaleString('fr-FR')+' Cursite','Cadeau d\'un développeur','#7df0e0');sfx('buy');}return;}
-    if(m.t==='devres'){if(m.msg){$('#devMsg').textContent=m.msg;note(m.msg);}if(m.bans){banList=m.bans;renderBans();}if(m.infos){muteSet=new Set(m.infos.filter(i=>i.muet).map(i=>i.peer));}if(m.admins)renderAdmins(m.admins);return;}
+    if(m.t==='devres'){if(m.msg){$('#devMsg').textContent=m.msg;note(m.msg);}if(m.bans){banList=m.bans;renderBans();}if(m.infos){muteSet=new Set(m.infos.filter(i=>i.muet).map(i=>i.peer));}if(m.admins)renderAdmins(m.admins);if(m.anomalies)renderAno(m.anomalies);return;}
     if(m.t==='top'){lbData=m;$('#lbState').textContent='Mis à jour à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});if(!lbEl.hidden)renderLb();}});
   room.onPeers(ch=>onPeers(ch.peers),()=>{room=null;netOn=false;remotes.clear();});
   sendPresence(true);
@@ -3016,7 +3020,7 @@ function namePrice(){return save.nameChanges>0?NAME_PRICE:0;}
 function openPupitre(){pupEl.hidden=false;paused=true;$('#pseudo2').value=pseudo;const p=namePrice();$('#pupMsg').textContent=p?'Changement payant : '+p+' Cursite (tu en as '+save.cursite+')':'Premier changement gratuit. Les suivants coûteront '+NAME_PRICE+' Cursite.';$('#pupSave').textContent=p?'Payer '+p+' Cursite':'Enregistrer (gratuit)';setTimeout(()=>$('#pseudo2').focus(),30);}
 function closePupitre(){pupEl.hidden=true;paused=false;cv.focus();}
 $('#pupClose').addEventListener('click',closePupitre);
-$('#pupSave').addEventListener('click',()=>{const v=clean($('#pseudo2').value).slice(0,16);if(!v){$('#pupMsg').textContent='Le pseudo ne peut pas être vide';return;}if(v===pseudo){$('#pupMsg').textContent='C\'est déjà ton pseudo';return;}const p=namePrice();if(save.cursite<p){$('#pupMsg').textContent='Il te faut '+p+' Cursite (tu en as '+save.cursite+')';sfx('deny');return;}save.cursite-=p;save.nameChanges++;save.pseudoSet=true;persist();pseudo=v;try{localStorage.setItem('royaume-maudit-pseudo',pseudo);}catch(e){}sfx('buy');closePupitre();note('Tu t\'appelles maintenant '+pseudo);sendPresence();sendScore();});
+$('#pupSave').addEventListener('click',()=>{const v=clean($('#pseudo2').value).slice(0,16);if(!v){$('#pupMsg').textContent='Le pseudo ne peut pas être vide';return;}if(v===pseudo){$('#pupMsg').textContent='C\'est déjà ton pseudo';return;}const p=namePrice();if(save.cursite<p){$('#pupMsg').textContent='Il te faut '+p+' Cursite (tu en as '+save.cursite+')';sfx('deny');return;}save.cursite-=p;save.nameChanges++;save.pseudoSet=true;persist();pseudo=v;save.pseudo=pseudo;persist();try{localStorage.setItem('royaume-maudit-pseudo',pseudo);}catch(e){}sfx('buy');closePupitre();note('Tu t\'appelles maintenant '+pseudo);sendPresence();sendScore();});
 $('#pseudo2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pupSave').click();}if(e.key==='Escape'){e.preventDefault();closePupitre();}e.stopPropagation();});
 function skinPreview(cls,skin){const c=document.createElement('canvas');c.width=128;c.height=96;const g=c.getContext('2d');g.imageSmoothingEnabled=false;const w=cls===save.current&&C()?C().equip[0]:{kind:CLASSES[cls].arme,tier:0};
   const img=heroSprite(cls,skin,w?w.kind:WB&&CLASSES[cls].arme,w?w.tier:0,'idle');const k=1.2;g.drawImage(img,64-26*k,50-32*k,img.width*k,img.height*k);
@@ -3537,10 +3541,10 @@ $('#gdClose').addEventListener('click',closeGuildWin);guildEl.addEventListener('
 function openAdmin(){if(!devMode)return;syncAuraForm();admEl.hidden=false;keys.clear();mouse.down=false;setAdmTab(admTab);}
 function closeAdmin(){if(admEl.hidden)return;admEl.hidden=true;cv.focus();}
 function setAdmTab(t){admTab=t;document.querySelectorAll('#admTabs button').forEach(b=>b.classList.toggle('on',b.dataset.at===t));document.querySelectorAll('.admpane').forEach(p=>p.hidden=p.dataset.ap!==t);
-  if(t==='joueurs'){adminReq('infos');renderDevPlayers();}if(t==='bans'){adminReq('bans');renderBans();}if(t==='objets'){renderItems();updItTarget();}if(t==='monstres')renderMonsters();if(t==='etats')renderEffGrid();if(t==='admins'){$('#devAdmins').innerHTML='<p class="hint">Chargement…</p>';adminReq('admins');}if(t!=='objets'&&t!=='joueurs')admGiveTo=null;if(t==='filtre')$('#filtList').innerHTML=[...MOTS_EXACTS,...MOTS_RACINES.map(r=>r+'…')].map(w=>`<span>${w}</span>`).join('');}
+  if(t==='joueurs'){adminReq('infos');renderDevPlayers();}if(t==='bans'){adminReq('bans');renderBans();}if(t==='objets'){renderItems();updItTarget();}if(t==='monstres')renderMonsters();if(t==='etats')renderEffGrid();if(t==='triche'){$('#devAno').innerHTML='<p class="hint">Chargement…</p>';adminReq('anomalies');}if(t==='admins'){$('#devAdmins').innerHTML='<p class="hint">Chargement…</p>';adminReq('admins');}if(t!=='objets'&&t!=='joueurs')admGiveTo=null;if(t==='filtre')$('#filtList').innerHTML=[...MOTS_EXACTS,...MOTS_RACINES.map(r=>r+'…')].map(w=>`<span>${w}</span>`).join('');}
 document.querySelectorAll('#admTabs button').forEach(b=>b.addEventListener('click',()=>setAdmTab(b.dataset.at)));
 $('#adminBtn').addEventListener('click',()=>admEl.hidden?openAdmin():closeAdmin());
-$('#devAdmRef').addEventListener('click',()=>adminReq('admins'));
+$('#devAdmRef').addEventListener('click',()=>adminReq('admins'));$('#devAnoRef').addEventListener('click',()=>adminReq('anomalies'));
 $('#fpMe').addEventListener('click',()=>{setFPV(!FPV);renderEffGrid();});
 $('#admClose').addEventListener('click',closeAdmin);
 admEl.addEventListener('click',e=>{if(e.target===admEl)closeAdmin();});
@@ -3603,6 +3607,8 @@ function screenPlayers(){const k=sceneKey(),rw=W/2/TS+1,rh=H/2/TS+1;return [...r
 function renderEffGrid(){const g=$('#effGrid');g.textContent='';for(const [e,ic,nm] of EFF_LIST){const b=document.createElement('button');b.type='button';b.className='act'+(e==='clear'?' danger':'');if(ic){const im=document.createElement('img');im.src=ST_URL[ic]||(ST_URL[ic]=ST_ICON[ic].toDataURL());im.alt='';b.append(im);}b.append(document.createTextNode(nm));
     b.onclick=()=>{const tg=$('#effTgt').value,t=clamp(+$('#effDur').value||8,1,60);let n=0;if(tg!=='scr'){adminEff(e,t);n++;}if(tg!=='me')for(const r of screenPlayers()){adminReq('eff',r.peer,{e,t});n++;}note(n?nm+' · '+n+' cible'+(n>1?'s':''):'Aucun joueur à l\'écran');};g.append(b);}
   $('#fpMe').textContent='Ma vue 1re personne : '+(FPV?'activée':'désactivée');}
+function renderAno(list){const box=$('#devAno');box.textContent='';if(!list.length){box.innerHTML='<p class="hint">Aucune sauvegarde refusée. 👍</p>';return;}
+  for(const a of list){const row=document.createElement('div');row.className='devrow';const nm=document.createElement('span');const d=new Date(a.t);nm.textContent=clean(String(a.n||'?')).slice(0,16)+' · '+d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · '+(a.r||[]).join(' · ');row.append(nm);box.append(row);}}
 function renderAdmins(list){const box=$('#devAdmins');box.textContent='';if(!list.length){box.innerHTML='<p class="hint">Aucun admin connecté.</p>';return;}
   for(const a of list){const row=document.createElement('div');row.className='devrow';const nm=document.createElement('span');const mins=Math.max(0,Math.round((Date.now()-a.t)/60000));
     nm.textContent=clean(String(a.n||'?')).slice(0,16)+(a.moi?' (toi)':'')+' · IP '+a.ip+' · admin depuis '+(mins<60?mins+' min':Math.floor(mins/60)+' h '+(mins%60)+' min')+' · '+sceneLabel(a.s);row.append(nm);box.append(row);}}
@@ -3822,7 +3828,7 @@ function openSelect(){
 }
 $('#cards').addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;choose(c.dataset.c);});
 function choose(k){
-  if(!save.pseudoSet){const ps=clean($('#pseudoIn').value).slice(0,16);if(ps){pseudo=ps;try{localStorage.setItem('royaume-maudit-pseudo',pseudo);}catch(e){}}save.pseudoSet=true;}
+  if(!save.pseudoSet){const ps=clean($('#pseudoIn').value).slice(0,16);if(ps){pseudo=ps;save.pseudo=pseudo;persist();try{localStorage.setItem('royaume-maudit-pseudo',pseudo);}catch(e){}}save.pseudoSet=true;}
   if(!save.chars[k])save.chars[k]=newChar(k);save.current=k;persist();
   selEl.hidden=true;paused=false;SEL=null;bagTab=0;if(save.tutoDone)enterNexus();else enterTuto();const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;
   invDirty=true;statsDirty=true;updWho();cv.focus();
@@ -5297,6 +5303,7 @@ else{save.current=null;P.x=13;P.y=11;openSelect();}
 setTab('inv');renderPlayers();applyCursor();setSong('lobby');
 initRoom();
 // Outils de test, actifs seulement avec ?debug=1 dans l'adresse
+
 function installDebug(){if(window.__rm)return;window.__rm={P,save,tp:(x,y)=>{P.x=x;P.y=y;},realm:()=>{enterRealm();},dungeon:(id,t)=>enterDungeon(id||12345,t),astral:()=>({stars,minis:MAP.minis,start:MAP.start,hub:MAP.hub}),toMini:i=>{const g=MAP.minis[i];P.x=g.x;P.y=g.y+3;},toHub:()=>{P.x=MAP.hub.x+.5;P.y=MAP.hub.y+4;},toGate:()=>{const g=MAP.doors[1];P.x=g.x+.5;P.y=g.y+3;},setStars:v=>{if(amHost)setStars(v);},state:()=>({scene,host:amHost,mons:monsters.length,near:monsters.filter(m=>Math.hypot(m.x-P.x,m.y-P.y)<12).map(m=>m.key),eb:eb.length,gold:save.gold,inv:C()&&C().inv.length,portals:dportals.length,zone:curZone}),gold:n=>{save.gold+=n;},kill:()=>{for(const m of monsters)if(Math.hypot(m.x-P.x,m.y-P.y)<14){if(amHost)hostKill(m);}},portal:()=>{dportals.push({id:++monId,x:P.x+2,y:P.y,life:60});},give:k=>{const f=freeInv();if(f>=0)C().inv[f]=mkItem(k,0);invDirty=true;},arena:()=>({fight,altar:MAP.altar,doors:MAP.doors&&MAP.doors.length,inside:inArena(P.x,P.y),arena:MAP.arena}),toAltar:()=>{P.x=MAP.altar.x;P.y=MAP.altar.y+2;},toDoor:()=>{const d=MAP.doors[0],a=MAP.altar;const vx=(d.x+.5)-a.x,vy=(d.y+.5)-a.y,l=Math.hypot(vx,vy);P.x=d.x+.5+vx/l*1.5;P.y=d.y+.5+vy/l*1.5;return{x:d.x,y:d.y};},lowBoss:()=>{for(const m of monsters)if(m.d.boss)m.hp=Math.min(m.hp,300);},die:()=>die('Test'),god:()=>{P.god=true;}};}
 requestAnimationFrame(frame);
 })();

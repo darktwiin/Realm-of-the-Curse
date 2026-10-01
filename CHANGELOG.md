@@ -1,5 +1,14 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.13 (server.js modifié + nouveau fichier arbitre.js)
+- Anti-triche, étape 1 : le serveur vérifie chaque sauvegarde avant de l'enregistrer (or, Cursite, objets, niveaux, potions, familiers, prestige, coffre et sacs). Une sauvegarde impossible est refusée et le joueur revient automatiquement à sa dernière sauvegarde valide.
+- Objets trafiqués (stats impossibles) supprimés, gains d'or ou de Cursite irréalistes annulés.
+- Récompenses données par le serveur (commandes admin, raid, récompense quotidienne) toujours acceptées.
+- Menu admin : nouvel onglet « Triche » qui liste les sauvegardes refusées (compte, raison, heure).
+- Le pseudo suit maintenant le compte d'un PC à l'autre.
+- Icône couronne dans l'onglet du navigateur.
+- Bouton Quêtes à côté du classement des joueurs.
+
 ## ver.0.0.12 (server.js modifié)
 - Comptes joueurs : connexion au lancement, progression sauvegardée sur le serveur (on la retrouve sur n'importe quel PC), un seul appareil connecté par compte. La sauvegarde locale actuelle est reprise à la première connexion.
 - Admin lié au compte (variable ADMIN_COMPTES côté serveur) : /god sans mot de passe pour les admins, refusé pour les autres.

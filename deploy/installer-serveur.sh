@@ -18,6 +18,7 @@ echo "== Caddy (HTTPS automatique)"
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' > /etc/apt/sources.list.d/caddy-stable.list
 apt-get update -y && apt-get install -y caddy
+mkdir -p /etc/caddy
 
 echo "== Utilisateur et dossiers"
 id -u $USER_APP >/dev/null 2>&1 || useradd --system --create-home --shell /usr/sbin/nologin $USER_APP
@@ -52,7 +53,7 @@ $DOMAINE {
   reverse_proxy 127.0.0.1:3000
 }
 CADDY
-systemctl reload caddy
+systemctl enable caddy && systemctl restart caddy
 
 echo "== Pare-feu"
 ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable

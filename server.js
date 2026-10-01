@@ -94,6 +94,12 @@ const sql = {
   sessDel: db.prepare('DELETE FROM sessions WHERE token = ?'),
   sessVieilles: db.prepare('DELETE FROM sessions WHERE cree < ?'),
 };
+const arbitre = require('./arbitre');
+db.exec(`CREATE TABLE IF NOT EXISTS anomalies (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER, nom TEXT, quand INTEGER, raisons TEXT)`);
+sql.anoIns = db.prepare('INSERT INTO anomalies (compte, nom, quand, raisons) VALUES (?, ?, ?, ?)');
+sql.anoListe = db.prepare('SELECT nom, quand, raisons FROM anomalies ORDER BY id DESC LIMIT 60');
+for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { try { arbitre.apprendre(JSON.parse(r.save)); } catch {} }
+const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0 });
 const hacher = (mdp, sel) => crypto.scryptSync(String(mdp), sel, 64).toString('hex');
 const essais = new Map(); // anti force brute : 8 essais par minute et par IP
 function tropDEssais(ip) { const t = Date.now(), e = (essais.get(ip) || []).filter(x => t - x < 60000); e.push(t); essais.set(ip, e); return e.length > 8; }
@@ -104,6 +110,7 @@ function connecter(moi, c, ws) {
   if (ancien && ancien !== moi) { try { envoyer(ancien.ws, { t: 'authout', msg: 'Ce compte vient de se connecter ailleurs' }); ancien.ws.close(4004, 'Connecté ailleurs'); } catch {} }
   moi.compte = { id: c.id, nom: c.nom, admin: ADMINS.has(String(c.nom).toLowerCase()) };
   moi.admin = 0; enLigne.set(c.id, moi); sql.vu.run(Date.now(), c.id);
+  moi.seaux = arbitre.nouveauxSeaux(); moi.dons = DONS0(); moi.refus = 0;
   const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
@@ -133,6 +140,20 @@ function actionCompte(moi, ws, m) {
 function sauverCompte(moi, m) {
   if (!moi.compte || !m.data || typeof m.data !== 'object' || Array.isArray(m.data)) return;
   const txt = JSON.stringify(m.data); if (txt.length > 1500000) return;
+  const row = sql.parId.get(moi.compte.id); let ancien = null; try { ancien = row && row.save ? JSON.parse(row.save) : null; } catch { ancien = null; }
+  // les admins ne sont pas contrôlés (outils de test)
+  if (!moi.compte.admin) {
+    let v; try { v = arbitre.verifier(ancien, m.data, { seaux: moi.seaux || (moi.seaux = arbitre.nouveauxSeaux()), dons: moi.dons || DONS0() }); } catch (e) { console.error('[arbitre] erreur', e); v = { ok: true }; }
+    if (!v.ok) {
+      moi.refus = (moi.refus || 0) + 1;
+      sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(v.raisons));
+      console.log(`[arbitre] sauvegarde refusée pour ${moi.compte.nom} : ${v.raisons.join(' · ')}`);
+      envoyer(moi.ws, { t: 'savefix', save: ancien, raisons: v.raisons });
+      return;
+    }
+  }
+  moi.dons = DONS0();
+  arbitre.apprendre(m.data);
   sql.save.run(txt, Date.now(), moi.compte.id);
 }
 function trouverJoueur(peer) { for (const s of salles.values()) { const j = s.get(peer); if (j) return j; } return null; }
@@ -289,7 +310,7 @@ function actionGuilde(moi, salle, m) {
     const i = raidEv.res.findIndex(r => r.gid === gid), x = raidEv.g[gid];
     if (i < 0 || !x || !x.c[pid]) { rep({ a: 'err', msg: 'Tu n\'as pas participé au dernier raid' }); return; }
     if (raidEv.recu[pid]) { rep({ a: 'err', msg: 'Récompense déjà récupérée' }); return; }
-    raidEv.recu[pid] = true; sauverRaid(); rep({ a: 'reward', rang: i + 1, gain: gainRang(i + 1) }); diffuserGuilde(gid, true); return;
+    raidEv.recu[pid] = true; sauverRaid(); { const G = gainRang(i + 1); if (moi.dons) { moi.dons.or += G.or; moi.dons.cursite += G.cu; moi.dons.objets += G.oeufs + G.cro; } } rep({ a: 'reward', rang: i + 1, gain: gainRang(i + 1) }); diffuserGuilde(gid, true); return;
   }
 }
 
@@ -351,6 +372,7 @@ wss.on('connection', (ws, req) => {
       if (cmd === 'bye') { moi.admin = 0; res(true, ''); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} quitte le mode admin`); return; }
       if (!moi.admin) { moi.admin = Date.now(); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} (${masquer(moi.ip)}) passe admin`); }
       if (cmd === 'hello') { res(true, ''); return; }
+      if (cmd === 'anomalies') { res(true, '', { anomalies: sql.anoListe.all().map(r => ({ n: r.nom, t: r.quand, r: JSON.parse(r.raisons || '[]') })) }); return; }
       if (cmd === 'admins') { const out = []; for (const s of salles.values()) for (const j of s.values()) if (j.admin) out.push({ n: String((j.etat && j.etat.n) || 'Joueur').slice(0, 16), ip: masquer(j.ip), t: j.admin, s: String((j.etat && j.etat.s) || ''), moi: j === moi }); res(true, '', { admins: out }); return; }
       if (cmd === 'bans') { res(true, '', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); return; }
       if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
@@ -376,10 +398,12 @@ wss.on('connection', (ws, req) => {
       } else if (cmd === 'item') {
         const it = m.arg;
         if (!it || typeof it !== 'object' || JSON.stringify(it).length > 2000) { res(false, 'Objet invalide'); return; }
+        if (cible.dons) cible.dons.objets += 1;
         envoyer(cible.ws, { t: 'dev', cmd: 'item', arg: it });
         res(true, String(it.name || 'Objet').slice(0, 40) + ' envoyé à ' + nom);
       } else if (cmd === 'god' || cmd === 'cursite' || cmd === 'gold') {
         const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(10000000, Math.floor(Number(m.arg) || 0)));
+        if (cible.dons) { if (cmd === 'gold') cible.dons.or += arg; if (cmd === 'cursite') cible.dons.cursite += arg; }
         envoyer(cible.ws, { t: 'dev', cmd, arg });
         res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + (cmd === 'gold' ? ' pièces envoyées à ' : ' Cursite envoyée à ') + nom);
       } else if (cmd === 'eff') {
