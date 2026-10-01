@@ -319,6 +319,14 @@ wss.on('connection', (ws, req) => {
         const arg = cmd === 'god' ? (m.arg ? 1 : 0) : Math.max(0, Math.min(10000000, Math.floor(Number(m.arg) || 0)));
         envoyer(cible.ws, { t: 'dev', cmd, arg });
         res(true, cmd === 'god' ? (arg ? 'GOD donné à ' : 'GOD retiré à ') + nom : arg + (cmd === 'gold' ? ' pièces envoyées à ' : ' Cursite envoyée à ') + nom);
+      } else if (cmd === 'eff') {
+        const a = m.arg || {}, e = String(a.e || ''), t = Math.max(0.5, Math.min(60, Number(a.t) || 5));
+        if (!['par', 'poi', 'slow', 'blind', 'burn', 'rage', 'invul', 'sonic', 'clear'].includes(e)) { res(false, 'État inconnu'); return; }
+        envoyer(cible.ws, { t: 'dev', cmd: 'eff', arg: { e, t } });
+        res(true, 'État appliqué à ' + nom);
+      } else if (cmd === 'fp') {
+        envoyer(cible.ws, { t: 'dev', cmd: 'fp', arg: m.arg ? 1 : 0 });
+        res(true, (m.arg ? 'Vue 1re personne activée pour ' : 'Vue 1re personne retirée à ') + nom);
       } else if (cmd === 'mute' || cmd === 'unmute') {
         if (cmd === 'mute') modo.mutes[cible.ip] = { n: nom, t: Date.now() }; else delete modo.mutes[cible.ip];
         sauverModo(); envoyer(cible.ws, { t: 'dev', cmd, arg: 0 });

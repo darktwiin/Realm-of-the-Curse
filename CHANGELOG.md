@@ -15,7 +15,7 @@
 - Fournaise : les diables cornus, les cerbères et les boules de feu du Seigneur des Abysses enflamment, comme les flammes du Dragon de raid.
 - Marais Putride (crapauds, sangsues) et Gardien du Serpent : poison.
 - Abysses : la noyade est progressive (1 %, 2 %, 3 %, 5 %, 8 %… de vie par seconde), et une poche d'air apparaît à la mort du Léviathan.
-- Jardins Célestes : courants moins forts (-90 % à contre-courant, +90 % dans le sens, ils t'emportent quand même). Les tourbillons violets de la salle du boss deviennent des tremplins qui te propulsent pour esquiver. Éclairs de l'Archange -20 %.
+- Jardins Célestes : courants moins forts (-80 % à contre-courant, +90 % dans le sens, ils t'emportent quand même). Les tourbillons violets de la salle du boss deviennent des tremplins qui te propulsent pour esquiver. Éclairs de l'Archange -20 %.
 - Les boss des 7 donjons de fin (Manoir, Tombeau, Abysses, Jardins, Fournaise, Caverne, Observatoire) donnent une potion de caractéristique à coup sûr.
 - Retour au Royaume après un donjon : 5 s d'invulnérabilité, annulées par ton premier tir.
 - Les monstres esquivent 2 fois moins, contournent les murs quand ils ne peuvent pas te toucher, et peuvent maintenant nager.
