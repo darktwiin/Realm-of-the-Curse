@@ -67,13 +67,14 @@ function objetValide(it) {
   if (!K) return 'type d\'objet inconnu : ' + String(it.kind).slice(0, 20);
   if (!estEntier(it.tier, 0, 7)) return 'tier impossible';
   if (K.alt && it.tier !== 7) return 'relique de Chronos d\'un tier impossible';
+  if (K.t7 && it.tier !== 6) return 'objet Tier 7 mal formé';
   if (it.slot !== K.slot) return 'emplacement incohérent';
   if (it.stats && typeof it.stats !== 'object') return 'statistiques illisibles';
   if (it.up != null && it.up !== 0 && (K.slot === 'conso' || !estEntier(it.up, 0, 2))) return 'niveau de forge impossible';
   if (K.slot === 'conso') { if (Object.keys(it.stats || {}).some(k => it.stats[k])) return 'consommable avec statistiques'; return null; }
   const ref = R.mkItem(it.kind, it.tier);
   if (K.slot === 'anneau') {
-    const amt = k => (k === 'vie' || k === 'mana') ? 15 + 15 * it.tier : 1 + it.tier;
+    const tE = K.t7 ? 7 : it.tier, amt = k => (k === 'vie' || k === 'mana') ? 15 + 15 * tE : 1 + tE;
     for (const k of Object.keys(it.stats || {})) {
       if (!R.SK.includes(k)) return 'anneau : statistique inconnue';
       const max = amt(k) + (it.tier >= 7 ? ((k === 'vie' || k === 'mana') ? 40 : 3) : 0);
@@ -226,6 +227,11 @@ function verifier(ancien, nouveau, ctx) {
   const gainOr = gainBrut - (dons.or || 0) - (etape2 ? ventes : 0);
   if (gainOr > sx.or + 0.5) pb.push('or gagné trop vite (+' + Math.round(gainOr) + ')'); else if (gainOr > 0) sx.or -= gainOr;
 
+  // --- héros à débloquer : il faut déjà l'avoir, l'avoir débloqué, ou avoir son « parent » au niveau 15 ---
+  { const dq = cls => { const r = R.CLASSES[cls] && R.CLASSES[cls].req; if (!r) return true; const niv = s => (s.chars && s.chars[r] && (s.chars[r].lvl | 0)) || 0;
+      return !!(ancien.chars[cls] || (ancien.unlock && ancien.unlock[cls]) || Math.max(niv(ancien), niv(nouveau)) >= 15); };
+    for (const cls of Object.keys(nouveau.chars)) if (R.CLASSES[cls] && !dq(cls)) pb.push('héros non débloqué (' + cls + ')');
+    for (const cls of Object.keys(nouveau.unlock || {})) if (nouveau.unlock[cls] && R.CLASSES[cls] && !dq(cls)) pb.push('déblocage de héros injustifié'); }
   // --- progression des héros ---
   let gainNiv = 0, gainKills = 0, gainBoss = 0, gainGloire = 0, gainXP = 0, kits = 0;
   const xpTot = ch => { let x = 0; for (let l = 1; l < (ch.lvl | 0); l++) x += R.need(l); return x + Math.max(0, +ch.xp || 0) + Math.max(0, +ch.gxp || 0) + (ch.gp | 0) * R.GLORY_XP; };
@@ -267,7 +273,7 @@ function verifier(ancien, nouveau, ctx) {
     { const pp = k.split('|'), upN = pp.length > 3 && pp[pp.length - 1][0] === '+' ? +pp[pp.length - 1].slice(1) : 0;
       if (upN) { const base = pp.slice(0, -1).join('|'), prec = upN > 1 ? base + '|+' + (upN - 1) : base;
         // objets à fondre : 2 objets identiques non améliorés ; pour un anneau (bonus tirés au hasard), 2 anneaux du même tier
-        const groupe = pp[0] === 'anneau' ? [...c0.keys()].filter(q => q.startsWith('anneau|' + pp[1] + '|') && !/\|\+\d$/.test(q)) : [base];
+        const groupe = R.KINDS[pp[0]] && R.KINDS[pp[0]].slot === 'anneau' ? [...c0.keys()].filter(q => q.startsWith(pp[0] + '|' + pp[1] + '|') && !/\|\+\d$/.test(q)) : [base];
         while (plus > 0 && perdu(prec) >= 1) {
           fondre(prec, 1); const pris = [];
           for (const q of groupe) { while (pris.length < 2 && perdu(q) >= 1) { fondre(q, 1); pris.push(q); } }
@@ -279,7 +285,7 @@ function verifier(ancien, nouveau, ctx) {
       if (kind === 'cle') { if (donsObj > 0) donsObj--; else horsListe++; continue; } // une clef vient toujours du serveur
       if (conso) { if (libConso > 0) libConso--; else if (donsObj > 0) donsObj--; else nConso++; continue; }
       if (t === 0 && kitT0 > 0) { kitT0--; continue; }
-      if (t === 6 && libT6 > 0) { libT6--; continue; }
+      if (t === 6 && libT6 > 0 && !(R.KINDS[kind] && R.KINDS[kind].t7)) { libT6--; continue; } // le cadeau T6 ne justifie pas un Tier 7
       if (t >= 7 && libRel > 0) { libRel--; continue; }
       if (donsObj > 0) { donsObj--; continue; }
       if (etape2) horsListe++; else { nConso++; if (t === 6) nT6++; if (t >= 7) nRel++; }

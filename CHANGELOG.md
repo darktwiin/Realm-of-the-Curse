@@ -1,5 +1,14 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.28 (server.js, butin.js et arbitre.js modifiés)
+- Héros à débloquer : Guerrier, Mage, Archer et Prêtre sont disponibles dès le départ. Guerrier niveau 15 débloque le Porte-bouclier, Mage niveau 15 le Mystificateur, Archer niveau 15 l'Assassin, Prêtre niveau 15 le Démoniste. L'écran de choix est réorganisé : chaque héros à débloquer est sous son « parent », avec la progression affichée. Un héros déjà créé reste jouable, et un déblocage est acquis pour toujours. Le serveur vérifie.
+- Message de bienvenue : quand un nouveau compte choisit son premier héros, tout le monde voit « Bienvenue à … » dans le chat, et le nouveau joueur reçoit une bannière.
+- 14e Relique de Chronos : la **Gemme du Démon Lié** (Démoniste). Le démon n'est plus posé au sol : il suit son maître et attaque seul ce qui approche, pour 75 % des dégâts.
+- Pièces : quand on gagne de l'or (monstre, vente au marchand, récompense de quête), les pièces jaillissent, restent un instant au sol puis filent vers le héros, qui les attrape, même s'il bouge. Animation seulement : l'or est compté comme avant.
+- Nouveau **Tier 7** (objets d'obsidienne, gris-noir) : armes, capacités, armures et anneaux. Mêmes effets que le Tier 6, avec plus de dégâts et de caractéristiques ; ce ne sont pas des reliques. Ils ne tombent que dans les deux derniers donjons (Observatoire Céleste et Horloge Brisée) : 5 % de chance par monstre tué.
+- Couleurs fixes : les reliques sont turquoise, les Reliques de Chronos sont or, le Tier 7 est gris-noir. L'icône ne change plus de couleur en permanence ; seul le petit symbole dans le coin de la case scintille encore.
+- Panneau admin, onglet Objets : chaque type d'objet tient sur une seule ligne (T0 à T6, puis Tier 7, Relique, Reliques de Chronos), avec un cadre de la couleur de la famille.
+
 ## ver.0.0.27 (butin.js et arbitre.js modifiés, server.js inchangé)
 - Touches **1, 2, 3, 4** : elles agissent sur les 4 premières cases du sac (un petit numéro s'affiche sur chaque case). Une potion de vie ou de mana est bue, une potion de caractéristique aussi (sauf si le maximum est atteint), et un équipement est échangé avec celui qu'on porte. Touches modifiables dans les Options.
 - 13 **Reliques de Chronos** (couleur ambre, symbole ⌛) : Chronos en donne une à chaque victoire, à 100 %, avec une chance sur deux qu'elle soit pour la classe du joueur. Elles ont les mêmes bonus que les reliques classiques mais un effet différent.

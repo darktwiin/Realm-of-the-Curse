@@ -148,7 +148,7 @@ function actionCompte(moi, ws, m) {
     if (filtrer(nom) !== nom) { non('Ce nom n\'est pas autorisé'); return; }
     if (sql.parNom.get(nom)) { non('Ce nom de compte est déjà pris'); return; }
     const sel = crypto.randomBytes(16).toString('hex'); sql.creer.run(nom, sel, hacher(mdp, sel), Date.now());
-    console.log(`[compte] création ${nom}`); connecter(moi, sql.parNom.get(nom), ws); return;
+    console.log(`[compte] création ${nom}`); connecter(moi, sql.parNom.get(nom), ws); moi.nouveau = true; return;
   }
   if (m.a === 'login') {
     const c = sql.parNom.get(nom);
@@ -410,6 +410,8 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
     if (m && m.t === 'peche') { pecher(moi, nom, m); return; }
+    // nouveau compte : son premier héros vient d'être choisi, on souhaite la bienvenue à tout le monde (une seule fois)
+    if (m && m.t === 'bienvenue') { if (moi.compte && moi.nouveau) { moi.nouveau = false; const n = filtrer(String(m.n || moi.compte.nom)).replace(/[<>]/g, '').slice(0, 16) || moi.compte.nom; console.log(`[compte] bienvenue à ${n}`); envoyer(ws, { t: 'bienvenue', n, moi: 1 }); diffuserPartout({ t: 'bienvenue', n }, moi); } return; }
     if (m && m.t === 'kill') { if (moi.compte) reclamerKill(moi, m, nom, salle, 0); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {

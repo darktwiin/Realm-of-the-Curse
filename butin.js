@@ -23,6 +23,17 @@ function objetAuHasard(R, t, cls) {
   else k = 'anneau';
   return R.mkItem(k, t);
 }
+// objet Tier 7 (obsidienne) : seulement dans les deux derniers donjons
+function objetT7(R, cls) {
+  const c = R.CLASSES[cls] || R.CLASSES[Object.keys(R.CLASSES)[0]], r = Math.random(), mien = Math.random() < 0.55;
+  let k;
+  if (r < 0.4) k = mien ? c.arme : pick(['epee', 'baton', 'arc', 'baguette', 'dague', 'mandoline']);
+  else if (r < 0.6) k = mien ? c.capa : pick(['casque', 'sort', 'carquois', 'tome', 'prisme', 'voile', 'bouclier', 'totem']);
+  else if (r < 0.85) k = mien ? c.armure : pick(['lourde', 'cuir', 'robe']);
+  else k = 'anneau';
+  return R.KINDS[k + '7'] ? R.mkItem(k + '7', 6) : null;
+}
+const DONJONS_T7 = 'ah', TAUX_T7 = 0.05; // Observatoire Céleste et Horloge Brisée : 5 % par monstre tué
 function potionsCarac(R, key, d, scene) {
   if (d.tuto) return [];
   for (const t in DUN_POT) if (R.DTYPES[t] && R.DTYPES[t].bk === key) { const [st, ch] = DUN_POT[t]; return Math.random() < ch ? [st === '*' ? pick(R.SK) : st] : []; }
@@ -45,6 +56,7 @@ function tirer(R, key, cls, scene, sc) {
     const t = sc[1], grand = DONJONS_A_CLEF.includes(t) && R.DTYPES[t] && R.DTYPES[t].bk === key;
     if ((grand && Math.random() < 0.01) || (d.star != null && Math.random() < 0.10)) { out.cle = 1; out.it.push(R.mkItem('cle', 0)); }
   }
+  if (typeof sc === 'string' && sc[0] === 'd' && DONJONS_T7.includes(sc[1]) && Math.random() < TAUX_T7) { const o7 = objetT7(R, cls); if (o7) { out.t7 = 1; out.it.push(o7); } }
   // Chronos : une Relique de Chronos à chaque fois (une chance sur deux qu'elle soit pour la classe du joueur)
   if (key === 'chronos') { const tous = Object.keys(R.KINDS).filter(k => R.KINDS[k].alt), miens = tous.filter(k => (R.KINDS[k].cls || []).includes(cls));
     if (tous.length) out.it.push(R.mkItem(pick(miens.length && Math.random() < 0.5 ? miens : tous), 7)); }
