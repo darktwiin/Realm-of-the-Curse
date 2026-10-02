@@ -1,5 +1,24 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.27 (butin.js et arbitre.js modifiés, server.js inchangé)
+- Touches **1, 2, 3, 4** : elles agissent sur les 4 premières cases du sac (un petit numéro s'affiche sur chaque case). Une potion de vie ou de mana est bue, une potion de caractéristique aussi (sauf si le maximum est atteint), et un équipement est échangé avec celui qu'on porte. Touches modifiables dans les Options.
+- 13 **Reliques de Chronos** (couleur ambre, symbole ⌛) : Chronos en donne une à chaque victoire, à 100 %, avec une chance sur deux qu'elle soit pour la classe du joueur. Elles ont les mêmes bonus que les reliques classiques mais un effet différent.
+  - Voile de Pureté (Assassin) : retire tous les effets négatifs et en protège 2 s.
+  - Miroir de Frénésie (Mystificateur) : après la téléportation, +100 % de vitesse d'attaque pendant 1 s (recharge 2,5 s).
+  - Grimoire du Renouveau (Prêtre) : soin de 160 PV dans 6 cases, puis régénération de 3 % de la vie par seconde pendant 6 s pour tous les joueurs touchés.
+  - Carquois de la Vipère (Archer) : grande flèche qui se scinde 4 fois en 2 flèches à 30 % des dégâts ; tout ce qui est touché est empoisonné 4 s.
+  - Sort de Gravité (Mage) : zone de 6 cases qui attire et regroupe tous les monstres (pas les boss).
+  - Heaume du Ralliement (Guerrier) : +60 % de vitesse de déplacement pendant 2 s pour le groupe dans 5 cases.
+  - Pacte de Chair (Démoniste) : démon soigneur (14 s) qui rend 5 % de la vie toutes les 2 s dans 4 cases ; il s'ajoute aux autres démons ; 150 mana.
+  - Rempart des Braves (Porte-bouclier) : +24 armure (l'équivalent du bouclier T4) pendant 6 s pour tous les joueurs dans 5 cases.
+  - Bâton de la Nova (Mage) : 12 projectiles tout autour de soi, portée divisée par deux.
+  - Lame du Colosse (Guerrier, Porte-bouclier) : vitesse d'attaque à 33 %, dégâts à 400 %, portée réduite de 20 %.
+  - Arc de la Tempête (Archer) : 5 flèches, vitesse d'attaque doublée, dégâts d'un arc Tier 2.
+  - Baguette de Miséricorde (Prêtre) : aucun dégât ; chaque tir est une vague qui rend 2 % de leur vie aux alliés traversés (au plus une fois toutes les 0,35 s par prêtre). Elle ne soigne ni le prêtre ni les monstres.
+  - Crocs Jumeaux (Mystificateur, Assassin) : 3 lames, vitesse d'attaque doublée, dégâts très réduits.
+- Nouvel état « Régénération » ; le poison des flèches s'affiche en dégâts verts.
+- Panneau admin, onglet Objets : la fiche complète d'un objet s'affiche au survol de la souris, et les Reliques de Chronos ont leurs deux lignes.
+
 ## ver.0.0.26 (server.js inchangé)
 - Parchemin ensanglanté : 3 démons à la fois au T5 (1 au T0, 2 du T1 au T4, 3 au T5, 4 au T6).
 - Les deux boss du centre des Plaines (le Roi Bouffon et le Béhémoth d'Obsidienne) peuvent être présents en même temps : tous les 20 monstres tués, celui qui manque apparaît, sans attendre la mort de l'autre.

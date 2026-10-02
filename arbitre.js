@@ -66,6 +66,7 @@ function objetValide(it) {
   const K = R.KINDS[it.kind];
   if (!K) return 'type d\'objet inconnu : ' + String(it.kind).slice(0, 20);
   if (!estEntier(it.tier, 0, 7)) return 'tier impossible';
+  if (K.alt && it.tier !== 7) return 'relique de Chronos d\'un tier impossible';
   if (it.slot !== K.slot) return 'emplacement incohérent';
   if (it.stats && typeof it.stats !== 'object') return 'statistiques illisibles';
   if (it.up != null && it.up !== 0 && (K.slot === 'conso' || !estEntier(it.up, 0, 2))) return 'niveau de forge impossible';
@@ -336,7 +337,7 @@ function degatsMax(s) {
   const lvl = Math.max(1, ch.lvl | 0), w = (ch.equip || [])[0];
   const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30;
   if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
-  const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5;
+  const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5 * Math.max(1, R.WB[w.kind].rk || 1) * 2 /* frénésie */;
   const tirs = R.WB[w.kind].shots + (w.extra || 0);
   return Math.round(Math.max(3000, w.dmg[1] * (1 + 0.1 * Math.min(2, w.up | 0)) * mult * tirs * cadence * 3));
 }

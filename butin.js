@@ -45,6 +45,9 @@ function tirer(R, key, cls, scene, sc) {
     const t = sc[1], grand = DONJONS_A_CLEF.includes(t) && R.DTYPES[t] && R.DTYPES[t].bk === key;
     if ((grand && Math.random() < 0.01) || (d.star != null && Math.random() < 0.10)) { out.cle = 1; out.it.push(R.mkItem('cle', 0)); }
   }
+  // Chronos : une Relique de Chronos à chaque fois (une chance sur deux qu'elle soit pour la classe du joueur)
+  if (key === 'chronos') { const tous = Object.keys(R.KINDS).filter(k => R.KINDS[k].alt), miens = tous.filter(k => (R.KINDS[k].cls || []).includes(cls));
+    if (tous.length) out.it.push(R.mkItem(pick(miens.length && Math.random() < 0.5 ? miens : tous), 7)); }
   if (d.midBoss || GARANTIS.includes(key)) out.spg.push(R.mkItem('sp_' + pick(R.SK), 0));
   out.sp = potionsCarac(R, key, d, scene).map(k => R.mkItem('sp_' + k, 0));
   if (d.or && Math.random() < d.or[0]) out.or = ri(d.or[1], d.or[2]);
