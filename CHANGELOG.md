@@ -1,5 +1,24 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.23 (server.js, arbitre.js et butin.js modifiés)
+- Deux nouvelles classes (8 au total) :
+  - **Porte-bouclier** : épée et armure lourde comme le Guerrier, mais la plus grosse armure du jeu. Capacité « bouclier » : En garde (armure fortement augmentée pendant 4 à 7,5 s) et une vague qui traverse les ennemis et **brise leur armure**. Relique (Égide du Titan) : invulnérable 1 seconde.
+  - **Invocateur** : nouvelle arme, la **mandoline** (8 tiers, relique comprise). Elle ne frappe pas : elle pose un esprit immobile, intouchable (les tirs le traversent), qui attaque à sa place 1 seconde après son apparition. Une nouvelle invocation remplace l'ancienne. Les dégâts montent avec le tier de la mandoline et la puissance du héros. Capacité « totem » : esprits supplémentaires (1 à la fois au T0, 2 du T1 au T5, 4 à partir du T6 avec une recharge très courte). Relique (Totem des Anciens) : pose en plus un golem-rempart immobile qui arrête 15 tirs ennemis puis disparaît.
+- Armure des monstres : tous les monstres ont maintenant 10 % d'armure (15 % pour les boss). Leur vie a été baissée d'autant, donc rien ne change pour les classes existantes. Nouvel état « Armure brisée » (icône de bouclier fendu) : tant qu'il dure, tout le groupe inflige 10 à 15 % de dégâts en plus. Nouvel état « En garde » pour le Porte-bouclier.
+- Forge du Village : nouvelle aile à gauche du hall (porte en face de celle de l'échoppe). Le forgeron fond **2 objets identiques** dans l'objet équipé : +10 % d'efficacité par niveau, 2 niveaux au maximum (+1, +2). Dégâts, armure, bonus de caractéristiques et puissance de la capacité augmentent ; le nombre de projectiles ne change jamais. Le niveau suit l'objet dans les échanges. Le serveur vérifie chaque forge.
+- Nouveau donjon rare : **La Vengeance sous-marine**. En pêchant dans les Plaines Sauvages, 1 prise sur 250 ouvre un portail de 60 s que tout le monde peut prendre. Donjon intermédiaire (niveau de la Forge Rouillée), entièrement sous l'eau, avec des courants marins. 5 poissons-monstres (Sardine vengeresse, Rouget enragé, Raie des profondeurs, Congre furieux, Espadon rancunier) et, dans l'arène, les deux poissons légendaires ensemble : le Poisson-lune doré des abysses et la Carpe koï d'or maudite. La sortie s'ouvre quand les deux sont vaincus.
+- Concours du premier donjon (samedi 3 octobre 2026, 18 h) : le premier joueur qui termine un Château de Morvane commencé après le départ gagne 500 Cursite. Rien n'est affiché avant l'heure. À 18 h : grande bannière dans les Événements, fenêtre d'explication (aussi à la connexion), et portail du concours dans le Village. Le gagnant et son temps sont annoncés à tout le monde. Les comptes admin ne concourent pas.
+- Familiers animés : ils se tournent comme le héros, bougent la tête, et marchent selon l'animal (6 pattes pour la fourmi, 4 pour le lion, bonds du lièvre, battements d'ailes du colibri…).
+- Le succès « Toutes les classes niveau 20 » compte les 8 classes.
+- Bouton Quêtes : raccourci clavier **J** (modifiable dans les touches).
+- Panneau admin : les Gardiens n'apparaissent plus dans la liste des joueurs. Nouveaux boutons : état / lancement / remise à zéro du concours, et portail de test vers La Vengeance sous-marine.
+- La salle de test des admins a été déplacée beaucoup plus loin : on ne peut plus l'apercevoir depuis le Village.
+- L'écran de choix du héros passe à 4 colonnes.
+
+## ver.0.0.22 (server.js et arbitre.js modifiés)
+- Correction du message « Sauvegarde resynchronisée » qui touchait des joueurs honnêtes : un objet posé au sol puis repris était vu par le serveur comme un objet apparu de nulle part. Le serveur se souvient maintenant pendant 2 min 30 de ce qui a été posé.
+- Même correction pour un cadeau resté au sol parce que le sac était plein (récompense de connexion, cadeau d'un admin, récompense de raid) et ramassé plus tard.
+
 ## ver.0.0.21 (server.js, butin.js et arbitre.js modifiés)
 - Nouveau donjon de fin de jeu : l'Horloge Brisée, accessible seulement avec une Clef du Temps.
   - La clef est un objet du sac. Elle tombe à 1 % sur le boss des 6 grands donjons (Château de Morvane, Nécropole des Dunes, Abysses Engloutis, Jardins Célestes, Fournaise Infernale, Caverne Gelée) et à 10 % sur chacun des 4 gardiens de l'Observatoire Céleste (pas sur le Dévoreur d'Étoiles).

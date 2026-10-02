@@ -11,14 +11,14 @@ const pick = x => x[Math.floor(Math.random() * x.length)];
 const DUN_POT = { s: ['vdep', 0.2], o: ['mana', 0.15], p: ['puissance', 0.15], e: ['vatt', 0.2], g: ['vie', 0.1], c: ['*', 0.4] };
 const GARANTIS = ['liche', 'pharaon', 'leviathan', 'archange', 'abysses', 'reine', 'devoreur', 'chronos'];
 const DONJONS_A_CLEF = 'csopeg'; // les boss de ces 6 donjons peuvent lâcher une Clef du Temps (1 %)
-const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]]));
+const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]])) + (it.up ? '|+' + (it.up | 0) : '');
 
 // ---------- tirage (copie fidèle de handleDeath / statDrops / randomItem du jeu) ----------
 function objetAuHasard(R, t, cls) {
   const c = R.CLASSES[cls] || R.CLASSES[Object.keys(R.CLASSES)[0]], r = Math.random(), mien = Math.random() < 0.55;
   let k;
-  if (r < 0.4) k = mien ? c.arme : pick(['epee', 'baton', 'arc', 'baguette', 'dague']);
-  else if (r < 0.6) k = mien ? c.capa : pick(['casque', 'sort', 'carquois', 'tome', 'prisme', 'voile']);
+  if (r < 0.4) k = mien ? c.arme : pick(['epee', 'baton', 'arc', 'baguette', 'dague', 'mandoline']);
+  else if (r < 0.6) k = mien ? c.capa : pick(['casque', 'sort', 'carquois', 'tome', 'prisme', 'voile', 'bouclier', 'totem']);
   else if (r < 0.85) k = mien ? c.armure : pick(['lourde', 'cuir', 'robe']);
   else k = 'anneau';
   return R.mkItem(k, t);
@@ -139,6 +139,7 @@ function reclamer(moi, m, ctx) {
   for (const it of [...r.it, ...r.spg, ...r.sp]) noter(dons, it);
   const x = Math.round((Number(m.x) || 0) * 10) / 10, y = Math.round((Number(m.y) || 0) * 10) / 10;
   ctx.envoyer(moi.ws, Object.assign({ t: 'butin', id, k: key, x, y }, r));
+  if (ctx.onTue) try { ctx.onTue(key, s); } catch (e) { console.error('[butin] onTue', e.message); }
 }
 
 // ---------- échanges : ce qui change de main est noté (et doit disparaître chez celui qui donne) ----------
@@ -146,6 +147,7 @@ function sigEchange(R, o) {
   if (!o || typeof o !== 'object' || !R.KINDS[o.kind]) return null;
   const tier = Math.max(0, Math.min(7, Math.floor(+o.tier) || 0)), it = R.mkItem(o.kind, tier);
   if (it.slot === 'anneau' && o.stats && typeof o.stats === 'object') { const st = {}; for (const k of R.SK) { const v = Math.floor(+o.stats[k] || 0); if (v > 0) st[k] = Math.min(v, (k === 'vie' || k === 'mana') ? 160 : 14); } if (Object.keys(st).length) it.stats = st; }
+  if (o.up && it.slot !== 'conso') it.up = Math.max(0, Math.min(2, o.up | 0)); // niveau de forge
   return it;
 }
 // donneur : sauvegarde du donneur (en base), objets offerts → [{ recu (objet tel que le receveur le fabrique), sigDonneur }]
@@ -156,7 +158,7 @@ function preparerEchange(saveDonneur, items) {
   for (const o of (items || []).slice(0, 8)) {
     const recu = sigEchange(R, o); if (!recu) continue;
     // le donneur doit vraiment posséder un objet de ce type et de ce tier (mêmes stats pour un anneau)
-    const i = possede.findIndex((it, j) => !pris.has(j) && it.kind === recu.kind && it.tier === recu.tier && (recu.slot !== 'anneau' || signature(it) === signature(recu)));
+    const i = possede.findIndex((it, j) => !pris.has(j) && it.kind === recu.kind && it.tier === recu.tier && (it.up | 0) === (recu.up | 0) && (recu.slot !== 'anneau' || signature(it) === signature(recu)));
     if (i < 0) continue;
     pris.add(i); out.push({ recu, sigDonneur: signature(possede[i]) });
   }

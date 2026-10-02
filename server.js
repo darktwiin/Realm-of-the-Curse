@@ -27,7 +27,7 @@ let scores = {};
 try { scores = JSON.parse(fs.readFileSync(FICHIER_SCORES, 'utf8')) || {}; } catch { scores = {}; }
 let scoresModifies = false;
 const entier = (v, max) => Math.max(0, Math.min(max, Math.floor(Number(v) || 0)));
-const CLASSES_OK = ['guerrier', 'mage', 'archer', 'pretre', 'trickster', 'assassin'];
+const CLASSES_OK = ['guerrier', 'mage', 'archer', 'pretre', 'trickster', 'assassin', 'bouclier', 'invocateur'];
 function enregistrerScore(m) {
   const id = String(m.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 24);
   if (id.length < 8) return;
@@ -109,7 +109,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS anomalies (id INTEGER PRIMARY KEY AUTOINCREM
 sql.anoIns = db.prepare('INSERT INTO anomalies (compte, nom, quand, raisons) VALUES (?, ?, ?, ?)');
 sql.anoListe = db.prepare('SELECT nom, quand, raisons FROM anomalies ORDER BY id DESC LIMIT 60');
 for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { try { arbitre.apprendre(JSON.parse(r.save)); } catch {} }
-const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0, xp: 0, kills: 0, boss: 0, liste: {} });
+const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0, xp: 0, kills: 0, boss: 0, liste: {}, sol: [] });
 // état anti-triche par compte (survit aux reconnexions tant que le serveur tourne)
 const etatsComptes = new Map();
 function etatCompte(id) { let e = etatsComptes.get(id); if (!e) { e = { dons: DONS0(), seaux: arbitre.nouveauxSeaux(), rythme: {}, aPerdre: [] }; etatsComptes.set(id, e); } return e; }
@@ -133,6 +133,7 @@ function connecter(moi, c, ws) {
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
   if (save) { envoyerCapGardien(moi, save); moi.cpt.boost = +save.boostXP || 0; }
+  if (concoursVisible()) envoyer(ws, etatConcours());
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
 }
 function actionCompte(moi, ws, m) {
@@ -180,7 +181,7 @@ function sauverCompte(moi, m) {
     }
     // ce qui n'a pas encore servi reste disponible (butin pas encore ramassé…), modifié sur place
     const D = cpt.dons, r = v.reste || DONS0();
-    D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {};
+    D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {}; D.sol = r.sol || [];
     cpt.aPerdre = cpt.aPerdre.filter(e => Date.now() - e.t < 3000); // les plus récents seront vérifiés à la sauvegarde suivante
   } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
@@ -408,6 +409,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
+    if (m && m.t === 'peche') { pecher(moi, nom, m); return; }
     if (m && m.t === 'kill') { if (moi.compte) reclamerKill(moi, m, nom, salle, 0); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {
@@ -437,6 +439,11 @@ wss.on('connection', (ws, req) => {
       if (!moi.admin) { moi.admin = Date.now(); console.log(`[admin] ${(moi.etat && moi.etat.n) || '?'} (${masquer(moi.ip)}) passe admin`); }
       if (cmd === 'hello') { res(true, ''); return; }
       if (cmd === 'annonce') { const sec = Math.max(5, Math.min(300, Math.floor(Number(m.arg) || 30))); annoncerMaj(sec); res(true, 'Annonce envoyée : compte à rebours de ' + sec + ' s (le serveur ne redémarre pas tout seul)'); return; }
+      // concours : « etat », « reset » (efface le vainqueur), ou un nombre = départ dans N minutes (0 = tout de suite)
+      if (cmd === 'concours') { const a = String(m.arg == null ? 'etat' : m.arg);
+        if (a === 'reset') { CONCOURS.gagnant = null; sauverConcours(); if (concoursVisible()) diffuserPartout(etatConcours({ live: 1 })); }
+        else if (/^\d+$/.test(a)) { CONCOURS.debut = Date.now() + (+a) * 60000; CONCOURS.gagnant = null; sauverConcours(); armerConcours(); if (+a === 0) diffuserPartout(etatConcours({ live: 1 })); }
+        res(true, 'Concours : départ ' + new Date(CONCOURS.debut).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }) + (CONCOURS.gagnant ? ' · gagnant : ' + CONCOURS.gagnant.n + ' (' + Math.round(CONCOURS.gagnant.d / 1000) + ' s)' : ' · pas encore de gagnant')); return; }
       if (cmd === 'suspects') { res(true, '', { suspects: listeSuspects() }); return; }
       if (cmd === 'anomalies') { res(true, '', { anomalies: sql.anoListe.all().map(r => ({ n: r.nom, t: r.quand, r: JSON.parse(r.raisons || '[]') })) }); return; }
       if (cmd === 'admins') { const out = []; for (const s of salles.values()) for (const j of s.values()) if (j.admin) out.push({ n: String((j.etat && j.etat.n) || 'Joueur').slice(0, 16), ip: masquer(j.ip), t: j.admin, s: String((j.etat && j.etat.s) || ''), moi: j === moi }); res(true, '', { admins: out }); return; }
@@ -617,7 +624,46 @@ const donjonsGardes = new Map(); // 'salle|scène' -> { t: demande, vu: dernier 
 // ---- Clef du Temps : le serveur vérifie que le joueur possède une clef, la marque « à perdre » et délivre le donjon ----
 const ticketsCle = new Map(); // 'salle|scène' -> fin de validité
 setInterval(() => { const n = Date.now(); for (const [k, t] of ticketsCle) if (t < n) ticketsCle.delete(k); }, 60000);
-const ticketOk = (salle, sc) => sc[1] !== 'h' || (ticketsCle.get(salle + '|' + sc) || 0) > Date.now();
+// donjons qui demandent un ticket du serveur : Horloge Brisée (clef) et Vengeance sous-marine (pêche)
+const ticketOk = (salle, sc) => (sc[1] !== 'h' && sc[1] !== 'v') || (ticketsCle.get(salle + '|' + sc) || 0) > Date.now();
+// pêche dans les Plaines : très rarement, un portail vers La Vengeance sous-marine (tirage côté serveur)
+const VENGEANCE_TAUX = 1 / 250;
+function pecher(moi, salle, m) {
+  if (!moi.compte || !moi.etat || moi.etat.s !== 'r') return;
+  const force = !!(m && m.force) && moi.compte.admin;
+  if (!force) { if (Date.now() - (moi.pecheT || 0) < 2500) return; moi.pecheT = Date.now(); if (Math.random() >= VENGEANCE_TAUX) return; }
+  const id = 1 + crypto.randomInt(2000000000);
+  ticketsCle.set(salle + '|dv' + id.toString(36), Date.now() + 2 * 3600000);
+  console.log(`[pêche] ${moi.compte.nom} ouvre La Vengeance sous-marine (${salle})`);
+  envoyer(moi.ws, { t: 'vengeance', id });
+}
+
+// ---------- concours du premier donjon : le premier à terminer un Château de Morvane commencé après le départ gagne 500 Cursite ----------
+const CONCOURS = { debut: Number(process.env.CONCOURS_DEBUT) || Date.UTC(2026, 9, 3, 16, 0, 0) /* samedi 3 octobre 2026, 18 h à Paris */, prix: 500, gagnant: null };
+const FICHIER_CONCOURS = path.join(DATA_DIR, 'concours.json');
+try { const c = JSON.parse(fs.readFileSync(FICHIER_CONCOURS, 'utf8')); if (c && c.debut === CONCOURS.debut && c.gagnant) CONCOURS.gagnant = c.gagnant; } catch {}
+const sauverConcours = () => { try { fs.writeFileSync(FICHIER_CONCOURS, JSON.stringify({ debut: CONCOURS.debut, gagnant: CONCOURS.gagnant })); } catch (e) { console.error('[concours]', e.message); } };
+// visible seulement à partir du départ, puis jusqu'à 24 h après la victoire (7 jours sans vainqueur)
+const concoursVisible = () => { const n = Date.now(); if (n < CONCOURS.debut) return false; return CONCOURS.gagnant ? n < CONCOURS.gagnant.t + 24 * 3600000 : n < CONCOURS.debut + 7 * 24 * 3600000; };
+const etatConcours = extra => Object.assign({ t: 'concours', debut: CONCOURS.debut, prix: CONCOURS.prix, gagnant: CONCOURS.gagnant ? { n: CONCOURS.gagnant.n, d: CONCOURS.gagnant.d } : null }, extra || {});
+function diffuserPartout(msg, sauf) { for (const salle of salles.values()) diffuser(salle, msg, sauf); }
+let minuteurConcours = null;
+function armerConcours() {
+  clearTimeout(minuteurConcours); const dans = CONCOURS.debut - Date.now();
+  if (dans > 0 && dans < 2000000000) minuteurConcours = setTimeout(() => { console.log('[concours] départ du chronomètre'); diffuserPartout(etatConcours({ live: 1 })); }, dans);
+}
+armerConcours();
+function concoursTue(moi, key, sc) {
+  if (key !== 'liche' || sc.slice(0, 2) !== 'dc' || CONCOURS.gagnant || Date.now() < CONCOURS.debut || !concoursVisible()) return;
+  if (!moi.compte || moi.compte.admin) return;                                  // les admins ne concourent pas
+  if (!(moi.etat && moi.etat.s === sc && (moi.sT || 0) >= CONCOURS.debut)) return; // donjon commencé avant le départ : ne compte pas
+  const n = String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 24);
+  CONCOURS.gagnant = { n, compte: moi.compte.nom, t: Date.now(), d: Date.now() - CONCOURS.debut }; sauverConcours();
+  if (moi.dons) moi.dons.cursite += CONCOURS.prix;
+  console.log(`[concours] ${moi.compte.nom} (${n}) gagne en ${Math.round(CONCOURS.gagnant.d / 1000)} s`);
+  envoyer(moi.ws, etatConcours({ gain: CONCOURS.prix }));
+  diffuserPartout(etatConcours({ live: 1 }), moi);
+}
 function utiliserCle(moi, salle) {
   if (!moi.compte) return;
   const rep = (ok, msg, id) => envoyer(moi.ws, { t: 'cle', ok, msg, id });
@@ -658,5 +704,5 @@ function reclamerKill(moi, m, nom, salle, essai) {
   const sc = String(m.s || ''), d = donjonsGardes.get(nom + '|' + sc);
   const G = gardienDe(salle, sc || 'r');
   if (!G && d && Date.now() - d.t < 8000 && essai < 25) { setTimeout(() => { if (moi.ws.readyState === 1) reclamerKill(moi, m, nom, salle, essai + 1); }, 400); return; }
-  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc), boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
+  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc), boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, onTue: (key, s) => concoursTue(moi, key, s), signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
 }

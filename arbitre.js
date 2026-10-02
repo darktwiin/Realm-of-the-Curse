@@ -55,7 +55,8 @@ function apprendre(s) { try { for (const it of objets(s)) CONNUS.add(signature(i
 const estEntier = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 const estNombre = (v, lo, hi) => typeof v === 'number' && isFinite(v) && v >= lo && v <= hi;
 const memeStats = (a, b) => { const ka = Object.keys(a || {}).filter(k => a[k]), kb = Object.keys(b || {}).filter(k => b[k]); if (ka.length !== kb.length) return false; for (const k of ka) if (Math.abs((a[k] || 0) - (b[k] || 0)) > 0.051) return false; return true; };
-const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]]));
+// le niveau de forge (+1, +2) fait partie de la signature : un objet amélioré n'est pas le même objet
+const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]])) + (it.up ? '|+' + (it.up | 0) : '');
 const prestigeGain = ch => { const spT = Object.values(ch.sp || {}).reduce((a, v) => a + (v | 0), 0); return (ch.lvl | 0) + Math.floor((ch.kills | 0) / 25) + 2 * spT + 3 * (ch.bosses | 0) + 2 * (ch.gp | 0); };
 
 // objet valide ? (comparé à ce que le jeu fabrique pour le même type et le même tier)
@@ -67,6 +68,7 @@ function objetValide(it) {
   if (!estEntier(it.tier, 0, 7)) return 'tier impossible';
   if (it.slot !== K.slot) return 'emplacement incohérent';
   if (it.stats && typeof it.stats !== 'object') return 'statistiques illisibles';
+  if (it.up != null && it.up !== 0 && (K.slot === 'conso' || !estEntier(it.up, 0, 2))) return 'niveau de forge impossible';
   if (K.slot === 'conso') { if (Object.keys(it.stats || {}).some(k => it.stats[k])) return 'consommable avec statistiques'; return null; }
   const ref = R.mkItem(it.kind, it.tier);
   if (K.slot === 'anneau') {
@@ -248,13 +250,23 @@ function verifier(ancien, nouveau, ctx) {
 
   // --- objets : apparitions comptées (les déplacements entre héros et coffres ne comptent pas) ---
   const liste = {}; for (const k in (dons.liste || {})) liste[k] = (dons.liste[k] || []).slice();
+  // objets posés au sol récemment (ils ont disparu d'une sauvegarde précédente) : on peut les reprendre pendant 2 min 30
+  const SOL_MS = 150000, sol = (dons.sol || []).filter(e => Date.now() - e.t < SOL_MS);
+  const duSol = k => { const i = sol.findIndex(e => e.sig === k); if (i < 0) return false; sol.splice(i, 1); return true; };
   let donsObj = dons.objets || 0, kitT0 = kits * 3, libT6 = bonusT6, libRel = bonusReliques, libConso = Math.max(0, bonusObjets - bonusT6 - bonusReliques);
   let nConso = 0, horsListe = 0, nT6 = 0, nRel = 0, nouveaux = 0;
+  // forge : un objet +N apparaît seulement si l'objet du niveau précédent et 2 objets identiques non améliorés ont disparu
+  const fondus = new Map(), perdu = k => Math.max(0, (c0.get(k) || 0) - (c1.get(k) || 0)) - (fondus.get(k) || 0), fondre = (k, n) => fondus.set(k, (fondus.get(k) || 0) + n);
   for (const [k, n] of c1) {
     let plus = n - (c0.get(k) || 0); if (plus <= 0) continue;
     nouveaux += plus;
     const L = liste[k]; while (plus > 0 && L && L.length) { L.shift(); plus--; } // donné par le serveur (butin, échange)
+    while (plus > 0 && duSol(k)) plus--; // repris au sol
     if (!plus) continue;
+    { const pp = k.split('|'), upN = pp.length > 3 && pp[pp.length - 1][0] === '+' ? +pp[pp.length - 1].slice(1) : 0;
+      if (upN) { const base = pp.slice(0, -1).join('|'), prec = upN > 1 ? base + '|+' + (upN - 1) : base;
+        while (plus > 0 && (upN === 1 ? perdu(base) >= 3 : (perdu(base) >= 2 && perdu(prec) >= 1))) { fondre(base, 2); fondre(prec, 1); plus--; nouveaux--; }
+        if (!plus) continue; } }
     const kind = k.split('|')[0], t = +k.split('|')[1], conso = R.KINDS[kind] && R.KINDS[kind].slot === 'conso';
     for (; plus > 0; plus--) {
       if (kind === 'cle') { if (donsObj > 0) donsObj--; else horsListe++; continue; } // une clef vient toujours du serveur
@@ -298,7 +310,16 @@ function verifier(ancien, nouveau, ctx) {
 
   if (pb.length) return { ok: false, raisons: [...new Set(pb)].slice(0, 6), enTrop };
   // ce qui reste des dons du serveur après cette sauvegarde (butin pas encore ramassé, etc.)
-  const reste = { cursite: 0, prestige: 0, objets: 0, or: Math.max(0, (dons.or || 0) - orServeur),
+  // ce qui vient de disparaître a peut-être été posé au sol : on le note pour accepter sa reprise.
+  // Exclus : ce qui a été donné en échange ou utilisé (clef), et, si de l'or de revente est entré, les objets qui se vendent.
+  { const donnes = new Set((ctx.aPerdre || []).map(e => e.sig)), vendu = gainBrut - (dons.or || 0) > 0.5;
+    for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0) - (fondus.get(k) || 0); if (moins <= 0 || donnes.has(k)) continue;
+      const kind = k.split('|')[0], t = +k.split('|')[1], K = R.KINDS[kind]; if (!K) continue;
+      if (K.slot === 'conso' ? kind !== 'cle' : (vendu && (R.SELL_PRICE[t] || 0) > 0)) continue;
+      for (let i = 0; i < Math.min(moins, 8); i++) sol.push({ sig: k, t: Date.now() }); }
+    if (sol.length > 40) sol.splice(0, sol.length - 40); }
+  // cadeaux pas encore dans le sac (sac plein : l'objet attend au sol) : le crédit reste valable
+  const reste = { sol, cursite: 0, prestige: 0, objets: Math.min(12, donsObj + libT6 + libRel), or: Math.max(0, (dons.or || 0) - orServeur),
     xp: Math.max(0, (dons.xp || 0) - gainXP), kills: Math.max(0, (dons.kills || 0) - gainKills), boss: Math.max(0, (dons.boss || 0) - gainBoss), liste };
   return { ok: true, reste, aPerdre: [] };
 }
@@ -311,7 +332,7 @@ function degatsMax(s) {
   if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
   const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5;
   const tirs = R.WB[w.kind].shots + (w.extra || 0);
-  return Math.round(Math.max(3000, w.dmg[1] * mult * tirs * cadence * 3));
+  return Math.round(Math.max(3000, w.dmg[1] * (1 + 0.1 * Math.min(2, w.up | 0)) * mult * tirs * cadence * 3));
 }
 
 module.exports = { degatsMax, verifier, nouveauxSeaux, regles: () => R, objetValide, apprendre };
