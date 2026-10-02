@@ -181,7 +181,7 @@ function sauverCompte(moi, m) {
     // ce qui n'a pas encore servi reste disponible (butin pas encore ramassé…), modifié sur place
     const D = cpt.dons, r = v.reste || DONS0();
     D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {};
-    cpt.aPerdre = [];
+    cpt.aPerdre = cpt.aPerdre.filter(e => Date.now() - e.t < 3000); // les plus récents seront vérifiés à la sauvegarde suivante
   } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
   cpt.boost = +m.data.boostXP || 0;
@@ -407,6 +407,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
+    if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
     if (m && m.t === 'kill') { if (moi.compte) reclamerKill(moi, m, nom, salle, 0); return; }
     // Échanges entre joueurs : relayés uniquement vers un joueur de la même salle
     if (m && m.t === 'tr') {
@@ -515,7 +516,7 @@ wss.on('connection', (ws, req) => {
     for (const k of Object.keys(m.patch).slice(0, 96)) {
       if (!/^[A-Za-z_][A-Za-z0-9_]{0,31}$/.test(k)) continue;
       let v = m.patch[k];
-      if (k === 'ti' && v === 'admin' && !moi.admin) v = null; // titre ADMIN réservé aux admins vérifiés
+      if (k === 'ti' && v === 'admin' && !(moi.compte && moi.compte.admin)) v = null; // titre ADMIN réservé aux comptes admin
       if (k === 'gd' && !moi.gardien) v = null; // seul le vrai Gardien peut s'annoncer
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
       if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
@@ -613,8 +614,30 @@ function listeSuspects() {
 function gardienDe(salle, sc) { for (const j of salle.values()) if (j.gardien && j.etat && j.etat.s === (sc || 'r')) return j; return null; }
 // ---- Donjons gardés : une copie du jeu héberge chaque donjon occupé (salle principale) ----
 const donjonsGardes = new Map(); // 'salle|scène' -> { t: demande, vu: dernier joueur présent }
+// ---- Clef du Temps : le serveur vérifie que le joueur possède une clef, la marque « à perdre » et délivre le donjon ----
+const ticketsCle = new Map(); // 'salle|scène' -> fin de validité
+setInterval(() => { const n = Date.now(); for (const [k, t] of ticketsCle) if (t < n) ticketsCle.delete(k); }, 60000);
+const ticketOk = (salle, sc) => sc[1] !== 'h' || (ticketsCle.get(salle + '|' + sc) || 0) > Date.now();
+function utiliserCle(moi, salle) {
+  if (!moi.compte) return;
+  const rep = (ok, msg, id) => envoyer(moi.ws, { t: 'cle', ok, msg, id });
+  if (Date.now() - (moi.cleT || 0) < 2000) return rep(false, 'Patiente un instant');
+  moi.cleT = Date.now();
+  if (!moi.compte.admin) {
+    let sv = null; try { const row = sql.parId.get(moi.compte.id); sv = row && row.save ? JSON.parse(row.save) : null; } catch { sv = null; }
+    const R = arbitre.regles(); if (!sv || !R || !R.KINDS.cle) return rep(false, 'Clef indisponible');
+    const sig = butin.signature(R.mkItem('cle', 0)), cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id));
+    const e = cpt.aPerdre.find(x => x.sig === sig), dispo = e ? e.max : butin.compterSig(sv, sig);
+    if (dispo < 1) return rep(false, 'Clef pas encore enregistrée : réessaie dans deux secondes');
+    if (e) { e.max = dispo - 1; e.t = Date.now(); } else cpt.aPerdre.push({ sig, max: dispo - 1, t: Date.now() });
+  }
+  const id = 1 + crypto.randomInt(2000000000);
+  ticketsCle.set(salle + '|dh' + id.toString(36), Date.now() + 2 * 3600000);
+  console.log(`[clef] ${moi.compte.nom} ouvre l'Horloge Brisée (${salle})`);
+  rep(true, '', id);
+}
 function demanderDonjon(salle, sc) {
-  if (!gardienProc || !/^d[a-z][0-9a-z]{1,10}$/.test(sc)) return;
+  if (!gardienProc || !/^d[a-z][0-9a-z]{1,10}$/.test(sc) || !ticketOk(salle, sc)) return;
   const k = salle + '|' + sc, d = donjonsGardes.get(k); if (d) { d.vu = Date.now(); return; }
   donjonsGardes.set(k, { t: Date.now(), vu: Date.now(), salle, sc });
   try { gardienProc.send({ t: 'donjon', salle, s: sc }); } catch {}
@@ -635,5 +658,5 @@ function reclamerKill(moi, m, nom, salle, essai) {
   const sc = String(m.s || ''), d = donjonsGardes.get(nom + '|' + sc);
   const G = gardienDe(salle, sc || 'r');
   if (!G && d && Date.now() - d.t < 8000 && essai < 25) { setTimeout(() => { if (moi.ws.readyState === 1) reclamerKill(moi, m, nom, salle, essai + 1); }, 400); return; }
-  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
+  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc), boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
 }

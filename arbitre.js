@@ -257,6 +257,7 @@ function verifier(ancien, nouveau, ctx) {
     if (!plus) continue;
     const kind = k.split('|')[0], t = +k.split('|')[1], conso = R.KINDS[kind] && R.KINDS[kind].slot === 'conso';
     for (; plus > 0; plus--) {
+      if (kind === 'cle') { if (donsObj > 0) donsObj--; else horsListe++; continue; } // une clef vient toujours du serveur
       if (conso) { if (libConso > 0) libConso--; else if (donsObj > 0) donsObj--; else nConso++; continue; }
       if (t === 0 && kitT0 > 0) { kitT0--; continue; }
       if (t === 6 && libT6 > 0) { libT6--; continue; }
@@ -265,15 +266,15 @@ function verifier(ancien, nouveau, ctx) {
       if (etape2) horsListe++; else { nConso++; if (t === 6) nT6++; if (t >= 7) nRel++; }
     }
   }
-  if (horsListe) pb.push('équipement non donné par le serveur (+' + horsListe + ')');
+  if (horsListe) pb.push('objet non donné par le serveur (+' + horsListe + ')');
   if (nConso > sx.objets + 0.5) pb.push('trop d\'objets d\'un coup (+' + nConso + ')'); else sx.objets -= nConso;
   if (nT6 > sx.t6 + 0.01) pb.push('trop d\'objets tier 6 (+' + nT6 + ')'); else sx.t6 -= nT6;
   if (nRel > sx.reliques + 0.01) pb.push('trop de reliques (+' + nRel + ')'); else sx.reliques -= nRel;
   // --- objets donnés lors d'un échange : celui qui donne doit bien les perdre (anti-duplication) ---
   const aPerdre = (ctx.aPerdre || []).filter(e => Date.now() - e.t < 30 * 60000);
   const enTrop = [];
-  for (const e of aPerdre) { const n = c1.get(e.sig) || 0; if (n > e.max) enTrop.push(e); }
-  if (enTrop.length) pb.push('objet échangé toujours dans le sac (duplication)');
+  for (const e of aPerdre) { if (Date.now() - e.t < 3000) continue; /* 3 s de marge : une sauvegarde déjà partie peut encore contenir l'objet */ const n = c1.get(e.sig) || 0; if (n > e.max) enTrop.push(e); }
+  if (enTrop.length) pb.push('objet donné ou utilisé toujours dans le sac (duplication)');
 
   // --- potions de caractéristique bues : chaque point demande une potion disparue ---
   for (const k of Object.keys(R.SP_DEF)) {

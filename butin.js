@@ -9,7 +9,8 @@ const arbitre = require('./arbitre');
 const ri = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
 const pick = x => x[Math.floor(Math.random() * x.length)];
 const DUN_POT = { s: ['vdep', 0.2], o: ['mana', 0.15], p: ['puissance', 0.15], e: ['vatt', 0.2], g: ['vie', 0.1], c: ['*', 0.4] };
-const GARANTIS = ['liche', 'pharaon', 'leviathan', 'archange', 'abysses', 'reine', 'devoreur'];
+const GARANTIS = ['liche', 'pharaon', 'leviathan', 'archange', 'abysses', 'reine', 'devoreur', 'chronos'];
+const DONJONS_A_CLEF = 'csopeg'; // les boss de ces 6 donjons peuvent lâcher une Clef du Temps (1 %)
 const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]]));
 
 // ---------- tirage (copie fidèle de handleDeath / statDrops / randomItem du jeu) ----------
@@ -25,19 +26,25 @@ function objetAuHasard(R, t, cls) {
 function potionsCarac(R, key, d, scene) {
   if (d.tuto) return [];
   for (const t in DUN_POT) if (R.DTYPES[t] && R.DTYPES[t].bk === key) { const [st, ch] = DUN_POT[t]; return Math.random() < ch ? [st === '*' ? pick(R.SK) : st] : []; }
+  if (key === 'chronos') { const n = ri(2, 3), o = []; for (let i = 0; i < n; i++) o.push(pick(R.SK)); return o; }
   if (d.star != null || key === 'devoreur') { const n = ri(1, 2), o = []; for (let i = 0; i < n; i++) o.push(pick(R.SK)); return o; }
   if (key === 'dieu_fou' || key === 'colosse') return Math.random() < 0.2 ? [pick(R.SK)] : [];
   // avant-dernière zone 0,8 %, dernière zone 1,1 % d'une potion de caractéristique au hasard
   if (scene === 'realm') { if (R.ZONES[5].pool.includes(key) && Math.random() < 0.008) return [pick(R.SK)]; if (R.ZONES[6].pool.includes(key) && Math.random() < 0.011) return [pick(R.SK)]; }
   return [];
 }
-function tirer(R, key, cls, scene) {
+function tirer(R, key, cls, scene, sc) {
   const d = R.MON[key], out = { xp: d.xp | 0, b: d.boss ? 1 : 0, it: [], rel: -1, oeuf: 0, spg: [], sp: [], or: 0 };
   if (d.tuto) { out.xp *= 2; out.tuto = 1; return out; }
   if (Math.random() < d.drop) { const n = d.n && d.boss ? d.n : 1; for (let i = 0; i < n; i++) { let t = ri(d.loot[0], d.loot[1]); if (Math.random() < 0.08) t = Math.min(6, t + 1); out.it.push(objetAuHasard(R, t, cls)); } }
   if (d.rel && (key === 'devoreur' || Math.random() < d.rel)) { out.rel = out.it.length; out.it.push(objetAuHasard(R, 7, cls)); }
   if (Math.random() < (d.boss ? 1 : 0.12)) out.it.push(R.mkItem(Math.random() < 0.6 ? 'pvie' : 'pmana', 0));
   if (Math.random() < 0.001) { out.oeuf = 1; out.it.push(R.mkItem('egg', 0)); }
+  // Clef du Temps : 1 % sur le boss des 6 grands donjons, 10 % sur chacun des 4 gardiens de l'Observatoire (jamais sur le Dévoreur)
+  if (R.KINDS.cle && typeof sc === 'string' && sc[0] === 'd') {
+    const t = sc[1], grand = DONJONS_A_CLEF.includes(t) && R.DTYPES[t] && R.DTYPES[t].bk === key;
+    if ((grand && Math.random() < 0.01) || (d.star != null && Math.random() < 0.10)) { out.cle = 1; out.it.push(R.mkItem('cle', 0)); }
+  }
   if (d.midBoss || GARANTIS.includes(key)) out.spg.push(R.mkItem('sp_' + pick(R.SK), 0));
   out.sp = potionsCarac(R, key, d, scene).map(k => R.mkItem('sp_' + k, 0));
   if (d.or && Math.random() < d.or[0]) out.or = ri(d.or[1], d.or[2]);
@@ -83,6 +90,7 @@ function reclamer(moi, m, ctx) {
   if (!(id > 0) || !d) return non('monstre inconnu');
   if (!s || /^[nvhGx]/.test(s)) return non('scène sans monstres');
   if (!!d.tuto !== (s[0] === 'u')) return non('monstre hors de sa zone');
+  if (ctx.sansClef) return non('donjon à clef sans clef');
   // la scène annoncée doit être celle où se trouve le joueur (ou celle qu'il vient de quitter)
   const ici = String((moi.etat && moi.etat.s) || '');
   if (s !== ici && !(moi.sAvant === s && Date.now() - (moi.sT || 0) < 8000)) return non('pas dans cette scène');
@@ -124,7 +132,7 @@ function reclamer(moi, m, ctx) {
   vus.add(cle); if (vus.size > 3000) { const a = [...vus].slice(-1500); vus.clear(); a.forEach(v => vus.add(v)); }
   // tirage
   const cls = R.CLASSES[m.c] ? String(m.c) : String((moi.etat && moi.etat.c) || '');
-  const r = tirer(R, key, cls, s === 'r' ? 'realm' : 'dungeon');
+  const r = tirer(R, key, cls, s === 'r' ? 'realm' : 'dungeon', s);
   if (ctx.boost && Date.now() < ctx.boost) r.xp = Math.round(r.xp * 1.3); // boost d'expérience (Cursite)
   const dons = ctx.dons; nettoyer(dons);
   dons.xp += r.xp; dons.kills += 1; dons.boss += r.b; dons.or += r.or;

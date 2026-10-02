@@ -1,5 +1,18 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.21 (server.js, butin.js et arbitre.js modifiés)
+- Nouveau donjon de fin de jeu : l'Horloge Brisée, accessible seulement avec une Clef du Temps.
+  - La clef est un objet du sac. Elle tombe à 1 % sur le boss des 6 grands donjons (Château de Morvane, Nécropole des Dunes, Abysses Engloutis, Jardins Célestes, Fournaise Infernale, Caverne Gelée) et à 10 % sur chacun des 4 gardiens de l'Observatoire Céleste (pas sur le Dévoreur d'Étoiles).
+  - Utilisée depuis le sac, elle ouvre n'importe où (Village, Plaines, maison, hall de guilde) un portail de 60 secondes que les autres joueurs peuvent prendre.
+  - Le temps y est déréglé : dans les zones bleues il ralentit, dans les zones dorées il accélère, pour le joueur comme pour les projectiles ennemis.
+  - 4 nouveaux monstres : Rouage vivant, Pendule possédée, Sablier errant (ses tirs ralentissent), Coucou mécanique.
+  - Boss : Chronos, l'Horloger Maudit (230 000 PV), dessiné en grand format avec les aiguilles de son cadran et son balancier animés en continu. Ses sorts s'enchaînent au hasard, jamais deux fois le même de suite : Carillon (projectiles qui partent puis reviennent), Tic tac (salves visées), Pluie d'engrenages, Les Aiguilles (deux aiguilles géantes balaient l'arène), Arrêt du temps (il faut se réfugier dans une bulle, sinon on est paralysé), Rembobinage (on est ramené là où on était 3 secondes plus tôt). Trois phases : sous 33 % de vie, les aiguilles ne s'arrêtent plus.
+  - Butin : 5 objets Tier 6, 1 chance sur 5 de Relique, 3 à 4 potions de caractéristique, 10 000 XP. Nouveau succès et titre « Maître du Temps ».
+  - Anti-triche : la clef ne peut venir que du serveur, le serveur vérifie qu'elle est bien consommée, et un donjon à clef ouvert sans clef ne rapporte rien.
+- Volet Événements : 4 nouvelles bannières cliquables (Horloge Brisée, Bonus de connexion, Quêtes de la semaine, Poissons légendaires). La pastille indique ce qui est à récupérer.
+- Le titre ADMIN est disponible en permanence pour les comptes admin, sans passer par /god.
+- En sortant d'un donjon ouvert depuis le Village, on revient au Village.
+
 ## ver.0.0.20 (server.js modifié)
 - Nouveau volet « Événements » dans le panneau de droite, juste au-dessus des Commandes : bannière du Raid du Dragon (jeudi 8 octobre 2026, compétition de guildes) avec le nombre de jours restants. Un clic sur la bannière ouvre la fenêtre de guilde.
 - Guildes limitées à 3 membres. Les guildes qui en ont déjà plus gardent leurs membres mais ne peuvent plus recruter.
