@@ -18,6 +18,7 @@ const MAX_OCTETS_ETAT = 8192;
 
 const INDEX = fs.readFileSync(path.join(__dirname, 'public', 'index.html'));
 let MENTIONS = Buffer.from('<meta charset="utf-8"><p>Conditions indisponibles.</p>'); try { MENTIONS = fs.readFileSync(path.join(__dirname, 'public', 'mentions.html')); } catch (e) { console.error('[mentions] fichier public/mentions.html absent'); }
+let WIKI = Buffer.from('<meta charset="utf-8"><p>Wiki indisponible.</p>'); try { WIKI = fs.readFileSync(path.join(__dirname, 'public', 'wiki.html')); } catch (e) { console.error('[wiki] fichier public/wiki.html absent'); }
 // graine du Royaume : une nouvelle carte à chaque lancement du serveur, la même pour tous les joueurs
 const REALM_SEED = 1 + Math.floor(Math.random() * 999999999);
 
@@ -68,6 +69,10 @@ const server = http.createServer((req, res) => {
     // conditions d'utilisation, confidentialité et mentions légales (aussi affichées dans le jeu)
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(MENTIONS);
+  } else if (url === '/wiki' || url === '/wiki/' || url === '/wiki.html') {
+    // wiki du jeu : page générée par outils/generer-wiki.js
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(WIKI);
   } else if (url === '/__annonce' && req.method === 'POST') {
     // appelé par deploy/annoncer.js juste avant un redémarrage : compte à rebours chez tous les joueurs
     const q = new URL(req.url, 'http://local').searchParams;
@@ -392,10 +397,11 @@ wss.on('connection', (ws, req) => {
   let salle = salles.get(nom);
   if (!salle) { salle = new Map(); salles.set(nom, salle); }
   const estGardien = params.get('gardien') === CLE_GARDIEN && (ip === '127.0.0.1' || ip === '::1');
-  if (!estGardien && [...salle.values()].filter(j => !j.gardien).length >= MAX_JOUEURS_PAR_SALLE) { ws.close(4001, 'Salle pleine'); return; }
+  const estBot = !estGardien && params.get('bot') === CLE_GARDIEN && (ip === '127.0.0.1' || ip === '::1'); // faux joueurs lancés par le Gardien
+  if (!estGardien && !estBot && [...salle.values()].filter(j => !j.gardien && !j.bot).length >= MAX_JOUEURS_PAR_SALLE) { ws.close(4001, 'Salle pleine'); return; }
 
   const peer = crypto.randomBytes(6).toString('hex');
-  const moi = { ws, peer, ip, etat: {}, vivant: true, msgs: 0, gardien: estGardien };
+  const moi = { ws, peer, ip, etat: {}, vivant: true, msgs: 0, gardien: estGardien, bot: estBot };
   moi.salleNom = nom;
   if (estGardien) console.log(`[gardien] connecté à la salle ${nom}`);
   else if (SERVEURS_IDS.has(nom) && nom !== 'principal' && gardienProc) { salleVue.set(nom, Date.now()); try { gardienProc.send({ t: 'salle', salle: nom }); } catch {} }
@@ -735,7 +741,7 @@ function demanderDonjon(salle, sc) {
 const salleVue = new Map(); // salle -> dernier moment où un joueur y était
 setInterval(() => {
   const occ = new Set();
-  for (const [nomS, salle] of salles) for (const j of salle.values()) if (!j.gardien) { salleVue.set(nomS, Date.now()); if (j.etat && typeof j.etat.s === 'string') occ.add(nomS + '|' + j.etat.s); }
+  for (const [nomS, salle] of salles) for (const j of salle.values()) if (!j.gardien && !j.bot) { salleVue.set(nomS, Date.now()); if (j.etat && typeof j.etat.s === 'string') occ.add(nomS + '|' + j.etat.s); }
   for (const [k, d] of donjonsGardes) {
     if (occ.has(k)) { d.vu = Date.now(); continue; }
     if (Date.now() - d.vu > 45000) { donjonsGardes.delete(k); try { gardienProc && gardienProc.send({ t: 'fin', salle: d.salle, s: d.sc }); } catch {} }

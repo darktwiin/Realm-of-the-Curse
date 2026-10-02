@@ -371,12 +371,34 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
 .sidetog{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:6;width:22px;height:64px;background:rgba(25,22,36,.92);border:2px solid var(--line2);border-right:0;color:var(--gold);cursor:pointer;font-size:12px;padding:0}
 .sidetog:hover{border-color:var(--gold)}
 .bar.xp.glory i{background:linear-gradient(#ffe27a,#d99a1a)!important}.bar.xp.glory em{color:#ffd23f}
+#titleScr{position:fixed;inset:0;z-index:100;background:#07030f;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:space-between;transition:opacity .6s}
+#titleScr[hidden]{display:none}#titleScr.out{opacity:0;pointer-events:none}
+#tsCv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.tsTop,.tsMenu,.tsFoot{position:relative;z-index:1;text-align:center}
+.tsTop{margin-top:clamp(18px,7vh,80px)}
+.tsTop h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(54px,13vw,168px);line-height:.95;letter-spacing:.06em;color:#fbeaff;text-shadow:0 0 12px #ff7bf2,0 0 38px #a45be8,0 0 90px #6a2ad0,6px 6px 0 #1a0733;animation:tsGlow 3.2s ease-in-out infinite}
+.tsTop p{margin:10px 0 0;font-family:var(--display);font-size:clamp(13px,1.7vw,20px);letter-spacing:.3em;text-transform:uppercase;color:#d8b4ff;text-shadow:2px 2px 0 #000}
+@keyframes tsGlow{0%,100%{text-shadow:0 0 12px #ff7bf2,0 0 38px #a45be8,0 0 90px #6a2ad0,6px 6px 0 #1a0733}50%{text-shadow:0 0 18px #ffd0ff,0 0 56px #c77bff,0 0 130px #8a3aff,6px 6px 0 #1a0733}}
+.tsMenu{display:flex;flex-direction:column;gap:10px;margin-top:auto;margin-bottom:clamp(8px,2.5vh,26px);width:min(340px,80vw)}
+.tsMenu button{font-family:var(--display);font-size:clamp(20px,2.4vw,28px);letter-spacing:.14em;padding:12px 18px;color:#f4e9ff;background:rgba(20,8,40,.82);border:3px solid #a45be8;box-shadow:5px 5px 0 #000;cursor:pointer;transition:transform .08s,border-color .08s,color .08s}
+.tsMenu button:hover,.tsMenu button:focus-visible{outline:none;border-color:#ffd23f;color:#ffd23f;transform:translate(-2px,-2px)}
+.tsMenu button.main{background:linear-gradient(#5a1fb0,#2e0f66);border-color:#ffd23f;font-size:clamp(24px,3vw,34px)}
+.tsMenu button.pt{font-size:clamp(14px,1.5vw,17px);padding:8px 12px}
+.tsFoot{font-family:var(--display);font-size:12px;color:#9e86c8;padding:0 10px 12px;letter-spacing:.08em}
+body.ton #opts{position:fixed;z-index:120}
+@media (prefers-reduced-motion:reduce){.tsTop h1{animation:none}}
 .verTag{position:absolute;left:8px;bottom:4px;z-index:6;font-size:11px;color:#f4f1e8;opacity:.6;text-shadow:0 0 2px #000,0 0 2px #000;pointer-events:none;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .bossboard{top:10px;left:50%!important;transform:translateX(-50%)}
 @media (max-width:820px){.hudtl{width:128px}.hudtl #mini{width:108px;height:108px}.hudbot{width:calc(100% - 20px);bottom:6px}.hudbot .who{display:none}}
 </style>
 </head>
 <body>
+<div id="titleScr" role="dialog" aria-label="Écran titre">
+  <canvas id="tsCv"></canvas>
+  <div class="tsTop"><h1>THE CURSE</h1><p>Le temps est brisé · à toi de le réparer</p></div>
+  <div class="tsMenu"><button type="button" class="main" id="tsPlay">▶ JOUER</button><button type="button" id="tsOpt">⚙ OPTIONS</button><button type="button" class="pt" id="tsWiki">📖 Wiki du jeu</button></div>
+  <div class="tsFoot"><span id="tsVer"></span> · Mano Gaming · Entrée pour jouer</div>
+</div>
 <div class="app">
   <div class="stage">
     <canvas id="game" tabindex="0" aria-label="Zone de jeu"></canvas>
@@ -415,7 +437,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.33"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.34"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -431,7 +453,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.33</div>
+    <div class="verTag" id="verTag">ver.0.0.34</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -592,7 +614,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.33</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.34</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -634,7 +656,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.33</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.34</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -747,7 +769,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       <button type="button" data-tab="inv" class="on" id="tabInvBtn">Inventaire<kbd>I</kbd></button>
       <button type="button" data-tab="stats" id="tabStBtn">Statistiques<kbd>C</kbd></button>
     </nav>
-    <div class="lbrow"><button type="button" class="lb-btn" id="lbBtn">🏆 Classement<kbd>L</kbd></button><button type="button" class="lb-btn" id="questBtn">📜 Quêtes<kbd>J</kbd><span id="questDot" hidden>!</span></button><button type="button" class="lb-btn" id="succBtn" style="grid-column:1/3">🏅 Succès</button></div>
+    <div class="lbrow"><button type="button" class="lb-btn" id="lbBtn">🏆 Classement<kbd>L</kbd></button><button type="button" class="lb-btn" id="questBtn">📜 Quêtes<kbd>J</kbd><span id="questDot" hidden>!</span></button><button type="button" class="lb-btn" id="succBtn">🏅 Succès</button><button type="button" class="lb-btn" id="wikiBtn">📖 Wiki</button></div>
     <button type="button" class="lb-btn devk" id="devKill2" hidden>💀 Tuer les monstres à l'écran (admin)</button>
     <section id="tabInv">
       <h3>Équipement</h3>
@@ -2115,7 +2137,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000033;let newerWarned=false;
+const NETV=2,BUILD=2600000034;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -2355,6 +2377,7 @@ try{Object.assign(opts,JSON.parse(localStorage.getItem(OPT_KEY))||{});}catch(e){
 function saveOpts(){try{localStorage.setItem(OPT_KEY,JSON.stringify(opts));}catch(e){}}
 
 /* ================= audio (musique et bruitages générés en direct) ================= */
+let titleOn=false;
 const AU={ctx:null,master:null,mus:null,fx:null,noise:null,song:null,step:0,next:0,last:{}};
 const NOTE={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function nf(n){const m=/^([A-G])([#b]?)(\d)$/.exec(n);if(!m)return 0;const s=NOTE[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);return 440*Math.pow(2,(12*(+m[3]+1)+s-69)/12);}
@@ -2404,6 +2427,10 @@ const SONGS={
   // Fête surprise (admin) : fanfare rigolote en do majeur
   fun:mkSong(168,'fun',[['C4','E4','G4'],['F4','A4','C5'],['G4','B4','D5'],['C4','E4','G4']],
     [[0,'C6',2],[2,'E6',2],[4,'G6',2],[6,'E6',2],[8,'C6',2],[10,'D6',1],[11,'E6',1],[12,'C6',4],[16,'F6',2],[18,'A6',2],[20,'F6',2],[22,'C6',2],[24,'A5',4],[28,'C6',4],[32,'B5',2],[34,'D6',2],[36,'G6',2],[38,'D6',2],[40,'B5',2],[42,'C6',1],[43,'D6',1],[44,'G5',4],[48,'C6',2],[50,'G5',2],[52,'E5',2],[54,'G5',2],[56,'C6',8]]),
+  // Écran titre : lent, mystérieux, si mineur, avec le tic-tac de l'horloge
+  titre:Object.assign(mkSong(76,'sombre',[['B3','D4','F#4'],['G3','B3','D4'],['E3','G3','B3'],['F#3','A#3','C#4'],['B3','D4','F#4'],['D4','F#4','A4'],['G3','B3','E4'],['F#3','A#3','C#4']],
+    [[0,'F#5',6],[6,'B5',2],[8,'D6',8],[16,'D6',4],[20,'B5',4],[24,'G5',8],[32,'E5',6],[38,'G5',2],[40,'B5',8],[48,'A#5',6],[54,'C#6',2],[56,'F#5',8],
+     [64,'F#6',6],[70,'E6',2],[72,'D6',8],[80,'A5',4],[84,'D6',4],[88,'F#6',8],[96,'E6',6],[102,'D6',2],[104,'B5',8],[112,'C#6',4],[116,'A#5',4],[120,'F#5',8]]),{tick:1}),
   crypte:mkSong(100,'sombre',[['A3','C4','E4'],['F3','A3','C4'],['D3','F3','A3'],['E3','G#3','B3']],
     [[0,'E5',8],[8,'C5',8],[16,'F5',8],[24,'A5',8],[32,'D5',8],[40,'F5',8],[48,'G#5',8],[56,'B5',8]])
 };
@@ -2473,7 +2500,7 @@ function playStep(song,step,t,sp){
     if(ld)tone(t,nf(ld[0]),ld[1]*sp,'triangle',0.07,m,{vib:1,a:0.08,r:0.3});
   }
 }
-function schedule(){const c=AU.ctx;if(!c)return;const song=SONGS[AU.song];if(!song){AU.next=c.currentTime+0.05;return;}const sp=60/song.bpm/4;if(AU.next<c.currentTime-0.2)AU.next=c.currentTime+0.05;while(AU.next<c.currentTime+0.15){playStep(song,AU.step,AU.next,sp);AU.step=(AU.step+1)%song.len;AU.next+=sp;}}
+function schedule(){const c=AU.ctx;if(!c)return;const song=SONGS[AU.song];if(!song){AU.next=c.currentTime+0.05;return;}const sp=60/song.bpm/4;if(AU.next<c.currentTime-0.2)AU.next=c.currentTime+0.05;while(AU.next<c.currentTime+0.15){playStep(song,AU.step,AU.next,sp);if(song.tick&&AU.step%4===0)noise(AU.next,0.03,0.07,AU.mus,AU.step%8?2400:3600,'bandpass');AU.step=(AU.step+1)%song.len;AU.next+=sp;}}
 // la musique de boss reste pendant le combat, même si on s'éloigne un moment
 let bossSong=null;
 function wantSong(){const w=wantSong0();if(w==='boss'||w==='final'){bossSong={w,t:Date.now(),s:sceneKey()};return w;}
@@ -2487,7 +2514,7 @@ function wantSong0(){if(PARTY)return 'fun';
   if(scene==='dungeon'&&monsters.some(m=>m.d.boss&&m.hp>0&&m.d.star!=null&&Math.hypot(m.x-P.x,m.y-P.y)<13))return 'boss';
   return scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby';}
 setInterval(()=>{if(save.current&&!INTRO)setSong(wantSong());},500);
-function setSong(n){if(AU.song===n)return;AU.song=n;AU.step=0;if(AU.ctx){const t=AU.ctx.currentTime;AU.next=t+0.15;AU.mus.gain.cancelScheduledValues(t);AU.mus.gain.setValueAtTime(0,t);AU.mus.gain.linearRampToValueAtTime(opts.mus*0.55,t+1.2);}}
+function setSong(n){if(titleOn&&n!=='titre')return;if(AU.song===n)return;AU.song=n;AU.step=0;if(AU.ctx){const t=AU.ctx.currentTime;AU.next=t+0.15;AU.mus.gain.cancelScheduledValues(t);AU.mus.gain.setValueAtTime(0,t);AU.mus.gain.linearRampToValueAtTime(opts.mus*0.55,t+1.2);}}
 function sfx(n,v){
   if(!AU.ctx||opts.mute||opts.sfx<=0)return;const t=AU.ctx.currentTime,o=AU.fx;v=v==null?1:v;
   const now=performance.now(),lim={hit:55,hurt:90,item:50,kill:60};if(lim[n]&&now-(AU.last[n]||0)<lim[n])return;AU.last[n]=now;
@@ -6383,6 +6410,69 @@ initRoom();
 
 function installDebug(){if(window.__rm)return;window.__rm={P,save,tp:(x,y)=>{P.x=x;P.y=y;},realm:()=>{enterRealm();},dungeon:(id,t)=>enterDungeon(id||12345,t),astral:()=>({stars,minis:MAP.minis,start:MAP.start,hub:MAP.hub}),toMini:i=>{const g=MAP.minis[i];P.x=g.x;P.y=g.y+3;},toHub:()=>{P.x=MAP.hub.x+.5;P.y=MAP.hub.y+4;},toGate:()=>{const g=MAP.doors[1];P.x=g.x+.5;P.y=g.y+3;},setStars:v=>{if(amHost)setStars(v);},state:()=>({scene,host:amHost,mons:monsters.length,near:monsters.filter(m=>Math.hypot(m.x-P.x,m.y-P.y)<12).map(m=>m.key),eb:eb.length,gold:save.gold,inv:C()&&C().inv.length,portals:dportals.length,zone:curZone}),gold:n=>{save.gold+=n;},kill:()=>{for(const m of monsters)if(Math.hypot(m.x-P.x,m.y-P.y)<14){if(amHost)hostKill(m);}},portal:()=>{dportals.push({id:++monId,x:P.x+2,y:P.y,life:60});},give:k=>{const f=freeInv();if(f>=0)C().inv[f]=mkItem(k,0);invDirty=true;},arena:()=>({fight,altar:MAP.altar,doors:MAP.doors&&MAP.doors.length,inside:inArena(P.x,P.y),arena:MAP.arena}),toAltar:()=>{P.x=MAP.altar.x;P.y=MAP.altar.y+2;},toDoor:()=>{const d=MAP.doors[0],a=MAP.altar;const vx=(d.x+.5)-a.x,vy=(d.y+.5)-a.y,l=Math.hypot(vx,vy);P.x=d.x+.5+vx/l*1.5;P.y=d.y+.5+vy/l*1.5;return{x:d.x,y:d.y};},lowBoss:()=>{for(const m of monsters)if(m.d.boss)m.hp=Math.min(m.hp,300);},die:()=>die('Test'),god:()=>{P.god=true;}};}
 requestAnimationFrame(frame);
+/* ================= écran titre : l'Horloge Brisée, violette, tourne à l'envers ================= */
+(function titleInit(){const el=document.getElementById('titleScr');if(!el)return;if(window.GARDIEN_MODE||window.BOT_MODE){el.hidden=true;return;}
+  titleOn=true;document.body.classList.add('ton');document.getElementById('tsVer').textContent=(document.querySelector('.verTag')||{textContent:''}).textContent;AU.song=null;setSong('titre');
+  const tc=document.getElementById('tsCv'),g=tc.getContext('2d');let W=1,H=1;
+  const size=()=>{const k=innerWidth<760?2:3;W=Math.max(160,Math.ceil(innerWidth/k));H=Math.max(120,Math.ceil(innerHeight/k));tc.width=W;tc.height=H;g.imageSmoothingEnabled=false;};size();addEventListener('resize',size);
+  const stars=Array.from({length:190},(_,i)=>({r:0.06+h2(i,3)*1.15,a:h2(i,5)*TAU,s:0.015+h2(i,7)*0.05,c:h2(i,9),z:h2(i,11)}));
+  const motes=Array.from({length:110},(_,i)=>({a:h2(i,21)*TAU,r:h2(i,23),sp:0.25+h2(i,25)*0.5,c:Math.floor(h2(i,27)*4)}));
+  const sable=Array.from({length:70},(_,i)=>({x:h2(i,31),y:h2(i,33),s:0.03+h2(i,35)*0.06,w:h2(i,37)}));
+  const fis=[];{let a=-0.5,r=0;for(let i=0;i<9;i++){fis.push([a,r]);a+=(h2(i,41)-.5)*0.5;r+=0.13;}}
+  const MC=['#a45be8','#ff7bf2','#3ff0ff','#ffd23f'],RN_=['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+  const R2=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};
+  const gear=(cx,cy,R,n,rot,c1,c2)=>{g.fillStyle=c1;g.beginPath();for(let i=0;i<n;i++){const a0=rot+i*TAU/n,st=TAU/n;for(const [da,k] of [[0,0.86],[0.14,1],[0.42,1],[0.56,0.86]])g.lineTo(cx+Math.cos(a0+da*st)*R*k,cy+Math.sin(a0+da*st)*R*k);}g.closePath();g.fill();
+    g.fillStyle=c2;g.beginPath();g.arc(cx,cy,R*0.6,0,TAU);g.fill();g.strokeStyle=c1;g.lineWidth=Math.max(1,R*0.1);for(let i=0;i<4;i++){const a=rot+i*TAU/8;g.beginPath();g.moveTo(cx-Math.cos(a)*R*0.6,cy-Math.sin(a)*R*0.6);g.lineTo(cx+Math.cos(a)*R*0.6,cy+Math.sin(a)*R*0.6);g.stroke();}g.fillStyle=c1;g.beginPath();g.arc(cx,cy,R*0.16,0,TAU);g.fill();};
+  const hand=(cx,cy,a,l,w,c)=>{g.strokeStyle='#07030f';g.lineWidth=w+2;g.lineCap='butt';g.beginPath();g.moveTo(cx-Math.cos(a)*l*0.14,cy-Math.sin(a)*l*0.14);g.lineTo(cx+Math.cos(a)*l,cy+Math.sin(a)*l);g.stroke();g.strokeStyle=c;g.lineWidth=w;g.stroke();};
+  let hero=null;const heroSil=()=>{if(hero)return hero;try{const src=heroSprite('guerrier',null,'epee',5,'idle'),c=document.createElement('canvas');c.width=src.width;c.height=src.height;const q=c.getContext('2d');q.drawImage(src,0,0);q.globalCompositeOperation='source-in';q.fillStyle='#05020b';q.fillRect(0,0,c.width,c.height);hero={c,src};}catch(e){hero={};}return hero;};
+  function tsFrame(ms){if(!titleOn)return;requestAnimationFrame(tsFrame);const t=ms/1000,cx=W/2,cy=H*0.5,R=Math.min(W*0.42,H*0.34);
+    {const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#05020d');gr.addColorStop(0.5,'#1a0934');gr.addColorStop(1,'#431466');g.fillStyle=gr;g.fillRect(0,0,W,H);}
+    {const gr=g.createRadialGradient(cx,cy,R*0.2,cx,cy,R*2.3);gr.addColorStop(0,'rgba(190,90,255,'+(0.42+0.08*Math.sin(t*1.3))+')');gr.addColorStop(0.45,'rgba(110,40,200,.2)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);}
+    // étoiles entraînées dans le tourbillon du temps
+    for(const s of stars){const a=s.a-t*s.s*(1.6-s.r),rad=s.r*Math.max(W,H)*0.72,x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad*0.82;if(x<0||y<0||x>=W||y>=H)continue;const tw=0.35+0.65*Math.abs(Math.sin(t*(0.7+s.z)+s.c*40));g.globalAlpha=tw;R2(x,y,s.z>0.8?2:1,s.z>0.8?2:1,s.c<0.2?'#ffd23f':s.c<0.5?'#d8b4ff':'#ffffff');
+      if(s.z>0.6){g.globalAlpha=tw*0.3;R2(cx+Math.cos(a+0.03)*rad,cy+Math.sin(a+0.03)*rad*0.82,1,1,'#c77bff');}}
+    g.globalAlpha=1;
+    // engrenages derrière le cadran
+    gear(cx-R*1.12,cy+R*0.5,R*0.5,14,-t*0.22,'#2c1650','#150a29');gear(cx+R*1.08,cy-R*0.42,R*0.4,12,t*0.3+0.2,'#341a5e','#150a29');gear(cx+R*1.0,cy+R*0.82,R*0.26,9,-t*0.55,'#2c1650','#150a29');gear(cx-R*0.98,cy-R*0.78,R*0.22,8,t*0.6,'#341a5e','#150a29');
+    // cadran
+    g.fillStyle='#0d0619';g.beginPath();g.arc(cx,cy,R*1.06,0,TAU);g.fill();
+    g.strokeStyle='#ffd23f';g.lineWidth=Math.max(2,R*0.035);g.beginPath();g.arc(cx,cy,R*1.03,0,TAU);g.stroke();g.strokeStyle='#7a3ad0';g.lineWidth=Math.max(1,R*0.02);g.beginPath();g.arc(cx,cy,R*0.95,0,TAU);g.stroke();
+    {const gr=g.createRadialGradient(cx,cy,0,cx,cy,R*0.95);gr.addColorStop(0,'#3a1470');gr.addColorStop(0.7,'#1c0a3a');gr.addColorStop(1,'#120626');g.fillStyle=gr;g.beginPath();g.arc(cx,cy,R*0.93,0,TAU);g.fill();}
+    for(let i=0;i<60;i++){const a=i*TAU/60,l=i%5?0.04:0.09;g.strokeStyle=i%5?'#6a3ab0':'#ffd23f';g.lineWidth=i%5?1:Math.max(1,R*0.018);g.beginPath();g.moveTo(cx+Math.cos(a)*R*(0.92-l),cy+Math.sin(a)*R*(0.92-l));g.lineTo(cx+Math.cos(a)*R*0.92,cy+Math.sin(a)*R*0.92);g.stroke();}
+    g.font=Math.max(7,Math.round(R*0.13))+'px "DotGothic16", monospace';g.textAlign='center';g.textBaseline='middle';
+    for(let i=0;i<12;i++){const a=-Math.PI/2+i*TAU/12,p=0.55+0.45*Math.sin(t*1.5-i*0.52);g.fillStyle='rgba(216,180,255,'+(0.45+0.5*p)+')';g.fillText(RN_[i],cx+Math.cos(a)*R*0.72,cy+Math.sin(a)*R*0.72);}
+    // anneau de runes qui tourne
+    g.strokeStyle='rgba(255,123,242,.5)';g.lineWidth=1;g.setLineDash([Math.max(2,R*0.05),Math.max(2,R*0.035)]);g.lineDashOffset=t*6;g.beginPath();g.arc(cx,cy,R*0.52,0,TAU);g.stroke();g.setLineDash([]);
+    // fissure lumineuse
+    {const p=0.6+0.4*Math.sin(t*2.3);for(const [w,c] of [[Math.max(3,R*0.06),'rgba(255,123,242,'+0.25*p+')'],[Math.max(1.5,R*0.022),'rgba(255,220,255,'+(0.6+0.4*p)+')']]){g.strokeStyle=c;g.lineWidth=w;g.beginPath();fis.forEach(([a,r],i)=>{const x=cx+Math.cos(a)*r*R,y=cy+Math.sin(a)*r*R;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();g.beginPath();g.moveTo(cx+Math.cos(fis[4][0])*fis[4][1]*R,cy+Math.sin(fis[4][0])*fis[4][1]*R);g.lineTo(cx+Math.cos(fis[4][0]+0.9)*R*0.8,cy+Math.sin(fis[4][0]+0.9)*R*0.8);g.stroke();}}
+    // aiguilles : le temps recule
+    {const sec=Math.floor(t),fr=t-sec,ease=fr<0.12?fr/0.12:1,sa=-Math.PI/2-(sec-1+ease)*TAU/60;hand(cx,cy,-Math.PI/2-t*0.035,R*0.5,Math.max(2,R*0.06),'#ffd23f');hand(cx,cy,-Math.PI/2-t*0.42,R*0.78,Math.max(2,R*0.04),'#f4e9ff');hand(cx,cy,sa,R*0.86,1,'#ff7bf2');
+      g.fillStyle='#ffd23f';g.beginPath();g.arc(cx,cy,Math.max(2,R*0.07),0,TAU);g.fill();g.fillStyle='#3a1470';g.beginPath();g.arc(cx,cy,Math.max(1,R*0.03),0,TAU);g.fill();
+      if(fr<0.1){g.globalAlpha=(0.1-fr)*1.2;g.fillStyle='#d8b4ff';g.fillRect(0,0,W,H);g.globalAlpha=1;}}
+    // poussière du temps aspirée en spirale vers le cadran
+    for(const m of motes){const ph=(t*m.sp*0.1+m.r)%1,rr=(1-ph)*R*2.1+R*0.1,a=m.a+t*m.sp*0.6+ph*5;g.globalAlpha=Math.min(1,ph*3)*(1-ph*0.3);R2(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr*0.85,ph>0.7?2:1,ph>0.7?2:1,MC[m.c]);}
+    g.globalAlpha=1;
+    // sol en ruines, colonnes brisées, héros face à l'horloge
+    {const base=H*0.86;g.fillStyle='#05020b';g.beginPath();g.moveTo(0,H);for(let x=0;x<=W;x+=4){const n=vn(x/38,3.7)*H*0.07+vn(x/11,9.1)*H*0.02;g.lineTo(x,base-n+Math.abs(x-cx)/W*H*0.05);}g.lineTo(W,H);g.closePath();g.fill();
+      for(const [fx,hh,ww] of [[0.07,0.34,0.035],[0.17,0.2,0.03],[0.83,0.28,0.035],[0.93,0.4,0.04],[0.29,0.1,0.025]]){const x=W*fx,w=Math.max(4,W*ww),h=H*hh;R2(x,base-h,w,h+H*0.1,'#05020b');R2(x-w*0.2,base-h,w*1.4,Math.max(2,h*0.06),'#05020b');g.fillStyle='#05020b';g.beginPath();g.moveTo(x,base-h);g.lineTo(x+w*0.4,base-h-h*0.09);g.lineTo(x+w*0.7,base-h-h*0.02);g.lineTo(x+w,base-h-h*0.12);g.lineTo(x+w,base-h);g.closePath();g.fill();R2(x,base-h,1,h,'rgba(164,91,232,.35)');}
+      const hs=heroSil();if(hs.c){const s=H*0.12/hs.c.height,w=hs.c.width*s,h=hs.c.height*s,px_=W>H*1.2?cx-R*1.45:cx-R*0.75,hx_=px_-w/2,hy=base-h*0.8-vn(px_/38,3.7)*H*0.07-vn(px_/11,9.1)*H*0.02+Math.abs(px_-cx)/W*H*0.05;g.globalAlpha=0.55;g.drawImage(hs.src,hx_-1,hy-1,w,h);g.globalAlpha=1;g.drawImage(hs.c,hx_,hy,w,h);}}
+    // sable qui remonte
+    for(const p of sable){const y=H-((t*p.s+p.y)%1)*H*0.75,x=(p.x+Math.sin(t*0.6+p.w*9)*0.02)*W;g.globalAlpha=0.25+0.5*p.w;R2(x,y,1,p.w>0.7?2:1,p.w>0.5?'#ffd23f':'#ff9ad8');}
+    g.globalAlpha=1;
+    {const gr=g.createRadialGradient(cx,H*0.5,Math.min(W,H)*0.35,cx,H*0.5,Math.max(W,H)*0.75);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=gr;g.fillRect(0,0,W,H);}
+    {const gr=g.createLinearGradient(0,0,0,H*0.3);gr.addColorStop(0,'rgba(5,2,13,.75)');gr.addColorStop(1,'rgba(5,2,13,0)');g.fillStyle=gr;g.fillRect(0,0,W,H*0.3);}
+  }
+  requestAnimationFrame(tsFrame);
+  const son=()=>{try{audioInit();}catch(e){}};
+  const jouer=()=>{if(!titleOn)return;son();titleOn=false;document.body.classList.remove('ton');el.classList.add('out');setTimeout(()=>{el.hidden=true;},650);AU.song=null;try{setSong(save.current?wantSong():'lobby');sfx('portal');}catch(e){}try{cv.focus();}catch(e){}};
+  el.addEventListener('pointerdown',son);
+  document.getElementById('tsPlay').addEventListener('click',jouer);
+  document.getElementById('tsOpt').addEventListener('click',()=>{son();try{openOpts();}catch(e){}});
+  document.getElementById('tsWiki').addEventListener('click',()=>{son();window.open('/wiki','_blank','noopener');});
+  window.addEventListener('keydown',e=>{if(!titleOn)return;if(!optEl.hidden){if(e.key==='Escape'){e.stopImmediatePropagation();optEl.hidden=true;}return;}e.stopImmediatePropagation();son();if(e.key==='Enter'||e.key===' '){e.preventDefault();jouer();}},true);
+  setTimeout(()=>{try{document.getElementById('tsPlay').focus();}catch(e){}},50);
+})();
+document.getElementById('wikiBtn').addEventListener('click',()=>window.open('/wiki','_blank','noopener'));
 })();
 </script>
 </body>

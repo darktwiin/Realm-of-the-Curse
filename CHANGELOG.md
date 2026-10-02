@@ -1,5 +1,10 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.34 (server.js et gardien.js modifiés ; nouveau fichier public/wiki.html)
+- **Écran titre** au lancement : l'Horloge Brisée, violette, tourne à l'envers au milieu d'un tourbillon d'étoiles, d'engrenages et de ruines. Menu « Jouer », « Options », « Wiki du jeu » ; touche Entrée pour jouer. L'écran a sa propre musique (lente, en mineur, avec le tic-tac de l'horloge), qui démarre au premier clic.
+- **Wiki** : nouvelle page `/wiki` (bouton sur l'écran titre et dans le panneau de droite). Objets avec leurs caractéristiques au survol, monstres et boss avec vie, dégâts, expérience et butin, zones, donjons et comment y entrer, taux de butin, héros, poissons. La page est fabriquée à partir du jeu lui-même par `outils/generer-wiki.js` : les chiffres sont ceux du serveur.
+- **Bots** : 4 faux joueurs (nom, héros, niveau et équipement tirés au hasard) se promènent au Village, partent se battre dans les Plaines Sauvages dans une zone de leur niveau, reviennent, et saluent les vrais joueurs qu'ils croisent (« salut », « coucou », « bonjour »…). Ils n'ont pas de compte : ni butin, ni expérience, ni classement. Réglage : variable `BOTS` du serveur (0 pour les couper, 12 au maximum, 4 par défaut).
+
 ## ver.0.0.33 (butin.js et arbitre.js modifiés, server.js inchangé depuis la 0.0.32)
 - Plaines Sauvages, rivage : les cases au bord de l'eau sont animées, la vague monte et redescend sur le sable avec sa frange d'écume, et des crêtes blanches avancent vers la terre (mer et lacs).
 - Transitions entre zones : les couleurs de deux zones voisines se mélangent sur le bord au lieu d'une coupure nette.
