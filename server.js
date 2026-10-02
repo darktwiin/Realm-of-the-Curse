@@ -1,4 +1,4 @@
-// Royaume Maudit — serveur multijoueur
+// The Curse (ex Royaume Maudit) — serveur multijoueur
 // Sert la page du jeu et relaie l'état de chaque joueur (position, classe, monstres de l'hôte…)
 // à tous les autres joueurs de la même salle, en temps réel, via WebSocket.
 
@@ -420,6 +420,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
     if (m && m.t === 'peche') { pecher(moi, nom, m); return; }
+    if (m && (m.t === 'dessin' || m.t === 'px')) { dessiner(moi, m); return; }
     if (m && m.t === 'cgu') { const v = String(m.v || ''); if (moi.compte && /^\d{4}-\d{2}-\d{2}$/.test(v)) { try { sql.cguIns.run(moi.compte.id, v, Date.now()); console.log(`[cgu] ${moi.compte.nom} accepte la version ${v}`); } catch (e) { console.error('[cgu]', e.message); } } return; }
     // nouveau compte : son premier héros vient d'être choisi, on souhaite la bienvenue à tout le monde (une seule fois)
     if (m && m.t === 'bienvenue') { if (moi.compte && moi.nouveau) { moi.nouveau = false; const n = filtrer(String(m.n || moi.compte.nom)).replace(/[<>]/g, '').slice(0, 16) || moi.compte.nom; console.log(`[compte] bienvenue à ${n}`); envoyer(ws, { t: 'bienvenue', n, moi: 1 }); diffuserPartout({ t: 'bienvenue', n }, moi); } return; }
@@ -579,7 +580,7 @@ function annoncerMaj(sec) {
   for (const j of tousLesSockets()) if (!j.gardien) envoyer(j.ws, { t: 'maj', s: sec });
 }
 server.listen(PORT, () => {
-  console.log(`Royaume Maudit en ligne sur http://localhost:${PORT}`);
+  console.log(`The Curse en ligne sur http://localhost:${PORT}`);
   lancerGardien();
 });
 
@@ -680,6 +681,32 @@ function concoursTue(moi, key, sc) {
   console.log(`[concours] ${moi.compte.nom} (${n}) gagne en ${Math.round(CONCOURS.gagnant.d / 1000)} s`);
   envoyer(moi.ws, etatConcours({ gain: CONCOURS.prix }));
   diffuserPartout(etatConcours({ live: 1 }), moi);
+}
+// ---------- table à dessin du Village : une toile commune de 100 × 100, un pixel par minute et par compte ----------
+const DESSIN_N = 100, DESSIN_COULEURS = 24, DESSIN_DELAI = 60000;
+const FICHIER_DESSIN = path.join(DATA_DIR, 'dessin.json');
+let DESSIN = Buffer.alloc(DESSIN_N * DESSIN_N, 0);
+try { const d = JSON.parse(fs.readFileSync(FICHIER_DESSIN, 'utf8')); const b = Buffer.from(String(d.d || ''), 'base64'); if (b.length === DESSIN_N * DESSIN_N) DESSIN = b; } catch {}
+const dessinPose = new Map();   // nom du compte -> heure du dernier pixel
+let dessinSale = null;
+const sauverDessin = () => { clearTimeout(dessinSale); dessinSale = setTimeout(() => { try { fs.writeFileSync(FICHIER_DESSIN, JSON.stringify({ d: DESSIN.toString('base64') })); } catch (e) { console.error('[dessin]', e.message); } }, 5000); };
+const dessinAttente = moi => !moi.compte || moi.compte.admin ? 0 : Math.max(0, DESSIN_DELAI - (Date.now() - (dessinPose.get(moi.compte.nom) || 0)));
+function dessiner(moi, m) {
+  if (!moi.compte) return;
+  if (m.t === 'dessin') { envoyer(moi.ws, { t: 'dessin', d: DESSIN.toString('base64'), att: dessinAttente(moi) }); return; }
+  if (m.raz) {                                                                      // tout effacer : admins seulement
+    if (!moi.compte.admin) return;
+    DESSIN.fill(0); sauverDessin(); console.log(`[dessin] ${moi.compte.nom} efface la toile`);
+    diffuserPartout({ t: 'dessin', d: DESSIN.toString('base64') }); return;
+  }
+  const x = m.x | 0, y = m.y | 0, c = m.c | 0;
+  if (!(x >= 0 && x < DESSIN_N && y >= 0 && y < DESSIN_N && c >= 0 && c < DESSIN_COULEURS && Number.isInteger(m.x) && Number.isInteger(m.y) && Number.isInteger(m.c))) return;
+  const att = dessinAttente(moi);
+  if (att > 0) { envoyer(moi.ws, { t: 'px', non: 1, att }); return; }
+  if (!moi.compte.admin) dessinPose.set(moi.compte.nom, Date.now());
+  DESSIN[y * DESSIN_N + x] = c; sauverDessin();
+  envoyer(moi.ws, { t: 'px', x, y, c, moi: 1, att: dessinAttente(moi) });
+  diffuserPartout({ t: 'px', x, y, c }, moi);
 }
 function utiliserCle(moi, salle) {
   if (!moi.compte) return;

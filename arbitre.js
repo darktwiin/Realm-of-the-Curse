@@ -346,7 +346,7 @@ function degatsMax(s) {
   const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30;
   if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
   const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5 * Math.max(1, R.WB[w.kind].rk || 1) * 2 /* frénésie */;
-  const tirs = R.WB[w.kind].shots + (w.extra || 0);
+  const tirs = (R.WB[w.kind].shots + (w.extra || 0)) * (R.WB[w.kind].dm || 1);
   return Math.round(Math.max(3000, w.dmg[1] * (1 + 0.1 * Math.min(2, w.up | 0)) * mult * tirs * cadence * 3));
 }
 

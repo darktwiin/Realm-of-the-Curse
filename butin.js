@@ -50,7 +50,7 @@ function tirer(R, key, cls, scene, sc) {
   if (Math.random() < d.drop) { const n = d.n && d.boss ? d.n : 1; for (let i = 0; i < n; i++) { let t = ri(d.loot[0], d.loot[1]); if (Math.random() < 0.08) t = Math.min(6, t + 1); out.it.push(objetAuHasard(R, t, cls)); } }
   if (d.rel && (key === 'devoreur' || Math.random() < d.rel)) { out.rel = out.it.length; out.it.push(objetAuHasard(R, 7, cls)); }
   if (Math.random() < (d.boss ? 1 : 0.12)) out.it.push(R.mkItem(Math.random() < 0.6 ? 'pvie' : 'pmana', 0));
-  if (Math.random() < 0.001) { out.oeuf = 1; out.it.push(R.mkItem('egg', 0)); }
+  if (Math.random() < 0.005) { out.oeuf = 1; out.it.push(R.mkItem('egg', 0)); }
   // Clef du Temps : 1 % sur le boss des 6 grands donjons, 10 % sur chacun des 4 gardiens de l'Observatoire (jamais sur le Dévoreur)
   if (R.KINDS.cle && typeof sc === 'string' && sc[0] === 'd') {
     const t = sc[1], grand = DONJONS_A_CLEF.includes(t) && R.DTYPES[t] && R.DTYPES[t].bk === key;
@@ -62,7 +62,7 @@ function tirer(R, key, cls, scene, sc) {
     if (tous.length) out.it.push(R.mkItem(pick(miens.length && Math.random() < 0.5 ? miens : tous), 7)); }
   if (d.midBoss || GARANTIS.includes(key)) out.spg.push(R.mkItem('sp_' + pick(R.SK), 0));
   out.sp = potionsCarac(R, key, d, scene).map(k => R.mkItem('sp_' + k, 0));
-  if (d.or && Math.random() < d.or[0]) out.or = ri(d.or[1], d.or[2]);
+  if (d.or && Math.random() < d.or[0]) out.or = Math.max(1, Math.round(ri(d.or[1], d.or[2]) * 1.3)); // pièces +30 %
   return out;
 }
 

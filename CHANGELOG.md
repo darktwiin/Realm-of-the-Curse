@@ -1,4 +1,41 @@
-# Royaume Maudit — notes de mise à jour
+# The Curse — notes de mise à jour
+
+## ver.0.0.33 (butin.js et arbitre.js modifiés, server.js inchangé depuis la 0.0.32)
+- Plaines Sauvages, rivage : les cases au bord de l'eau sont animées, la vague monte et redescend sur le sable avec sa frange d'écume, et des crêtes blanches avancent vers la terre (mer et lacs).
+- Transitions entre zones : les couleurs de deux zones voisines se mélangent sur le bord au lieu d'une coupure nette.
+- Rochers : 3 nouvelles formes (dalle plate, aiguille, amas de pierres), présentes sur la Plage, dans le Canyon de Rouille et dans les Terres Brûlées.
+- Arbres : 3 nouveaux arbres dans les Plaines d'Émeraude (sapin, pommier, bouleau) et 3 dans la Forêt des Murmures (sapin sombre, arbre aux lucioles, cyprès violet) ; 3 nouveaux arbres morts dans le Marais Putride (souche, arbre penché, grand tronc fendu).
+- Chemins rapides : pavage de briques, dessiné deux fois plus finement.
+- Baguette de Miséricorde (Prêtre) : la vague de soin est presque deux fois plus large, porte un peu plus loin et soigne 3 % de la vie au lieu de 2 %.
+- Sort de l'Éclipse (Mage, celui qui se lance 3 fois) : dégâts −40 %.
+- Bâton de la Nova (Mage) : dégâts +30 %.
+- Œufs de familier : 1 chance sur 200 sur tous les monstres (au lieu de 1 sur 1000).
+
+## ver.0.0.32 (server.js modifié ; mentions.html modifié)
+- Le jeu s'appelle désormais **The Curse** partout : fenêtre de connexion, message de bienvenue, page des conditions d'utilisation.
+- Village, hall : l'autel des classes, le pupitre du pseudo et la statue des skins sont contre le mur de gauche, de part et d'autre de l'entrée de la forge. « Forge » et « Échoppe » sont écrits sur des panneaux de bois plantés devant les portes.
+- Passeur des mondes retiré : on change de serveur à la **fontaine** (touche E à côté du bassin).
+- Deux nouvelles portes autour des portails, dessinées deux fois plus finement : une ruine maudite (crâne cornu, runes, ronces, flammes violettes) pour les Plaines Sauvages, un porche à colombages (toit de tuiles, lanternes, lierre, jardinières) pour la Maison.
+- Forge : hotte, soufflet, tas de charbon, armes au mur, bac de trempe fumant, tonneaux, lingots, meule qui tourne, étincelles sur l'enclume. La forge apparaît sur la mini-carte.
+- Passage secret : derrière le mur de la forge (coin en bas à gauche), un couloir noir invisible mène à la salle de test.
+- Prés du sud entièrement refaits et agrandis : clôtures en bois à la place des murs, chemins de terre, arbres et rochers, étang déplacé, maison du pêcheur avec son ponton, pré des vaches et poulailler en bas à droite (animaux animés). L'Éleveur est maintenant à côté des enclos.
+- Pêcheur : assis au bout du ponton, il donne la quête « attraper tous les poissons » (lac et mer), récompensée par le titre exclusif 🎣 PÊCHEUR MAUDIT 🎣 ; la progression s'affiche au-dessus de lui et dans le tableau de pêche.
+- **Table à dessin** (à la place de la statue en bas à gauche du hall) : une toile commune de 100 × 100 pour tout le serveur. Chaque joueur pose un pixel par minute, 24 couleurs, molette pour zoomer, glisser pour se déplacer. La toile se voit en direct sur le chevalet. Les admins n'ont pas de délai et peuvent tout effacer. La toile est gardée par le serveur (`dessin.json` dans le dossier de données).
+
+## ver.0.0.31 (butin.js modifié, server.js inchangé)
+- Correction : un monstre « presque mort » ne disparaît plus pour revenir avec quelques PV, et un boss ne remonte plus à 50 %. Un gros coup dépassant le plafond de l'anti-triche du Gardien était perdu pour de bon ; il est maintenant appliqué en plusieurs fois.
+- Boss du centre des Plaines (Roi Bouffon, Béhémoth d'Obsidienne) : leur barre de vie et leur nom s'affichent de nouveau, en plus gros. La flèche de boss pointe vers le plus proche des deux.
+- Seigneur des Braises (Fournaise Infernale) : à 50 % de vie il devient invulnérable 5 s, puis des rochers tombent du plafond jusqu'à la fin du combat.
+- Reine des Glaces : la salve rapide tirée droit sur le joueur est retirée, et l'anneau de projectiles n'a plus de trou.
+- Sanctuaire des Lucioles : dégâts des monstres −20 %. Abysses Engloutis : le Léviathan attaque 30 % plus lentement.
+- Autel des Lucioles : le bonus dure 30 s et une icône d'état l'indique.
+- Pièces gagnées sur les monstres : +30 %. Créer une guilde coûte 100 pièces.
+- Duels : l'option est retirée du menu des joueurs et les pièces de sang ne sont plus affichées (le code reste en place).
+- Affichage : le nom en haut à gauche et le titre de l'onglet deviennent « The Curse » ; la ligne des états du héros a une hauteur réservée (la barre ne saute plus) ; l'inspection d'un joueur affiche « UT » pour une relique au lieu de « T7 ».
+- Village : l'autel des classes, le pupitre du pseudo et la statue des skins s'utilisent aussi depuis les côtés.
+- Portail de l'Horloge Brisée : deux aiguilles tournent sur le portail.
+- Salle d'essai (admin) : salle élargie, Château de Morvane placé après la Caverne de Glace, et paliers de difficulté affichés au mur.
+- Panneau admin, onglet Objets : la liste se construit par petits morceaux, le jeu et la musique ne se figent plus à l'ouverture.
 
 ## ver.0.0.30 (arbitre.js modifié, server.js inchangé)
 - Bonus de connexion revu : jour 3 anneau Tier 6, jour 4 100 Cursite (inversés) ; jour 6 une Relique au hasard, tirée parmi toutes les reliques classiques et les Reliques de Chronos, toutes classes confondues ; jour 7 le titre « ★ BETA TESTEUR ★ » (75 Cursite si on l'a déjà). Le set Relique complet du jour 7 disparaît.
