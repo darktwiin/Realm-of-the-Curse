@@ -3,7 +3,9 @@
 ## ver.0.0.26 (server.js inchangé)
 - Parchemin ensanglanté : 3 démons à la fois au T5 (1 au T0, 2 du T1 au T4, 3 au T5, 4 au T6).
 - Les deux boss du centre des Plaines (le Roi Bouffon et le Béhémoth d'Obsidienne) peuvent être présents en même temps : tous les 20 monstres tués, celui qui manque apparaît, sans attendre la mort de l'autre.
-- Deux nouveaux skins (500 Cursite, à la Statue des skins) : **Chevalier noir** pour le Porte-bouclier (armure noire, lueur rouge dans la visière, aura d'ombre) et **Démon d'azur** pour l'Invocateur (peau bleue, aura de givre).
+- Deux nouveaux skins (500 Cursite, à la Statue des skins) : **Chevalier noir** pour le Porte-bouclier (armure noire, lueur rouge dans la visière, et **Démon d'azur** pour l'Invocateur (peau bleue, peau bleue).
+- Particules : elles ne sont plus incluses dans les skins. Elles s'achètent à part à la Statue des skins, 300 Cursite par classe, et se portent avec n'importe quelle apparence de la classe (bouton Montrer / Cacher).
+- L'Invocateur s'appelle maintenant le **Démoniste**. Ses démons prennent la couleur de son skin (bleus avec le Démon d'azur).
 
 ## ver.0.0.25 (server.js inchangé)
 - Invocateur :
