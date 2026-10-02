@@ -17,6 +17,7 @@ const SERVEURS_IDS = new Set(SERVEURS.map(s => s[0]));
 const MAX_OCTETS_ETAT = 8192;
 
 const INDEX = fs.readFileSync(path.join(__dirname, 'public', 'index.html'));
+let MENTIONS = Buffer.from('<meta charset="utf-8"><p>Conditions indisponibles.</p>'); try { MENTIONS = fs.readFileSync(path.join(__dirname, 'public', 'mentions.html')); } catch (e) { console.error('[mentions] fichier public/mentions.html absent'); }
 // graine du Royaume : une nouvelle carte à chaque lancement du serveur, la même pour tous les joueurs
 const REALM_SEED = 1 + Math.floor(Math.random() * 999999999);
 
@@ -63,6 +64,10 @@ const server = http.createServer((req, res) => {
   if (url === '/' || url === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(INDEX);
+  } else if (url === '/mentions' || url === '/mentions.html' || url === '/cgu' || url === '/confidentialite') {
+    // conditions d'utilisation, confidentialité et mentions légales (aussi affichées dans le jeu)
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(MENTIONS);
   } else if (url === '/__annonce' && req.method === 'POST') {
     // appelé par deploy/annoncer.js juste avant un redémarrage : compte à rebours chez tous les joueurs
     const q = new URL(req.url, 'http://local').searchParams;
@@ -106,6 +111,10 @@ const sql = {
 const arbitre = require('./arbitre');
 const butin = require('./butin');
 db.exec(`CREATE TABLE IF NOT EXISTS anomalies (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER, nom TEXT, quand INTEGER, raisons TEXT)`);
+// acceptation des conditions d'utilisation : une ligne par compte et par version du texte
+db.exec(`CREATE TABLE IF NOT EXISTS consentements (compte INTEGER NOT NULL, version TEXT NOT NULL, quand INTEGER NOT NULL, PRIMARY KEY (compte, version))`);
+sql.cguIns = db.prepare('INSERT OR IGNORE INTO consentements (compte, version, quand) VALUES (?, ?, ?)');
+sql.cguDernier = db.prepare('SELECT version FROM consentements WHERE compte = ? ORDER BY quand DESC LIMIT 1');
 sql.anoIns = db.prepare('INSERT INTO anomalies (compte, nom, quand, raisons) VALUES (?, ?, ?, ?)');
 sql.anoListe = db.prepare('SELECT nom, quand, raisons FROM anomalies ORDER BY id DESC LIMIT 60');
 for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { try { arbitre.apprendre(JSON.parse(r.save)); } catch {} }
@@ -131,7 +140,8 @@ function connecter(moi, c, ws) {
   moi.cpt = etatCompte(c.id); moi.seaux = moi.cpt.seaux; moi.dons = moi.cpt.dons; moi.refus = 0; moi.tues = null;
   const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
-  envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save });
+  let cgu = null; try { const r = sql.cguDernier.get(c.id); cgu = r ? r.version : null; } catch {}
+  envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save, cgu });
   if (save) { envoyerCapGardien(moi, save); moi.cpt.boost = +save.boostXP || 0; }
   if (concoursVisible()) envoyer(ws, etatConcours());
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
@@ -410,6 +420,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
     if (m && m.t === 'peche') { pecher(moi, nom, m); return; }
+    if (m && m.t === 'cgu') { const v = String(m.v || ''); if (moi.compte && /^\d{4}-\d{2}-\d{2}$/.test(v)) { try { sql.cguIns.run(moi.compte.id, v, Date.now()); console.log(`[cgu] ${moi.compte.nom} accepte la version ${v}`); } catch (e) { console.error('[cgu]', e.message); } } return; }
     // nouveau compte : son premier héros vient d'être choisi, on souhaite la bienvenue à tout le monde (une seule fois)
     if (m && m.t === 'bienvenue') { if (moi.compte && moi.nouveau) { moi.nouveau = false; const n = filtrer(String(m.n || moi.compte.nom)).replace(/[<>]/g, '').slice(0, 16) || moi.compte.nom; console.log(`[compte] bienvenue à ${n}`); envoyer(ws, { t: 'bienvenue', n, moi: 1 }); diffuserPartout({ t: 'bienvenue', n }, moi); } return; }
     if (m && m.t === 'kill') { if (moi.compte) reclamerKill(moi, m, nom, salle, 0); return; }

@@ -177,10 +177,12 @@ function verifier(ancien, nouveau, ctx) {
     else if ((L1.n | 0) > (L0.n | 0) + 1) pb.push('série de connexion trafiquée');
     else {
       const idx = L0.day === L1.day - 1 ? (L0.n | 0) % 7 : 0;
+      // jour 1 : 4 potions · 2 : 5 potions de caractéristique · 3 : anneau T6 · 4 : 100 Cursite · 5 : 150 Cursite · 6 : 1 relique au hasard · 7 : titre bêta (75 Cursite si déjà obtenu)
       if (idx === 0) bonusObjets += 4; if (idx === 1) bonusObjets += 5;
-      if (idx === 2) bonusCursite += 100; if (idx === 4) bonusCursite += 150; if (idx === 5) bonusCursite += 75;
-      if (idx === 3) { bonusObjets += 1; bonusT6 += 1; }
-      if (idx === 6) { bonusObjets += 4; bonusReliques += 4; }
+      if (idx === 2) { bonusObjets += 1; bonusT6 += 1; }
+      if (idx === 3) bonusCursite += 100; if (idx === 4) bonusCursite += 150;
+      if (idx === 5) { bonusObjets += 1; bonusReliques += 1; }
+      if (idx === 6) bonusCursite += 75;
     }
   }
   // --- bonus des 3 quêtes du jour (+50 Cursite, une fois par jour) ---
@@ -211,7 +213,7 @@ function verifier(ancien, nouveau, ctx) {
     if (!(+nouveau.boostXP <= Date.now() + 3600000 + 10 * 60000)) pb.push('boost d\'XP trafiqué');
   }
   if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
-  if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 6 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
+  if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 7 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
 
   // --- or : achats obligatoires (coffres, sacs), pièces tirées par le serveur, ventes, quêtes ---
   const o0 = objets(ancien), o1 = objets(nouveau), c0 = compter(o0), c1 = compter(o1);

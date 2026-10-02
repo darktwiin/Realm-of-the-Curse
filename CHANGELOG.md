@@ -1,8 +1,15 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.30 (arbitre.js modifié, server.js inchangé)
+- Bonus de connexion revu : jour 3 anneau Tier 6, jour 4 100 Cursite (inversés) ; jour 6 une Relique au hasard, tirée parmi toutes les reliques classiques et les Reliques de Chronos, toutes classes confondues ; jour 7 le titre « ★ BETA TESTEUR ★ » (75 Cursite si on l'a déjà). Le set Relique complet du jour 7 disparaît.
+
+## ver.0.0.29 (server.js inchangé depuis la 0.0.28)
+- Tombes : quand un joueur meurt, une pierre tombale à son nom apparaît à l'endroit de sa mort pour les autres joueurs présents (Plaines, donjons, raid). Elle reste 2 minutes.
+
 ## ver.0.0.28 (server.js, butin.js et arbitre.js modifiés)
 - Héros à débloquer : Guerrier, Mage, Archer et Prêtre sont disponibles dès le départ. Guerrier niveau 15 débloque le Porte-bouclier, Mage niveau 15 le Mystificateur, Archer niveau 15 l'Assassin, Prêtre niveau 15 le Démoniste. L'écran de choix est réorganisé : chaque héros à débloquer est sous son « parent », avec la progression affichée. Un héros déjà créé reste jouable, et un déblocage est acquis pour toujours. Le serveur vérifie.
 - Message de bienvenue : quand un nouveau compte choisit son premier héros, tout le monde voit « Bienvenue à … » dans le chat, et le nouveau joueur reçoit une bannière.
+- Conditions d'utilisation : nouvelle page `/mentions` (conditions d'utilisation, confidentialité, mentions légales). Chaque joueur, nouveau ou déjà inscrit, doit les accepter une fois avant de jouer ; le serveur garde la date d'acceptation. Si le texte change, le jeu redemande l'accord. Nouveau fichier `public/mentions.html`.
 - 14e Relique de Chronos : la **Gemme du Démon Lié** (Démoniste). Le démon n'est plus posé au sol : il suit son maître et attaque seul ce qui approche, pour 75 % des dégâts.
 - Pièces : quand on gagne de l'or (monstre, vente au marchand, récompense de quête), les pièces jaillissent, restent un instant au sol puis filent vers le héros, qui les attrape, même s'il bouge. Animation seulement : l'or est compté comme avant.
 - Nouveau **Tier 7** (objets d'obsidienne, gris-noir) : armes, capacités, armures et anneaux. Mêmes effets que le Tier 6, avec plus de dégâts et de caractéristiques ; ce ne sont pas des reliques. Ils ne tombent que dans les deux derniers donjons (Observatoire Céleste et Horloge Brisée) : 5 % de chance par monstre tué.

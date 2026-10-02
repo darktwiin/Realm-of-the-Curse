@@ -386,6 +386,18 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="shop-foot"><span class="hint">Le nom de compte est privé : ton pseudo en jeu se choisit après.</span><button type="button" class="act main" id="authGo">Se connecter</button></div>
       </div>
     </div>
+    <div class="overlay authwin" id="cguWin" hidden style="z-index:60">
+      <div class="shop-inner" role="dialog" aria-label="Conditions d'utilisation" style="max-width:720px;width:min(720px,96%)">
+        <h2>Conditions d'utilisation</h2>
+        <p id="cguIntro">Avant de jouer, lis et accepte les conditions d'utilisation et la politique de confidentialité du jeu.</p>
+        <iframe id="cguFrame" title="Conditions d'utilisation et confidentialité" style="width:100%;height:min(46vh,380px);border:2px solid var(--line);background:#14111e"></iframe>
+        <p style="margin:8px 0 2px"><a href="/mentions" target="_blank" rel="noopener" style="color:#7df0e0">Ouvrir le texte dans un nouvel onglet</a></p>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin:8px 0;cursor:pointer"><input type="checkbox" id="cguLu" style="margin-top:4px"> <span>J'ai lu et j'accepte les conditions d'utilisation et la politique de confidentialité.</span></label>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin:8px 0;cursor:pointer"><input type="checkbox" id="cguAge" style="margin-top:4px"> <span>J'ai 15 ans ou plus, ou j'ai l'accord de l'un de mes parents pour jouer.</span></label>
+        <p class="hint" id="cguMsg"></p>
+        <div class="shop-foot"><button type="button" class="act" id="cguNon">Refuser et me déconnecter</button><button type="button" class="act main" id="cguOui" disabled>Accepter et jouer</button></div>
+      </div>
+    </div>
     <button type="button" class="gshop" id="gshopBtn" hidden><i class="cgem" style="width:14px;height:14px;margin-right:10px;vertical-align:middle"></i>CURSITE</button>
     <div class="overlay" id="gshopWin" hidden>
       <div class="shop-inner" role="dialog" aria-label="Cursite">
@@ -397,7 +409,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.28"><h1>Royaume Maudit</h1></div>
+      <div class="brand" title="ver.0.0.30"><h1>Royaume Maudit</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -413,7 +425,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.28</div>
+    <div class="verTag" id="verTag">ver.0.0.30</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -573,7 +585,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.28</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.30</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -615,7 +627,7 @@ input[type=color]{width:100%;height:34px;border:2px solid var(--line2);backgroun
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.28</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.30</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1775,6 +1787,16 @@ function onNetHello(){if(!ONLINE)return;const tk=lsGet(TOKEN_KEY);if(tk){AUTH.ok
 function onSaveFix(m){if(!m.save||!m.save.chars)return;AUTH.ok=false;lsSet(SAVE_KEY,JSON.stringify(m.save));sessionStorage.setItem('rm-reload','1');sessionStorage.setItem('rm-fix',(m.raisons||[]).join(' · ').slice(0,200));location.reload();}
 setTimeout(()=>{const f=sessionStorage.getItem('rm-fix');if(f){sessionStorage.removeItem('rm-fix');showBanner('Sauvegarde resynchronisée','Le serveur a refusé une modification incohérente ('+f+')','#ff9a3c');}},2500);
 function authKicked(){AUTH.ok=false;lsSet(TOKEN_KEY,null);showAuth('Ton compte vient de se connecter sur un autre appareil.',true);}
+// Conditions d'utilisation : à accepter une fois par version du texte (les joueurs déjà inscrits aussi). Le serveur garde la date d'acceptation.
+const CGU_V='2026-10-02';let cguOuvert=false;
+function showCgu(maj){const el=document.getElementById('cguWin');if(!el||cguOuvert)return;cguOuvert=true;el.hidden=false;paused=true;try{keys.clear();mouse.down=false;}catch(e){}
+  const fr=document.getElementById('cguFrame');if(!fr.getAttribute('src'))fr.setAttribute('src','/mentions');document.getElementById('cguLu').checked=false;document.getElementById('cguAge').checked=false;document.getElementById('cguOui').disabled=true;
+  document.getElementById('cguIntro').textContent=maj?'Les conditions d\'utilisation ont été mises à jour. Pour continuer à jouer, lis-les et accepte-les de nouveau.':'Avant de jouer, lis et accepte les conditions d\'utilisation et la politique de confidentialité du jeu.';}
+function hideCgu(){const el=document.getElementById('cguWin');if(!el)return;el.hidden=true;if(cguOuvert){cguOuvert=false;paused=[...document.querySelectorAll('.overlay')].some(o=>!o.hidden);}}
+{const maj=()=>{document.getElementById('cguOui').disabled=!(document.getElementById('cguLu').checked&&document.getElementById('cguAge').checked);};
+  document.getElementById('cguLu').addEventListener('change',maj);document.getElementById('cguAge').addEventListener('change',maj);
+  document.getElementById('cguOui').addEventListener('click',()=>{if(!room||!room.raw){document.getElementById('cguMsg').textContent='Serveur injoignable, réessaie dans un instant.';return;}room.raw({t:'cgu',v:CGU_V});hideCgu();note('Conditions acceptées · bon jeu !');try{cv.focus();}catch(e){}});
+  document.getElementById('cguNon').addEventListener('click',()=>{hideCgu();logout();});}
 function onAuthRes(m){
   if(m.t==='authout'){authKicked();return;}
   if(!m.ok){if(lsGet(TOKEN_KEY)&&!AUTH.ok)lsSet(TOKEN_KEY,null);showAuth(m.msg||'Erreur',true);return;}
@@ -1782,7 +1804,7 @@ function onAuthRes(m){
   // AUTH.ok reste faux tant qu'on va recharger la page (sinon la sauvegarde vide de ce navigateur partirait au serveur)
   if(m.save&&m.save.chars){if(!reloaded&&JSON.stringify(m.save)!==JSON.stringify(save)){lsSet(SAVE_KEY,JSON.stringify(m.save));lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}}
   else if(owner&&owner!==me&&!reloaded){lsSet(SAVE_KEY,null);lsSet(OWNER_KEY,me);sessionStorage.setItem('rm-reload','1');location.reload();return;}
-  AUTH={ok:true,nom:m.nom,admin:!!m.admin};lsSet(OWNER_KEY,me);pushSave(true);hideAuth();if(!devMode)note('Connecté au compte '+m.nom+(AUTH.admin?' (admin : /god)':''));try{fillTitles();}catch(e){}}
+  AUTH={ok:true,nom:m.nom,admin:!!m.admin};lsSet(OWNER_KEY,me);pushSave(true);hideAuth();if(!devMode)note('Connecté au compte '+m.nom+(AUTH.admin?' (admin : /god)':''));if(m.cgu!==CGU_V&&!window.GARDIEN_MODE)showCgu(!!m.cgu);else hideCgu();try{fillTitles();}catch(e){}}
 function authSend(a){const nom=document.getElementById('authNom').value.trim(),mdp=document.getElementById('authMdp').value;if(!room||!room.raw){showAuth('Serveur injoignable, nouvel essai dans un instant…',true);return;}
   if(a==='register'&&mdp!==document.getElementById('authMdp2').value){showAuth('Les deux mots de passe ne correspondent pas',true);return;}room.raw({t:'auth',a,nom,mdp});showAuth('Envoi…');}
 function logout(){const tk=lsGet(TOKEN_KEY);try{room.raw({t:'auth',a:'logout',token:tk});}catch(e){}pushSave(true);lsSet(TOKEN_KEY,null);AUTH={ok:false,nom:null,admin:false};if(devMode)setDevMode(false);showAuth('Déconnecté.');}
@@ -2063,7 +2085,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000028;let newerWarned=false;
+const NETV=2,BUILD=2600000030;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -2159,7 +2181,7 @@ function onPeers(peers){
       {const nx=num(p.x,0)/10,ny=num(p.y,0)/10,now=Date.now();if(r.lx!=null&&now>r.lt){const dts=Math.max(0.05,(now-r.lt)/1000),vx=clamp((nx-r.lx)/dts,-12,12),vy=clamp((ny-r.ly)/dts,-12,12);r.vx=(r.vx||0)*0.5+vx*0.5;r.vy=(r.vy||0)*0.5+vy*0.5;}r.lx=nx;r.ly=ny;r.lt=now;}
       r.p=p;
       if(typeof p.m==='string'&&p.m!==r.lastMsg){r.lastMsg=p.m;const t=filtrer(clean(p.m.slice(p.m.indexOf('|')+1)).slice(0,100));if(t){pushChat({n:clean(p.n).slice(0,16)||'?',t,life:14,col:t.startsWith('✦')?'#3ff0ff':'#ebe6f6'});r.bubble={t,life:5};}}
-      if(typeof p.ev==='string'&&p.ev!==r.lastEv){r.lastEv=p.ev;if(p.s===sceneKey())remoteEv(p.ev,r);}
+      if(typeof p.ev==='string'&&p.ev!==r.lastEv){r.lastEv=p.ev;if(p.s===sceneKey()||p.ev.split('|')[1]==='d')remoteEv(p.ev,r);}
       if(typeof p.hl==='string'&&p.hl!==r.lastHl){r.lastHl=p.hl;const hf=p.hl.split('|'),pcH=hf[1]&&hf[1][0]==='p',a=pcH?Math.round(S().tot.vie*clamp(parseInt(hf[1].slice(1),10)||0,0,60)/100):clamp(parseInt(hf[1],10)||0,0,800),hr=clamp(parseFloat(hf[2])||4.5,1,12);
         let hx=r.x,hy=r.y;if(hf[4]){const c=hf[4].split(',');const cx=(+c[0]||0)/10,cy=(+c[1]||0)/10;if(Math.hypot(cx-r.x,cy-r.y)<16){hx=cx;hy=cy;}} // centre du soin (démon soigneur), jamais loin du lanceur
         const bc=typeof hf[3]==='string'&&/^[gva]\d{1,3},\d{1,2}$/.test(hf[3])?hf[3]:'';
@@ -2520,7 +2542,7 @@ function classVfx(cls,x,y,ang,rel){
 let coinTic=0;
 // des pièces jaillissent de (x, y), restent un instant au sol, puis volent vers le héros (animation seulement : l'or est déjà compté)
 function coinBurst(x,y,g){const n=clamp(Math.ceil(Math.sqrt(g))+1,2,14);for(let i=0;i<n;i++){const a=Math.random()*TAU,v=rnd(1.5,4.5);coinsFx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0,d:0.35+i*0.05+Math.random()*0.1});}sfx('coin');}
-function resetScene(){SUM=[];POIS.clear();P.frenzy=0;P.regenT=0;if(P.guard>0){P.guard=0;statsDirty=true;}FISH=null;INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostX=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;handled.clear();}
+function resetScene(){SUM=[];TOMBS=[];POIS.clear();P.frenzy=0;P.regenT=0;if(P.guard>0){P.guard=0;statsDirty=true;}FISH=null;INTRO=null;SHAKE=0;monsters=[];pb=[];eb=[];bags=[];dportals=[];coinsFx=[];vfx=[];bombs=[];strikes=[];P.castQ=[];setSong(scene==='realm'?'aventure':scene==='dungeon'?'crypte':'lobby');lastHostM=null;lastHostX=null;lastHostD=null;lastHostG=null;dPrimed=false;exitOpen=false;handled.clear();}
 function enterNexus(){setTimeout(dailyAuto,700);if(scene==='arena'&&DU&&DU.state!=='fight'){duelSend({k:'dleave'});DU=null;$('#duelBox').hidden=true;}if(scene==='tuto'&&!save.tutoDone){save.tutoDone=true;persist();}if(scene!=='nexus')sfx('portal');scene='nexus';MAP=nexusMap;P.x=NSPAWN.x;P.y=NSPAWN.y;resetScene();curZone=-2;amHost=false;updZone();showBanner('Village','Zone sûre · la fontaine soigne');sendPresence();}
 // point d'arrivée tiré au hasard sur la plage, loin des monstres connus
 // même point pour tous les joueurs pendant une minute (tiré selon l'heure), puis il change de place
@@ -2880,7 +2902,12 @@ function hitMon(m,dmg,col){
 function sendEv(t,x,y){myEv=(++evSeq)+'|'+t+'|'+Math.round(x*10)+'|'+Math.round(y*10);sendPresence();}
 function markVuln(x,y){const rx=W/TS/2+2,ry=H/TS/2+2;let n=0;for(const m of monsters)if(m.hp>0&&Math.abs(m.x-x)<rx&&Math.abs(m.y-y)<ry){m.vuln=time+6;n++;}return n;}
 function boomFx(x,y,r){vfx.push({k:'boom',x,y,r,t:0,life:0.5,col:'#ff4fd8'});burst(x,y,'#ff4fd8',30,6);burst(x,y,'#3ff0ff',18,4);sfx('boss',0.5);}
+// Tombes : là où un joueur vient de mourir, une pierre tombale à son nom reste 2 minutes pour les autres joueurs de la scène
+let TOMBS=[];const TOMB_SPR=makeSprite(['..GGGG..','.GGGGGG.','.GWWWWG.','.GGWWGG.','.GGWWGG.','.GGGGGG.','DGGGGGGD','DDDDDDDD'],{G:'#8a8f9c',W:'#3a3d48',D:'#4a3a2a'},6);
+function addTomb(x,y,n){if(solidAt(x,y))return;TOMBS.push({x,y,n:clean(String(n||'?')).slice(0,16),fin:time+120,ne:time});if(TOMBS.length>30)TOMBS.shift();burst(x,y,'#8a8f9c',14,2);}
+function drawTombs(){if(!TOMBS.length)return;TOMBS=TOMBS.filter(t=>time<t.fin);for(const t of TOMBS)up(t.x,t.y,()=>{const s=TS*0.85,a=Math.min(1,(t.fin-time)/4),pop=Math.min(1,(time-t.ne)/0.25);ctx.globalAlpha=a;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(sx(t.x),sy(t.y)+s*0.42,s*0.42,s*0.12,0,0,TAU);ctx.fill();ctx.drawImage(TOMB_SPR,sx(t.x)-s/2,sy(t.y)-s*0.55+s*(1-pop)*0.5,s,s*pop);label(t.n,sx(t.x),sy(t.y)-s*0.7,'#b8b4c6',Math.round(TS*0.24));ctx.globalAlpha=1;});}
 function remoteEv(ev,r){const f=ev.split('|');const x=(+f[2])/10,y=(+f[3])/10;if(!isFinite(x)||!isFinite(y))return;
+  if(f[1]==='d'){if(f[4]===sceneKey())addTomb(x,y,r.p&&r.p.n);return;}
   if(f[1]==='l'&&MAP&&MAP.switches){let b=null,bd=3;for(const sw of MAP.switches){const dd=Math.hypot(sw.x-x,sw.y-y);if(dd<bd){bd=dd;b=sw;}}if(b)lightSwitch(b,true);}
   if(f[1]==='v'){markVuln(x,y);vfx.push({k:'healring',x,y,r:10,t:0,life:0.8,col:'#ffd23f'});}
   else if(f[1]==='b')bombs.push({x,y,t:0.9,dm:0,own:false});
@@ -3172,6 +3199,7 @@ function themeTick(dt,st,T,mv){
     if(P.hp<=0){die(why);return;}}
 }
 function die(src){
+  if(scene!=='tuto'&&scene!=='arena')myEv=(++evSeq)+'|d|'+Math.round(P.x*10)+'|'+Math.round(P.y*10)+'|'+sceneKey(); // une tombe apparaît chez les autres joueurs de la scène
   if(scene==='raid'){raidDeath(src);return;}
   enterNexus();const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;paused=true;keys.clear();mouse.down=false;
   const ch=C(),g=prestigeGain(ch),sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];
@@ -3714,11 +3742,13 @@ function dayNum(){const d=new Date();return Math.floor((d.getTime()-d.getTimezon
 const DAILY=[
   {j:1,txt:'2 potions de vie + 2 potions de mana',items:()=>[mkItem('pvie',0),mkItem('pvie',0),mkItem('pmana',0),mkItem('pmana',0)],ic:['pvie','pvie','pmana','pmana']},
   {j:2,txt:'1 potion de chaque caractéristique',items:()=>['sp_vie','sp_mana','sp_puissance','sp_vatt','sp_vdep'].map(k=>mkItem(k,0)),ic:['sp_vie','sp_mana','sp_puissance','sp_vatt','sp_vdep']},
-  {j:3,txt:'100 Cursite',curs:100},
-  {j:4,txt:'Un anneau Tier 6',items:()=>[mkItem('anneau',6)],ic:['anneau:6']},
+  {j:3,txt:'Un anneau Tier 6',items:()=>[mkItem('anneau',6)],ic:['anneau:6']},
+  {j:4,txt:'100 Cursite',curs:100},
   {j:5,txt:'150 Cursite',curs:150},
-  {j:6,txt:'Titre « ★ BETA TESTEUR ★ »',title:'beta'},
-  {j:7,txt:'Set Relique complet : arme, objet spécial, armure et anneau (classe au choix)',set:true}];
+  {j:6,txt:'1 Relique au hasard (toutes classes, Reliques de Chronos comprises)',items:()=>[reliqueAuHasard()],ic:['epee:7','sort2:7']},
+  {j:7,txt:'Titre « ★ BETA TESTEUR ★ »',title:'beta'}];
+// une relique tirée dans tout le lot : les reliques classiques et les Reliques de Chronos, toutes classes confondues
+function reliqueAuHasard(){const lot=Object.keys(KINDS).filter(k=>KINDS[k].slot!=='conso'&&!KINDS[k].t7);return mkItem(pick(lot),7);}
 function loginState(){if(!save.login)save.login={day:-9,n:0,seen:-9};return save.login;}
 function dailyIdx(){const L=loginState(),t=dayNum();if(L.day===t)return -1;return L.day===t-1?L.n%7:0;}
 function dailyBroken(){const L=loginState();return L.n>0&&L.day<dayNum()-1;}
@@ -4649,6 +4679,7 @@ function doAct(a,e){
 }
 const MOVE_ACTS=['up','down','left','right'];
 window.addEventListener('keydown',e=>{
+  if(cguOuvert)return;
   if(e.key==='Escape'){if(!concEl.hidden){closeConc();return;}if(!forgeEl.hidden){closeForge();return;}if(!succEl.hidden){closeSucces();return;}if(!srvEl.hidden){closeServeurs();return;}if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!presEl.hidden){closePresWin();return;}if(!$('#gshopWin').hidden){closeGShop();return;}if(!$('#inspWin').hidden){closeInspect();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
   const A=actsOf(e.code);
@@ -5836,7 +5867,7 @@ function render(){
   const x0=Math.floor(P.x-rw)-1,x1=Math.ceil(P.x+rw)+1,y0=Math.floor(P.y-rh)-1,y1=Math.ceil(P.y+rh)+1;
   ctx.save();if(camA){ctx.translate(W/2,H/2);ctx.rotate(camA);ctx.translate(-W/2,-H/2);}inWorld=true;
   if(scene==='realm')drawRealm(x0,x1,y0,y1);else if(scene==='dungeon')drawDungeon(x0,x1,y0,y1);else if(scene==='vault')drawVault(x0,x1,y0,y1);else if(scene==='hub')drawHub(x0,x1,y0,y1);else if(scene==='tuto')drawTuto(x0,x1,y0,y1);else if(scene==='arena')drawArena(x0,x1,y0,y1);else if(scene==='ghall')drawGHall(x0,x1,y0,y1);else if(scene==='raid')drawRaid(x0,x1,y0,y1);else drawNexus(x0,x1,y0,y1);
-  drawSummons();
+  drawTombs();drawSummons();
   for(const k of keyPortals()){const rem=Math.max(0,Math.ceil((k.fin-Date.now())/1000))+' s';if(k.ty==='v')drawPortal(k.x,k.y,'#0a4a5a','#ffd23f','La Vengeance sous-marine','Donjon rare · '+rem,{scale:1.35,fast:true});else drawPortal(k.x,k.y,'#141034','#3ff0ff',"L'Horloge Brisée",'Donjon à clef · '+rem,{scale:1.35,fast:true});}
   if(scene==='realm'){for(const d of dportals){const T=DTYPES[d.t||'c'];drawPortal(d.x,d.y,T.col[0],T.col[1],T.nom,(d.t==='a'?'World boss · ':'')+Math.ceil(d.life)+' s',d.t==='a'?{scale:1.45,world:true,fast:true,th:'a'}:{th:d.t});}}
   for(const b of bags)up(b.x,b.y,()=>{const s=TS*0.62,X=sx(b.x),Y=sy(b.y)+Math.sin(time*3+b.x)*2;if(b.kind==='blanc'||b.kind==='relique'){ctx.fillStyle=b.kind==='relique'?`hsla(${(time*120)%360},100%,65%,.35)`:'rgba(255,240,180,.25)';ctx.beginPath();ctx.arc(X,Y,s*(0.8+0.1*Math.sin(time*5)),0,TAU);ctx.fill();}ctx.drawImage(BAGS[b.kind],X-s/2,Y-s/2,s,s);});
