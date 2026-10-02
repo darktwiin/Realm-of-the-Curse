@@ -1,5 +1,19 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.26 (server.js inchangé)
+- Parchemin ensanglanté : 3 démons à la fois au T5 (1 au T0, 2 du T1 au T4, 3 au T5, 4 au T6).
+- Les deux boss du centre des Plaines (le Roi Bouffon et le Béhémoth d'Obsidienne) peuvent être présents en même temps : tous les 20 monstres tués, celui qui manque apparaît, sans attendre la mort de l'autre.
+- Deux nouveaux skins (500 Cursite, à la Statue des skins) : **Chevalier noir** pour le Porte-bouclier (armure noire, lueur rouge dans la visière, aura d'ombre) et **Démon d'azur** pour l'Invocateur (peau bleue, aura de givre).
+
+## ver.0.0.25 (server.js inchangé)
+- Invocateur :
+  - Compteur sous le héros : « Démons 2/4 » (1 au T0, 2 du T1 au T5, 4 au T6), ou « Gardien 0/1 » avec la relique.
+  - Les démons attaquent 0,35 s après leur apparition (au lieu de 1 s), et déplacer le démon de la gemme ne remet plus son attaque à zéro.
+  - Coût du Parchemin ensanglanté : 10 mana au T0, +5 par tier, soit 40 au T6 (au lieu de 25) et 45 pour la relique. Les parchemins déjà obtenus sont mis à jour.
+  - La relique n'invoque plus que le démon gardien (le tank) : plus de petit démon qui attaque en même temps.
+  - Correction : un monstre tué par un démon pouvait réapparaître. Un démon resté loin derrière le héros frappait des monstres que le serveur jugeait trop éloignés du joueur : le coup était refusé et le monstre revenait. Un démon disparaît maintenant à plus de 13 cases du héros et ne vise que des monstres à moins de 15 cases de lui.
+- Porte-bouclier : grand écu bleu à emblème doré, porté devant lui.
+
 ## ver.0.0.24 (server.js et arbitre.js modifiés)
 - Invocateur revu : c'est maintenant un **démon** (cornes, peau rouge) qui invoque des démons de la famille de la Fournaise Infernale. La couleur de leurs yeux suit le tier de l'arme. La relique invoque un démon gardien.
   - Son arme devient la **Gemme de sang** et sa capacité le **Parchemin ensanglanté** (nouvelles icônes, nouveaux noms, projectiles rouge sang). Les objets déjà obtenus sont renommés tout seuls.
