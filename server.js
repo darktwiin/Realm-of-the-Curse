@@ -441,8 +441,8 @@ wss.on('connection', (ws, req) => {
       if (cmd === 'annonce') { const sec = Math.max(5, Math.min(300, Math.floor(Number(m.arg) || 30))); annoncerMaj(sec); res(true, 'Annonce envoyée : compte à rebours de ' + sec + ' s (le serveur ne redémarre pas tout seul)'); return; }
       // concours : « etat », « reset » (efface le vainqueur), ou un nombre = départ dans N minutes (0 = tout de suite)
       if (cmd === 'concours') { const a = String(m.arg == null ? 'etat' : m.arg);
-        if (a === 'reset') { CONCOURS.gagnant = null; sauverConcours(); if (concoursVisible()) diffuserPartout(etatConcours({ live: 1 })); }
-        else if (/^\d+$/.test(a)) { CONCOURS.debut = Date.now() + (+a) * 60000; CONCOURS.gagnant = null; sauverConcours(); armerConcours(); if (+a === 0) diffuserPartout(etatConcours({ live: 1 })); }
+        if (a === 'reset') { CONCOURS.gagnant = null; sauverConcours(); diffuserPartout(etatConcours({ live: 1 })); }
+        else if (/^\d+$/.test(a)) { CONCOURS.debut = Date.now() + (+a) * 60000; CONCOURS.gagnant = null; sauverConcours(); armerConcours(); diffuserPartout(etatConcours({ live: 1 })); }
         res(true, 'Concours : départ ' + new Date(CONCOURS.debut).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }) + (CONCOURS.gagnant ? ' · gagnant : ' + CONCOURS.gagnant.n + ' (' + Math.round(CONCOURS.gagnant.d / 1000) + ' s)' : ' · pas encore de gagnant')); return; }
       if (cmd === 'suspects') { res(true, '', { suspects: listeSuspects() }); return; }
       if (cmd === 'anomalies') { res(true, '', { anomalies: sql.anoListe.all().map(r => ({ n: r.nom, t: r.quand, r: JSON.parse(r.raisons || '[]') })) }); return; }
@@ -638,14 +638,17 @@ function pecher(moi, salle, m) {
   envoyer(moi.ws, { t: 'vengeance', id });
 }
 
-// ---------- concours du premier donjon : le premier à terminer un Château de Morvane commencé après le départ gagne 500 Cursite ----------
-const CONCOURS = { debut: Number(process.env.CONCOURS_DEBUT) || Date.UTC(2026, 9, 3, 16, 0, 0) /* samedi 3 octobre 2026, 18 h à Paris */, prix: 500, gagnant: null };
+// ---------- concours du premier donjon : le premier à terminer le donjon désigné, commencé après le départ, gagne 500 Cursite ----------
+const CONCOURS = { debut: Number(process.env.CONCOURS_DEBUT) || Date.UTC(2026, 9, 3, 16, 0, 0) /* samedi 3 octobre 2026, 18 h à Paris */, prix: 500, gagnant: null, donjon: process.env.CONCOURS_DONJON || 'c' };
 const FICHIER_CONCOURS = path.join(DATA_DIR, 'concours.json');
 try { const c = JSON.parse(fs.readFileSync(FICHIER_CONCOURS, 'utf8')); if (c && c.debut === CONCOURS.debut && c.gagnant) CONCOURS.gagnant = c.gagnant; } catch {}
 const sauverConcours = () => { try { fs.writeFileSync(FICHIER_CONCOURS, JSON.stringify({ debut: CONCOURS.debut, gagnant: CONCOURS.gagnant })); } catch (e) { console.error('[concours]', e.message); } };
-// visible seulement à partir du départ, puis jusqu'à 24 h après la victoire (7 jours sans vainqueur)
-const concoursVisible = () => { const n = Date.now(); if (n < CONCOURS.debut) return false; return CONCOURS.gagnant ? n < CONCOURS.gagnant.t + 24 * 3600000 : n < CONCOURS.debut + 7 * 24 * 3600000; };
-const etatConcours = extra => Object.assign({ t: 'concours', debut: CONCOURS.debut, prix: CONCOURS.prix, gagnant: CONCOURS.gagnant ? { n: CONCOURS.gagnant.n, d: CONCOURS.gagnant.d } : null }, extra || {});
+// annoncé à l'avance (sans dire quel donjon), puis visible jusqu'à 24 h après la victoire (7 jours sans vainqueur)
+const concoursVisible = () => { const n = Date.now(); return CONCOURS.gagnant ? n < CONCOURS.gagnant.t + 24 * 3600000 : n < CONCOURS.debut + 7 * 24 * 3600000; };
+const concoursParti = () => Date.now() >= CONCOURS.debut;
+// le type et le nom du donjon ne partent vers les joueurs qu'une fois le chronomètre lancé
+const etatConcours = extra => { const R = arbitre.regles(), T = R && R.DTYPES && R.DTYPES[CONCOURS.donjon];
+  return Object.assign({ t: 'concours', debut: CONCOURS.debut, prix: CONCOURS.prix, gagnant: CONCOURS.gagnant ? { n: CONCOURS.gagnant.n, d: CONCOURS.gagnant.d } : null }, concoursParti() && T ? { dt: CONCOURS.donjon, dn: T.nom } : {}, extra || {}); };
 function diffuserPartout(msg, sauf) { for (const salle of salles.values()) diffuser(salle, msg, sauf); }
 let minuteurConcours = null;
 function armerConcours() {
@@ -654,7 +657,8 @@ function armerConcours() {
 }
 armerConcours();
 function concoursTue(moi, key, sc) {
-  if (key !== 'liche' || sc.slice(0, 2) !== 'dc' || CONCOURS.gagnant || Date.now() < CONCOURS.debut || !concoursVisible()) return;
+  const R = arbitre.regles(), T = R && R.DTYPES && R.DTYPES[CONCOURS.donjon];
+  if (!T || key !== T.bk || sc.slice(0, 2) !== 'd' + CONCOURS.donjon || CONCOURS.gagnant || !concoursParti() || !concoursVisible()) return;
   if (!moi.compte || moi.compte.admin) return;                                  // les admins ne concourent pas
   if (!(moi.etat && moi.etat.s === sc && (moi.sT || 0) >= CONCOURS.debut)) return; // donjon commencé avant le départ : ne compte pas
   const n = String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 24);
@@ -704,5 +708,5 @@ function reclamerKill(moi, m, nom, salle, essai) {
   const sc = String(m.s || ''), d = donjonsGardes.get(nom + '|' + sc);
   const G = gardienDe(salle, sc || 'r');
   if (!G && d && Date.now() - d.t < 8000 && essai < 25) { setTimeout(() => { if (moi.ws.readyState === 1) reclamerKill(moi, m, nom, salle, essai + 1); }, 400); return; }
-  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc), boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, onTue: (key, s) => concoursTue(moi, key, s), signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
+  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc) && !moi.compte.admin, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, onTue: (key, s) => concoursTue(moi, key, s), signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
 }

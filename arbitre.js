@@ -265,7 +265,13 @@ function verifier(ancien, nouveau, ctx) {
     if (!plus) continue;
     { const pp = k.split('|'), upN = pp.length > 3 && pp[pp.length - 1][0] === '+' ? +pp[pp.length - 1].slice(1) : 0;
       if (upN) { const base = pp.slice(0, -1).join('|'), prec = upN > 1 ? base + '|+' + (upN - 1) : base;
-        while (plus > 0 && (upN === 1 ? perdu(base) >= 3 : (perdu(base) >= 2 && perdu(prec) >= 1))) { fondre(base, 2); fondre(prec, 1); plus--; nouveaux--; }
+        // objets à fondre : 2 objets identiques non améliorés ; pour un anneau (bonus tirés au hasard), 2 anneaux du même tier
+        const groupe = pp[0] === 'anneau' ? [...c0.keys()].filter(q => q.startsWith('anneau|' + pp[1] + '|') && !/\|\+\d$/.test(q)) : [base];
+        while (plus > 0 && perdu(prec) >= 1) {
+          fondre(prec, 1); const pris = [];
+          for (const q of groupe) { while (pris.length < 2 && perdu(q) >= 1) { fondre(q, 1); pris.push(q); } }
+          if (pris.length < 2) { fondre(prec, -1); for (const q of pris) fondre(q, -1); break; }
+          plus--; nouveaux--; }
         if (!plus) continue; } }
     const kind = k.split('|')[0], t = +k.split('|')[1], conso = R.KINDS[kind] && R.KINDS[kind].slot === 'conso';
     for (; plus > 0; plus--) {

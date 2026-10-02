@@ -1,5 +1,13 @@
 # Royaume Maudit — notes de mise à jour
 
+## ver.0.0.24 (server.js et arbitre.js modifiés)
+- Invocateur revu : c'est maintenant un **démon** (cornes, peau rouge) qui invoque des démons de la famille de la Fournaise Infernale. La couleur de leurs yeux suit le tier de l'arme. La relique invoque un démon gardien.
+  - Son arme devient la **Gemme de sang** et sa capacité le **Parchemin ensanglanté** (nouvelles icônes, nouveaux noms, projectiles rouge sang). Les objets déjà obtenus sont renommés tout seuls.
+- Porte-bouclier revu : un vrai chevalier, heaume d'acier fermé avec visière en T, armure sombre et écu au bras.
+- Forge : un anneau s'améliore maintenant avec 2 anneaux **du même tier** (leurs bonus sont tirés au hasard, deux anneaux n'étaient presque jamais « identiques »). Vaut aussi pour les anneaux Relique.
+- Concours : la bannière est visible dès maintenant dans les Événements, avec la date et le compte à rebours, **sans dire quel donjon**. Le serveur ne révèle le donjon aux joueurs qu'au départ du chronomètre.
+- Salle des portails admin : ajout de La Vengeance sous-marine et de l'Horloge Brisée (14 portails). Les admins peuvent y tuer des monstres sans clef ni ticket.
+
 ## ver.0.0.23 (server.js, arbitre.js et butin.js modifiés)
 - Deux nouvelles classes (8 au total) :
   - **Porte-bouclier** : épée et armure lourde comme le Guerrier, mais la plus grosse armure du jeu. Capacité « bouclier » : En garde (armure fortement augmentée pendant 4 à 7,5 s) et une vague qui traverse les ennemis et **brise leur armure**. Relique (Égide du Titan) : invulnérable 1 seconde.
@@ -7,7 +15,7 @@
 - Armure des monstres : tous les monstres ont maintenant 10 % d'armure (15 % pour les boss). Leur vie a été baissée d'autant, donc rien ne change pour les classes existantes. Nouvel état « Armure brisée » (icône de bouclier fendu) : tant qu'il dure, tout le groupe inflige 10 à 15 % de dégâts en plus. Nouvel état « En garde » pour le Porte-bouclier.
 - Forge du Village : nouvelle aile à gauche du hall (porte en face de celle de l'échoppe). Le forgeron fond **2 objets identiques** dans l'objet équipé : +10 % d'efficacité par niveau, 2 niveaux au maximum (+1, +2). Dégâts, armure, bonus de caractéristiques et puissance de la capacité augmentent ; le nombre de projectiles ne change jamais. Le niveau suit l'objet dans les échanges. Le serveur vérifie chaque forge.
 - Nouveau donjon rare : **La Vengeance sous-marine**. En pêchant dans les Plaines Sauvages, 1 prise sur 250 ouvre un portail de 60 s que tout le monde peut prendre. Donjon intermédiaire (niveau de la Forge Rouillée), entièrement sous l'eau, avec des courants marins. 5 poissons-monstres (Sardine vengeresse, Rouget enragé, Raie des profondeurs, Congre furieux, Espadon rancunier) et, dans l'arène, les deux poissons légendaires ensemble : le Poisson-lune doré des abysses et la Carpe koï d'or maudite. La sortie s'ouvre quand les deux sont vaincus.
-- Concours du premier donjon (samedi 3 octobre 2026, 18 h) : le premier joueur qui termine un Château de Morvane commencé après le départ gagne 500 Cursite. Rien n'est affiché avant l'heure. À 18 h : grande bannière dans les Événements, fenêtre d'explication (aussi à la connexion), et portail du concours dans le Village. Le gagnant et son temps sont annoncés à tout le monde. Les comptes admin ne concourent pas.
+- Concours du premier donjon (samedi 3 octobre 2026, 18 h) : le premier joueur qui termine le donjon désigné, commencé après le départ, gagne 500 Cursite. À 18 h : fenêtre d'explication (aussi à la connexion) et portail du concours dans le Village. Le gagnant et son temps sont annoncés à tout le monde. Les comptes admin ne concourent pas.
 - Familiers animés : ils se tournent comme le héros, bougent la tête, et marchent selon l'animal (6 pattes pour la fourmi, 4 pour le lion, bonds du lièvre, battements d'ailes du colibri…).
 - Le succès « Toutes les classes niveau 20 » compte les 8 classes.
 - Bouton Quêtes : raccourci clavier **J** (modifiable dans les touches).
