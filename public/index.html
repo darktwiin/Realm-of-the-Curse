@@ -448,7 +448,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.43"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.44"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -464,7 +464,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.43</div>
+    <div class="verTag" id="verTag">ver.0.0.44</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -627,7 +627,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.43</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.44</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -669,7 +669,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.43</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.44</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -779,7 +779,7 @@ body.ton #opts{position:fixed;z-index:120}
         <h2 style="color:#ffd23f">🏆 Concours du premier donjon</h2>
         <canvas id="concArt" width="464" height="150" style="width:100%;image-rendering:pixelated;border:2px solid #ffd23f"></canvas>
         <div id="concTxt" style="margin:10px 0;line-height:1.5"></div>
-        <div class="shop-foot"><span class="hint">Le portail du concours est dans le Village, juste au nord-est de la fontaine.</span><button type="button" class="act main" id="concClose">C'est parti !</button></div>
+        <div class="shop-foot"><span class="hint"></span><button type="button" class="act main" id="concClose">C'est parti !</button></div>
       </div>
     </div>
     <div class="overlay" id="forgeWin" hidden>
@@ -1330,7 +1330,7 @@ const MON={
   // Zone 5 — Terres brûlées
   salamandre:{nom:'Salamandre',hp:1200,xp:125,spd:2.4,dmg:52,cd:0.9,pat:'wave',n:3,bs:6,br:7,sz:1,loot:[3,5],drop:0.3,pref:4,bc:'#ff8a2a',or:[0.15,1,2]},
   imp:{nom:'Diablotin',hp:900,xp:115,spd:4.5,dmg:46,cd:0.9,pat:'burst',n:5,bs:9,br:6,sz:0.85,loot:[3,5],drop:0.28,pref:4,bc:'#ff4fd8',mv:'erratic',or:[0.15,1,2]},
-  cendreux:{nom:'Cendreux',hp:1400,xp:130,spd:1.4,dmg:58,cd:2,pat:'mines',n:8,bs:5,br:8,sz:1,loot:[3,5],drop:0.3,pref:3,bc:'#ff9a3c',or:[0.15,1,2]},
+  cendreux:{nom:'Cendreux',hp:1400,xp:130,spd:1.54,dmg:58,cd:2,pat:'mines',n:8,bs:5,br:8,sz:1,loot:[3,5],drop:0.3,pref:0,bc:'#ff9a3c',or:[0.15,1,2]},
   wyrm:{nom:'Wyrm de lave',hp:1800,xp:140,spd:2,dmg:56,cd:0.3,pat:'spiral',arms:2,bs:6,br:7,sz:1.2,loot:[3,5],drop:0.32,pref:4,bc:'#ffcf3a',or:[0.16,1,2]},
   // Zone 6 — Terres Désolées (ces monstres peuvent lâcher un donjon)
   demon:{nom:'Démon',hp:2200,xp:170,spd:2.2,dmg:64,cd:1.2,pat:'ring',n:14,bs:6.5,br:7,sz:1.15,loot:[4,6],drop:0.34,pref:5,bc:'#ff4d5e',or:[0.2,1,2],rel:1/1500,dun:1/29},
@@ -3017,7 +3017,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000043;let newerWarned=false;
+const NETV=2,BUILD=2600000044;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -4574,18 +4574,18 @@ function concArt(g,Wb,Hb){evtFond(g,Wb,Hb,'#12060a','#4a0e1a','#b3363a','rgba(25
 function openConc(){if(!CONC)return;paused=true;concEl.hidden=false;keys.clear();mouse.down=false;try{concArt($('#concArt').getContext('2d'),464,150);}catch(e){}
   const g=CONC.g,dn=CONC.dn?clean(CONC.dn):'',T=CONC.dt&&DTYPES[CONC.dt],prix='<b style="color:#7df0e0">'+CONC.prix+' Cursite</b>';
   $('#concTxt').innerHTML=g?'<p>Le concours est terminé : <b style="color:#ffd23f">'+clean(g.n)+'</b> a terminé le donjon '+dn+' le premier, en <b>'+fmtDuree(g.d)+'</b>, et remporte '+prix+'. Bravo !</p>'
-    :!concOn()?'<p><b>'+concQuand()+'</b> : un donjon sera désigné, et le <b>premier joueur</b> qui le termine gagne '+prix+'.</p><ul style="margin:6px 0 0 18px"><li><b>Quel donjon ?</b> Surprise : il ne sera révélé qu\'au départ du chronomètre.</li><li>À l\'heure dite, un portail du concours s\'ouvrira dans le Village : tout le monde part en même temps.</li><li>Seul ou à plusieurs, tous les niveaux peuvent tenter leur chance. Un seul gagnant.</li></ul>'
-    :'<p><b>Le chronomètre est lancé !</b> Le <b>premier joueur</b> qui termine le donjon <b>'+dn+'</b>'+(T?' (qui bat '+T.boss+')':'')+' gagne '+prix+'.</p><ul style="margin:6px 0 0 18px"><li>Le donjon doit être commencé <b>après le départ</b> du chronomètre : entre par le portail du concours, dans le Village.</li><li>Tu peux y aller seul ou à plusieurs : c\'est celui qui porte le coup de grâce compté par le serveur qui gagne.</li><li>Un seul gagnant. Le vainqueur est annoncé à tout le monde, avec son temps.</li></ul>';
-  concEl.querySelector('.hint').textContent=g?'':concOn()?'Le portail du concours est dans le Village, juste au nord-est de la fontaine.':'Sois dans le Village à l\'heure : le portail apparaîtra près de la fontaine.';
+    :!concOn()?'<p><b>'+concQuand()+'</b> : un donjon sera désigné, et le <b>premier joueur</b> qui le termine gagne '+prix+'.</p><ul style="margin:6px 0 0 18px"><li><b>Quel donjon ?</b> Surprise : il ne sera révélé qu\'au départ du chronomètre.</li><li>À l\'heure dite, le donjon sera annoncé : à toi de trouver son portail dans les Plaines Sauvages.</li><li>Seul ou à plusieurs : si vous le terminez en groupe, la récompense est partagée entre vous.</li></ul>'
+    :'<p><b>Le chronomètre est lancé !</b> Le <b>premier joueur</b> qui termine le donjon <b>'+dn+'</b>'+(T?' (qui bat '+T.boss+')':'')+' gagne '+prix+'.</p><ul style="margin:6px 0 0 18px"><li><b>Pas de portail au Village</b> : il faut trouver un portail de ce donjon dans les Plaines Sauvages (ils s\'ouvrent en tuant des monstres) et y entrer <b>après le départ</b> du chronomètre.</li><li>Seul ou à plusieurs : tous les joueurs présents dans le donjon à la mort du boss gagnent, et la récompense est <b>divisée</b> par leur nombre.</li><li>Les vainqueurs sont annoncés à tout le monde, avec leur temps.</li></ul>';
+  concEl.querySelector('.hint').textContent=g?'':concOn()?'Cherche un portail « '+dn+' » dans les Plaines Sauvages.':'Sois en jeu à l\'heure : le donjon sera annoncé à tout le monde.';
   $('#concClose').textContent=g||!concOn()?'Fermer':'C\'est parti !';}
 function closeConc(){concEl.hidden=true;paused=false;cv.focus();}
 $('#concClose').addEventListener('click',closeConc);
 function onConcours(m){if(!m||!(m.debut>0)){CONC=null;buildEvts();return;}const avant=CONC;
-  CONC={debut:+m.debut,prix:+m.prix||500,dt:typeof m.dt==='string'&&DTYPES[m.dt]?m.dt:null,dn:m.dn?String(m.dn).slice(0,40):null,g:m.gagnant&&m.gagnant.n?{n:String(m.gagnant.n).slice(0,24),d:+m.gagnant.d||0}:null};buildEvts();
-  if(m.gain>0){const n=clamp(Math.floor(m.gain),0,5000);save.cursite+=n;persist();pushSave(true);showBanner('🏆 Tu remportes le concours !','+'+n+' Cursite · premier à terminer le donjon '+(CONC.dn||''),'#ffd23f');sfx('relic');burst(P.x,P.y,'#ffd23f',80,6);}
-  else if(CONC.g&&!(avant&&avant.g)&&avant){showBanner('🏆 '+CONC.g.n+' remporte le concours !',(CONC.dn||'Donjon')+' terminé en '+fmtDuree(CONC.g.d)+' · '+CONC.prix+' Cursite','#ffd23f');sfx('level');}
+  CONC={debut:+m.debut,prix:+m.prix||500,dt:typeof m.dt==='string'&&DTYPES[m.dt]?m.dt:null,dn:m.dn?String(m.dn).slice(0,40):null,g:m.gagnant&&m.gagnant.n?{n:String(m.gagnant.n).slice(0,80),d:+m.gagnant.d||0}:null};buildEvts();
+  if(m.gain>0){const n=clamp(Math.floor(m.gain),0,5000);save.cursite+=n;persist();pushSave(true);showBanner('🏆 Tu remportes le concours !','+'+n+' Cursite'+(n<CONC.prix?' (récompense partagée)':'')+' · premier à terminer le donjon '+(CONC.dn||''),'#ffd23f');sfx('relic');burst(P.x,P.y,'#ffd23f',80,6);}
+  else if(CONC.g&&!(avant&&avant.g)&&avant){showBanner('🏆 '+CONC.g.n+(CONC.g.n.includes(',')?' remportent':' remporte')+' le concours !',(CONC.dn||'Donjon')+' terminé en '+fmtDuree(CONC.g.d)+' · '+CONC.prix+' Cursite','#ffd23f');sfx('level');}
   // au départ : l'explication s'ouvre dès que le joueur est tranquille (en zone sûre, hors tutoriel, aucune fenêtre ouverte)
-  if(concOn()&&!CONC.g&&!concVu){concVu=true;concAttente=true;showBanner('🏆 Le concours commence !','Premier à terminer '+CONC.dn+' : '+CONC.prix+' Cursite','#ffd23f');sfx('boss');}}
+  if(concOn()&&!CONC.g&&!concVu){concVu=true;concAttente=true;showBanner('🏆 Le concours commence !','Trouve '+CONC.dn+' dans les Plaines et termine-le le premier : '+CONC.prix+' Cursite','#ffd23f');sfx('boss');}}
 let concAttente=false;
 setInterval(()=>{if(!concAttente)return;if(!CONC||CONC.g){concAttente=false;return;}if(paused||!save.current||!(scene==='nexus'||safe())||[...document.querySelectorAll('.overlay')].some(o=>!o.hidden))return;concAttente=false;openConc();},1000);
 const EVTS=[
@@ -4597,7 +4597,7 @@ const EVTS=[
     txt:'Chaque dimanche, le joueur qui pêche <b>le plus gros poisson</b> de la journée (lac, étang ou mer) gagne le titre <b>👑 ROI DE LA PÊCHE 👑</b> pour toute la semaine.',on:()=>!!TOUR&&TOUR.actif,clic:()=>openFishWin()},
   {id:'concours',h:120,bord:'#ffd23f',vis:()=>!!CONC,k:'Concours · un seul gagnant',t:'PREMIER DONJON',d:()=>!CONC?'':concOn()?CONC.dn+' · '+CONC.prix+' Cursite':concQuand()+' · '+CONC.prix+' Cursite',c:()=>!CONC?'':CONC.g?'🏆 '+CONC.g.n+' en '+fmtDuree(CONC.g.d):concOn()?'En cours depuis '+fmtDuree(Date.now()-CONC.debut):concDans(),
     fond:['#12060a','#4a0e1a','#b3363a','rgba(255,210,63,.7)',77],art:(g)=>{concBoss(g,232,120,18);},
-    txt:()=>!CONC?'':concOn()?'Le <b>premier joueur</b> à terminer <b>'+clean(CONC.dn)+'</b> depuis le départ du chronomètre gagne <b>'+CONC.prix+' Cursite</b>. Portail du concours dans le Village.':'Le <b>premier joueur</b> à terminer le donjon désigné gagne <b>'+CONC.prix+' Cursite</b>. <b>Quel donjon ?</b> Il ne sera révélé qu\'au départ…',on:()=>!!CONC&&!CONC.g,clic:()=>openConc()},
+    txt:()=>!CONC?'':concOn()?'Le <b>premier joueur</b> à terminer <b>'+clean(CONC.dn)+'</b> depuis le départ du chronomètre gagne <b>'+CONC.prix+' Cursite</b>. À trouver dans les Plaines Sauvages ; en groupe, la récompense est partagée.':'Le <b>premier joueur</b> à terminer le donjon désigné gagne <b>'+CONC.prix+' Cursite</b>. <b>Quel donjon ?</b> Il ne sera révélé qu\'au départ…',on:()=>!!CONC&&!CONC.g,clic:()=>openConc()},
   {id:'raid',h:104,bord:'#ff9a3c',k:'Événement de guilde',t:'RAID DU DRAGON',d:()=>'Jeudi 8 octobre 2026',c:()=>{const j=evtJours();return j>1?'Dans '+j+' jours':j===1?'Demain !':j===0?'C\'est aujourd\'hui !':'Événement terminé';},
     fond:['#1a0608','#4a0e12','#b83a12','rgba(255,170,40,.75)',2026],art:(g)=>{const d=makeDragonFrame(2,'all'),k=4;g.drawImage(d,46,-192,d.width*k,d.height*k);},
     txt:'Compétition de guildes : la guilde qui inflige le plus de dégâts au Dragon l\'emporte. <b>3 joueurs maximum par guilde.</b> Récompenses pour toutes les guildes classées.',on:()=>evtJours()>=0,clic:()=>openGuildWin()},
@@ -4613,7 +4613,8 @@ const EVTS=[
   {id:'peche',h:84,bord:'#ffd23f',k:'Pêche',t:'POISSONS LÉGENDAIRES',d:()=>'Un au lac, un à la mer',c:()=>{const g=save.fish||{},n=(g.koi?1:0)+(g.lune?1:0);return n+' / 2 attrapés';},
     fond:['#04080e','#0a2a4a','#1a5a9a','rgba(255,210,63,.5)',9],art:(g)=>{g.drawImage(fishSpr('lune'),172,2,56,56);g.drawImage(fishSpr('koi'),150,46,36,36);},on:()=>false,clic:()=>{if(save.current)openFishWin();}},
 ];
-function buildEvts(){const box=document.getElementById('evtList');if(!box)return;box.textContent='';
+function buildEvts(){if(window.GARDIEN_MODE||window.BOT_MODE)return; // pas d'interface
+  const box=document.getElementById('evtList');if(!box)return;box.textContent='';
   for(const e of EVTS){if(e.vis&&!e.vis()){e.el=null;continue;}const d=document.createElement('div');d.className='evtban'+(e.h<100?' petit':'');d.style.borderColor=e.bord;d.style.boxShadow='0 0 12px '+e.bord+'55';const cv2=document.createElement('canvas');cv2.width=232;cv2.height=e.h;
     try{evtFond(cv2.getContext('2d'),232,e.h,e.fond[0],e.fond[1],e.fond[2],e.fond[3],e.fond[4],e.art);}catch(err){}
     const t=document.createElement('div');t.className='evtxt';t.innerHTML='<span class="evk" style="color:'+e.bord+'"></span><b></b><span class="evd"></span><span class="evc"></span>';t.children[0].textContent=e.k;t.children[1].textContent=e.t;e.el=t;
@@ -5757,7 +5758,6 @@ function interact(){
   if(scene==='nexus'){
     if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6){enterRealm();return;}
     {const c=nearAltarObj();if(c==='forge'){openForge();return;}if(c==='eleveur'){openPets();return;}if(c==='srv'){openServeurs();return;}if(c==='pecheur'){openFishWin();return;}if(c==='table'){openPix();return;}if(c==='craft'){openRes(true);return;}if(c==='hv'){openHV();return;}if(c==='quest'){openQuests();return;}if(c==='guide'){enterTuto();return;}if(c==='pup'){openPupitre();return;}if(c==='statue'){openSkins();return;}if(c==='altar'){openSelect();return;}}
-    if(concOn()&&!CONC.g&&Math.hypot(P.x-CONCPORT.x,P.y-CONCPORT.y)<1.6){enterDungeon(1+Math.floor(Math.random()*2e9),CONC.dt);return;}
     if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9){openShop();return;}
     if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5){enterVault();return;}
     if(Math.hypot(P.x-GPORT.x,P.y-GPORT.y)<1.5){enterGuildHall();return;}
@@ -6658,7 +6658,6 @@ function drawNexus(x0,x1,y0,y1){
   // portes monumentales autour des deux portails
   drawGateP(NPORT.x,NPORT.y);drawGateM(VPORT.x,VPORT.y);
   drawPortal(NPORT.x,NPORT.y,'#a45be8','#ff7bf2','Plaines Sauvages','',{frame:false});
-  if(concOn()&&!CONC.g)drawPortal(CONCPORT.x,CONCPORT.y,'#2a1420','#ffd23f','Concours · '+CONC.dn,'Premier à finir : '+CONC.prix+' Cursite',{scale:1.25,fast:true});
   drawPortal(VPORT.x,VPORT.y,'#b8862b','#ffd96a','Maison','',{frame:false});
   drawPortal(GPORT.x,GPORT.y,'#6a3ab0','#ffd23f','Guilde',GUILD?'['+GUILD.tag+']':'créer ou rejoindre',{scale:0.85});
 }
@@ -7422,7 +7421,7 @@ function render(){
   let prompt=null;
   if(nearKeyPortal())prompt=nearKeyPortal().ty==='v'?'E · Plonger dans La Vengeance sous-marine':'E · Entrer dans l\'Horloge Brisée (donjon à clef)';
   else if(scene==='nexus'&&Math.hypot(P.x-GPORT.x,P.y-GPORT.y)<1.5)prompt=GUILD?'E · Hall de guilde ['+GUILD.tag+']':'E · Guildes : créer ou rejoindre';
-  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans les Plaines Sauvages';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)',srv:'E · Fontaine : changer de serveur',pecheur:'E · Parler au pêcheur (quête : tous les poissons)',table:'E · Table à dessin (1 pixel par minute)',craft:'E · Table enchantée (fabriquer un talisman)',hv:'E · Hôtel des ventes (acheter et vendre entre joueurs)',forge:'E · Forgeron (améliorer ton équipement)'}[nearAltarObj()];else if(concOn()&&!CONC.g&&Math.hypot(P.x-CONCPORT.x,P.y-CONCPORT.y)<1.6)prompt='E · Concours : entrer dans le donjon '+CONC.dn;else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
+  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans les Plaines Sauvages';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)',srv:'E · Fontaine : changer de serveur',pecheur:'E · Parler au pêcheur (quête : tous les poissons)',table:'E · Table à dessin (1 pixel par minute)',craft:'E · Table enchantée (fabriquer un talisman)',hv:'E · Hôtel des ventes (acheter et vendre entre joueurs)',forge:'E · Forgeron (améliorer ton équipement)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
   else if(scene==='vault'&&VIS){if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt=VIS.aime?'Tu as déjà laissé un cœur ici ♥':'E · Laisser un cœur ♥ à '+VIS.n;else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';}
   else if(scene==='vault'){const c=nearChest();if(DECO.on)prompt=null;else if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt='E · Décorer la maison, acheter des meubles';else if(nearSalleDoor())prompt='E · Agrandir la maison : une salle en plus ('+SALLE.prix+' pièces)';else if(Math.hypot(P.x-PRESNPC.x,P.y-PRESNPC.y)<1.6)prompt='E · Gardien du Prestige (niveau maximum)';else if(Math.hypot(P.x-FBOARD.x,P.y-FBOARD.y)<1.5)prompt='E · Tableau de pêche';else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';else if(Math.hypot(P.x-PSIGN.x,P.y-PSIGN.y)<1.6||inPark(P.x,P.y))prompt='E · Gérer mes familiers';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
   else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Village (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}

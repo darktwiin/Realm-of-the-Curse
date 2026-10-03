@@ -707,12 +707,13 @@ function concoursTue(moi, key, sc) {
   if (!T || key !== T.bk || sc.slice(0, 2) !== 'd' + CONCOURS.donjon || CONCOURS.gagnant || !concoursParti() || !concoursVisible()) return;
   if (!moi.compte || moi.compte.admin) return;                                  // les admins ne concourent pas
   if (!(moi.etat && moi.etat.s === sc && (moi.sT || 0) >= CONCOURS.debut)) return; // donjon commencé avant le départ : ne compte pas
-  const n = String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 24);
-  CONCOURS.gagnant = { n, compte: moi.compte.nom, t: Date.now(), d: Date.now() - CONCOURS.debut }; sauverConcours();
-  if (moi.dons) moi.dons.cursite += CONCOURS.prix;
-  console.log(`[concours] ${moi.compte.nom} (${n}) gagne en ${Math.round(CONCOURS.gagnant.d / 1000)} s`);
-  envoyer(moi.ws, etatConcours({ gain: CONCOURS.prix }));
-  diffuserPartout(etatConcours({ live: 1 }), moi);
+  // tous les joueurs présents dans ce donjon gagnent ensemble : la récompense est partagée entre eux
+  const equipe = [moi]; for (const s of salles.values()) for (const j of s.values()) if (j !== moi && j.ws.readyState === 1 && j.compte && !j.compte.admin && !j.bot && !j.gardien && j.etat && j.etat.s === sc && s.get(moi.peer) === moi && !equipe.some(e => e.compte.id === j.compte.id)) equipe.push(j);
+  const part = Math.max(1, Math.floor(CONCOURS.prix / equipe.length)), noms = equipe.map(j => String((j.etat && j.etat.n) || j.compte.nom).slice(0, 16));
+  CONCOURS.gagnant = { n: noms.join(', ').slice(0, 80), compte: moi.compte.nom, comptes: equipe.map(j => j.compte.nom), part, t: Date.now(), d: Date.now() - CONCOURS.debut }; sauverConcours();
+  console.log(`[concours] ${equipe.map(j => j.compte.nom).join(', ')} gagne(nt) en ${Math.round(CONCOURS.gagnant.d / 1000)} s : ${part} Cursite chacun`);
+  for (const j of equipe) { const c = j.cpt || (j.cpt = etatCompte(j.compte.id)); c.dons.cursite += part; envoyer(j.ws, etatConcours({ gain: part })); }
+  for (const s of salles.values()) for (const j of s.values()) if (!equipe.includes(j)) envoyer(j.ws, etatConcours({ live: 1 }));
 }
 // ---------- table à dessin du Village : une toile commune de 100 × 100, un pixel par minute et par compte ----------
 const DESSIN_N = 100, DESSIN_COULEURS = 24, DESSIN_DELAI = 60000;
@@ -884,8 +885,8 @@ function paris() { const t = new Date().toLocaleString('sv-SE', { timeZone: 'Eur
   const jr = new Date(Date.UTC(y, m - 1, j)), js = process.env.FAUX_DIMANCHE ? 0 : jr.getUTCDay(), /* FAUX_DIMANCHE : pour les essais */ lundi = new Date(jr.getTime() - ((js + 6) % 7) * 86400000);
   return { jour: d, js, semaine: lundi.toISOString().slice(0, 10), heure: +h.slice(0, 2) }; }
 
-// ---------- objectif commun de la semaine : tous les monstres tués sur le serveur ; une fois atteint, +25 % d'expérience pour tout le monde jusqu'à dimanche soir ----------
-const OBJECTIF = { semaine: paris().semaine, n: 0, but: Math.max(100, +process.env.OBJECTIF_SEMAINE || 15000), atteint: 0 }, OBJECTIF_BONUS = 1.25;
+// ---------- objectif commun de la semaine : tous les monstres tués sur le serveur ; une fois atteint, +10 % d'expérience pour tout le monde jusqu'à dimanche soir ----------
+const OBJECTIF = { semaine: paris().semaine, n: 0, but: Math.max(100, +process.env.OBJECTIF_SEMAINE || 5000), atteint: 0 }, OBJECTIF_BONUS = 1.10;
 const FICHIER_OBJECTIF = path.join(DATA_DIR, 'objectif.json');
 try { const o = JSON.parse(fs.readFileSync(FICHIER_OBJECTIF, 'utf8')); if (o && o.semaine === OBJECTIF.semaine) { OBJECTIF.n = o.n | 0; OBJECTIF.atteint = +o.atteint || 0; } } catch {}
 let objectifSale = false, objectifVu = -1;

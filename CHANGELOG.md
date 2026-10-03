@@ -1,5 +1,10 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.44 (server.js et gardien.js modifiés ; wiki.html régénéré)
+- **Concours** : plus de portail au Village. À l'heure dite le donjon est annoncé, et il faut trouver son portail dans les Plaines Sauvages. Tous les joueurs présents dans le donjon à la mort du boss gagnent ensemble : la récompense est divisée par leur nombre.
+- **Objectif commun** : 5 000 monstres par semaine au lieu de 15 000 (le compteur en cours est conservé), bonus d'expérience de 10 % au lieu de 25 %.
+- **Cendreux** : 10 % plus rapide, et il fonce jusqu'à la case du joueur au lieu de rester à 3 cases.
+
 ## ver.0.0.43 (server.js, gardien.js et arbitre.js modifiés ; wiki.html régénéré)
 - **Stabilité des Plaines et des donjons** : un Gardien en retard de quelques secondes reste l'hôte (plus de monde « refait » par un joueur pendant ce temps : monstres qui disparaissent, portails d'une seconde). Une erreur dans le Gardien ne l'arrête plus. Les monstres sont envoyés jusqu'à 22 cases (15 avant) et ne réapparaissent plus à moins de 24 cases d'un joueur (14 avant) : plus d'apparition à l'écran sur les grands écrans.
 - La zone affichée ne passe plus à « Plage des Naufragés » quand on nage dans un lac au milieu de l'île.
