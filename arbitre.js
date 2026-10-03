@@ -114,7 +114,7 @@ const nbKind = (list, f) => list.filter(f).length;
 // ---------- seaux de rythme (par compte, en mémoire) ----------
 // chaque seau se remplit avec le temps ; une sauvegarde qui demande plus que le seau ne contient est refusée
 const SEAUX = {
-  or: { debit: 450, max: 4000 },          // pièces par minute
+  or: { debit: 15, max: 80 },             // petite marge de pièces par minute (tutoriel, arrondis) : tout le reste doit être justifié
   niveaux: { debit: 1.5, max: 6 },        // niveaux gagnés (tous héros) par minute
   objets: { debit: 14, max: 45 },         // nouveaux objets par minute
   t6: { debit: 0.5, max: 6 },             // nouveaux objets tier 6
@@ -122,9 +122,10 @@ const SEAUX = {
   monstres: { debit: 60, max: 250 },      // monstres tués
   boss: { debit: 3, max: 12 },            // boss tués
   gloire: { debit: 2, max: 6 },           // points de gloire
+  herbes: { debit: 25, max: 60 },         // plantes cueillies
 };
 function nouveauxSeaux() { const s = { t: Date.now() }; for (const k in SEAUX) s[k] = SEAUX[k].max; return s; }
-function remplir(sx) { const now = Date.now(), dt = (now - sx.t) / 60000; sx.t = now; for (const k in SEAUX) sx[k] = Math.min(SEAUX[k].max, sx[k] + SEAUX[k].debit * dt); }
+function remplir(sx) { const now = Date.now(), dt = (now - sx.t) / 60000; sx.t = now; for (const k in SEAUX) sx[k] = Math.min(SEAUX[k].max, (sx[k] ?? SEAUX[k].max) + SEAUX[k].debit * dt); }
 
 // jour serveur (même calcul que le jeu : un nombre par jour)
 const jourDe = d => d.getFullYear() * 372 + d.getMonth() * 31 + d.getDate();
@@ -216,6 +217,15 @@ function verifier(ancien, nouveau, ctx) {
     cursiteDepenseMin += R.BOOST_PRIX;
     if (!(+nouveau.boostXP <= Date.now() + 3600000 + 10 * 60000)) pb.push('boost d\'XP trafiqué');
   }
+  // --- herboriste : cinq plantes cueillies dans les Plaines (rythme limité). Potion de vie = Sanguine + Racine vermeille + Trèfle doré ; potion de mana = Azurine + Lunaire + Trèfle doré ---
+  const libHerbe = { pvie: 0, pmana: 0, t: 0 };
+  { const h0 = ancien.herbes || {}, h1 = nouveau.herbes || {}; let gain = 0; const moins = k => Math.max(0, (h0[k] | 0) - (h1[k] | 0));
+    for (const k of Object.keys(h1)) { if (!'srlat'.includes(k) || k.length !== 1) { pb.push('plante inconnue'); continue; } if (!estEntier(h1[k] ?? 0, 0, 99999)) { pb.push('plantes impossibles'); continue; } gain += Math.max(0, (h1[k] | 0) - (h0[k] | 0)); }
+    if (gain > sx.herbes + 0.5) pb.push('plantes cueillies trop vite (+' + gain + ')'); else sx.herbes -= gain;
+    libHerbe.pvie = Math.min(moins('s'), moins('r')); libHerbe.pmana = Math.min(moins('a'), moins('l')); libHerbe.t = moins('t');
+    // expérience du métier : 10 par potion fabriquée
+    const x0 = (ancien.herbo && ancien.herbo.xp) | 0, x1 = (nouveau.herbo && nouveau.herbo.xp) | 0;
+    if (!estEntier((nouveau.herbo && nouveau.herbo.xp) ?? 0, 0, 1000000)) pb.push('métier impossible'); else if (x1 - x0 > 10 * Math.min(libHerbe.t, libHerbe.pvie + libHerbe.pmana)) pb.push('expérience d\'herboriste injustifiée'); }
   // --- cristaux de Cursite : un meuble acheté 1000 Cursite, qui peut passer dans le sac (pour l'hôtel des ventes) et rapporte 10 Cursite par jour une fois posé ---
   const nbCr = sv => objets(sv).filter(it => it.kind === 'cristal').length, hCr = sv => Math.max(0, (sv.house && sv.house.inv && sv.house.inv.cristal) | 0);
   const crI0 = nbCr(ancien), crI1 = nbCr(nouveau), crH0 = hCr(ancien), crH1 = hCr(nouveau);
@@ -227,7 +237,6 @@ function verifier(ancien, nouveau, ctx) {
   { const cj0 = (ancien.house && ancien.house.cj) | 0, cj1 = (nouveau.house && nouveau.house.cj) | 0;
     if (cj1 !== cj0) { if (cj1 < cj0 || Math.abs(cj1 - today) > 1) pb.push('production de cristal trafiquée');
       else bonusCursite += 10 * Math.min(crH1, ((nouveau.house && Array.isArray(nouveau.house.m) && nouveau.house.m) || []).filter(e => Array.isArray(e) && e[0] === 'cristal').length); } }
-  if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
   if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 7 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
 
   // --- or : achats obligatoires (coffres, sacs), pièces tirées par le serveur, ventes, quêtes ---
@@ -241,10 +250,6 @@ function verifier(ancien, nouveau, ctx) {
   for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0); if (moins > 0) { const t = +k.split('|')[1], K = R.KINDS[k.split('|')[0]]; if (K && K.slot !== 'conso') ventes += moins * (K.t7 ? 15 : (R.SELL_PRICE[t] || 0)); } }
   // familiers vendus : 40, 150, 600 ou 2500 pièces selon le rang
   { const PRIX = [40, 150, 600, 2500], ids1 = new Set((nouveau.pets || []).map(p => p.id)); for (const p of (ancien.pets || [])) if (!ids1.has(p.id)) ventes += PRIX[Math.min(3, p.t | 0)] || 0; }
-  const gainBrut = d('gold') + orDepenseMin + (ctx.aPayer || 0); // aPayer : objets achetés à l'hôtel des ventes
-  const orServeur = Math.min(Math.max(0, gainBrut), dons.or || 0);
-  const gainOr = gainBrut - (dons.or || 0) - (etape2 ? ventes : 0);
-  if (gainOr > sx.or + 0.5) pb.push('or gagné trop vite (+' + Math.round(gainOr) + ')'); else if (gainOr > 0) sx.or -= gainOr;
 
   // --- héros à débloquer : il faut déjà l'avoir, l'avoir débloqué, ou avoir son « parent » au niveau 15 ---
   { const dq = cls => { const r = R.CLASSES[cls] && R.CLASSES[cls].req; if (!r) return true; const niv = s => (s.chars && s.chars[r] && (s.chars[r].lvl | 0)) || 0;
@@ -280,7 +285,8 @@ function verifier(ancien, nouveau, ctx) {
   const SOL_MS = 150000, sol = (dons.sol || []).filter(e => Date.now() - e.t < SOL_MS);
   const duSol = k => { const i = sol.findIndex(e => e.sig === k); if (i < 0) return false; sol.splice(i, 1); return true; };
   let donsObj = dons.objets || 0, kitT0 = kits * 3, libT6 = bonusT6, libRel = bonusReliques, libConso = Math.max(0, bonusObjets - bonusT6 - bonusReliques);
-  let nConso = 0, horsListe = 0, nT6 = 0, nRel = 0, nouveaux = 0;
+  let nConso = 0, horsListe = 0, nT6 = 0, nRel = 0, nouveaux = 0, oeufsAchetes = 0, kitPot = kits * 3;
+  let spAchat = (nouveau.spDay != null && nouveau.spDay !== ancien.spDay && Math.abs((nouveau.spDay | 0) - today) <= 1) ? 1 : 0; // potion de caractéristique du jour au marchand
   // forge : un objet +N apparaît seulement si l'objet du niveau précédent et 2 objets identiques non améliorés ont disparu
   const fondus = new Map(), perdu = k => Math.max(0, (c0.get(k) || 0) - (c1.get(k) || 0)) - (fondus.get(k) || 0), fondre = (k, n) => fondus.set(k, (fondus.get(k) || 0) + n);
   for (const [k, n] of c1) {
@@ -302,8 +308,18 @@ function verifier(ancien, nouveau, ctx) {
         if (!plus) continue; } }
     const kind = k.split('|')[0], t = +k.split('|')[1], conso = R.KINDS[kind] && R.KINDS[kind].slot === 'conso';
     for (; plus > 0; plus--) {
-      if (kind === 'cle') { if (donsObj > 0) donsObj--; else horsListe++; continue; } // une clef vient toujours du serveur
-      if (conso) { if (libConso > 0) libConso--; else if (donsObj > 0) donsObj--; else nConso++; continue; }
+      if (kind === 'cle' || kind === 'cle_tour') { if (donsObj > 0) donsObj--; else horsListe++; continue; } // une clef vient toujours du serveur
+      if (libHerbe[kind] > 0 && libHerbe.t > 0) { libHerbe[kind]--; libHerbe.t--; continue; }   // potion fabriquée avec ses plantes
+      if (conso) { // un consommable vient du serveur, d'un cadeau, du kit d'un nouveau héros, des plantes, ou d'un achat payé
+        if ((kind === 'pvie' || kind === 'pmana') && kitPot > 0) { kitPot--; continue; }
+        if (libConso > 0) { libConso--; continue; }
+        if (donsObj > 0) { donsObj--; continue; }
+        if (!etape2) { nConso++; continue; }
+        if (kind === 'pvie' || kind === 'pmana') { orDepenseMin += 5; continue; }
+        if (kind === 'croquette') { orDepenseMin += 500; continue; }
+        if (kind === 'egg') { oeufsAchetes++; continue; }
+        if (kind.startsWith('sp_') && spAchat > 0) { spAchat--; orDepenseMin += 50; continue; }
+        horsListe++; continue; }
       if (t === 0 && kitT0 > 0) { kitT0--; continue; }
       if (t === 6 && libT6 > 0 && !(R.KINDS[kind] && R.KINDS[kind].t7)) { libT6--; continue; } // le cadeau T6 ne justifie pas un Tier 7
       if (t >= 7 && libRel > 0) { libRel--; continue; }
@@ -315,6 +331,22 @@ function verifier(ancien, nouveau, ctx) {
   if (nConso > sx.objets + 0.5) pb.push('trop d\'objets d\'un coup (+' + nConso + ')'); else sx.objets -= nConso;
   if (nT6 > sx.t6 + 0.01) pb.push('trop d\'objets tier 6 (+' + nT6 + ')'); else sx.t6 -= nT6;
   if (nRel > sx.reliques + 0.01) pb.push('trop de reliques (+' + nRel + ')'); else sx.reliques -= nRel;
+  // --- Cursite et or : vérifiés ici, une fois connus les consommables achetés au marchand ---
+  // œuf acheté : 50 Cursite s'il en reste à justifier, sinon 300 pièces
+  for (let i = 0; i < oeufsAchetes; i++) { if (d('cursite') <= (dons.cursite || 0) + bonusCursite - cursiteDepenseMin - 50 + 0.5) cursiteDepenseMin += 50; else orDepenseMin += 300; }
+  if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
+  // récompenses en pièces des quêtes : seulement quand une quête passe à « récompense prise », avec le plafond de chaque quête
+  let orQuetes = 0;
+  { const q0 = ancien.quests || {}, q1 = nouveau.quests || {}, meme = q0.day === q1.day, MAXJ = [110, 75, 150];
+    if (!meme && q1.day != null && ((q0.day != null && q1.day < q0.day) || Math.abs((q1.day | 0) - today) > 1)) pb.push('quêtes d\'un autre jour');
+    for (let i = 0; i < 3; i++) if (q1.got && q1.got[i] && !(meme && q0.got && q0.got[i])) orQuetes += MAXJ[i];
+    const w0 = ancien.wquests || {}, w1 = nouveau.wquests || {}, memeS = w0.week === w1.week;
+    if (!memeS && w1.week != null && w0.week != null && w1.week < w0.week) pb.push('quêtes d\'une autre semaine');
+    for (let i = 0; i < 3; i++) if (w1.got && w1.got[i] && !(memeS && w0.got && w0.got[i])) orQuetes += 525; }
+  const gainBrut = d('gold') + orDepenseMin + (ctx.aPayer || 0); // aPayer : objets achetés à l'hôtel des ventes
+  const orServeur = Math.min(Math.max(0, gainBrut - orQuetes - (etape2 ? ventes : 0)), dons.or || 0); // les pièces des quêtes et des ventes ne consomment pas celles du serveur
+  const gainOr = gainBrut - (dons.or || 0) - (etape2 ? ventes : 0) - orQuetes;
+  if (gainOr > sx.or + 0.5) pb.push('or gagné trop vite (+' + Math.round(gainOr) + ')'); else if (gainOr > 0) sx.or -= gainOr;
   // --- objets donnés lors d'un échange : celui qui donne doit bien les perdre (anti-duplication) ---
   const aPerdre = (ctx.aPerdre || []).filter(e => Date.now() - e.t < 30 * 60000);
   const enTrop = [];

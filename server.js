@@ -167,7 +167,7 @@ function connecter(moi, c, ws) {
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, id: c.id, admin: moi.compte.admin, save, cgu });
   if (save) { envoyerCapGardien(moi, save); moi.cpt.boost = +save.boostXP || 0; }
   if (concoursVisible()) envoyer(ws, etatConcours());
-  envoyer(ws, etatObjectif()); tournoiCloture(); envoyer(ws, etatTournoi(moi)); if (ALPHAS.has(String(c.nom).toLowerCase())) envoyer(ws, { t: 'titres', l: ['alpha'] });
+  envoyer(ws, etatObjectif()); tournoiCloture(); envoyer(ws, etatTournoi(moi)); envoyer(ws, etatGuerre()); if (ALPHAS.has(String(c.nom).toLowerCase())) envoyer(ws, { t: 'titres', l: ['alpha'] });
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
 }
 function actionCompte(moi, ws, m) {
@@ -718,15 +718,41 @@ function concoursTue(moi, key, sc) {
 // ---------- table à dessin du Village : une toile commune de 100 × 100, un pixel par minute et par compte ----------
 const DESSIN_N = 100, DESSIN_COULEURS = 24, DESSIN_DELAI = 60000;
 const FICHIER_DESSIN = path.join(DATA_DIR, 'dessin.json');
-let DESSIN = Buffer.alloc(DESSIN_N * DESSIN_N, 0);
-try { const d = JSON.parse(fs.readFileSync(FICHIER_DESSIN, 'utf8')); const b = Buffer.from(String(d.d || ''), 'base64'); if (b.length === DESSIN_N * DESSIN_N) DESSIN = b; } catch {}
+// logo du jeu en 100 × 100, dans les 24 couleurs de la table à dessin (renvoie un Buffer d'indices)
+function logoDessin() {
+  const N = 100, d = Buffer.alloc(N * N, 4), set = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < N && y < N) d[y * N + x] = c; };
+  let s = 12345; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const cx = 50, cy = 46, R = 25;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const r = Math.hypot(x - cx, y - cy); if (r < 44 && (x + y) % 2 === 0 && r > 30) set(x, y, 19); else if (r <= 30) set(x, y, 19); }      // halo bleu nuit
+  for (let i = 0; i < 70; i++) { const x = rnd() * N | 0, y = rnd() * N | 0; if (Math.hypot(x - cx, y - cy) > R + 4) set(x, y, rnd() < 0.3 ? 0 : rnd() < 0.5 ? 20 : 2); }          // étoiles
+  for (let y = -R - 2; y <= R + 2; y++) for (let x = -R - 2; x <= R + 2; x++) { const r = Math.hypot(x, y); if (r <= R + 1.5) set(cx + x, cy + y, r > R - 0.5 ? 4 : r > R - 3.5 ? (x + y < -8 ? 20 : 21) : r > R - 5 ? 4 : (x * 0.6 + y < -6 ? 3 : 4 === 4 ? 3 : 3)); }
+  for (let y = -R + 5; y <= R - 5; y++) for (let x = -R + 5; x <= R - 5; x++) { const r = Math.hypot(x, y); if (r <= R - 5.5) set(cx + x, cy + y, r < 9 ? 19 : 3); }                 // cadran
+  for (let h = 0; h < 12; h++) { const a = h * Math.PI / 6, L = h % 3 === 0 ? 4 : 2; for (let k = 0; k < L; k++) set(cx + Math.sin(a) * (R - 7 - k), cy - Math.cos(a) * (R - 7 - k), h % 3 === 0 ? 11 : 12); }
+  const ligne = (x0, y0, x1, y1, c, w) => { const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 2); for (let i = 0; i <= n; i++) { const x = x0 + (x1 - x0) * i / n, y = y0 + (y1 - y0) * i / n; for (let a = 0; a < (w || 1); a++) for (let b = 0; b < (w || 1); b++) set(x + a, y + b, c); } };
+  ligne(cx, cy, cx - 9, cy - 8, 11, 2); ligne(cx, cy, cx + 6, cy - 15, 12, 2);                                    // aiguilles
+  for (const [a, b] of [[0, 0], [1, 0], [0, 1], [1, 1], [-1, 0], [0, -1]]) set(cx + a, cy + b, 10);
+  { let x = cx + 2, y = cy + 3; const pts = [[4, 3], [-2, 4], [5, 4], [-1, 5], [4, 4], [3, 3]]; for (const [dx, dy] of pts) { ligne(x, y, x + dx, y + dy, 16, 1); x += dx; y += dy; } }   // fissure
+  { let x = cx + 19, y = 2; const pts = [[-6, 7], [4, 1], [-7, 9], [3, 0], [-5, 8]]; for (const [dx, dy] of pts) { ligne(x, y, x + dx, y + dy, 12, 2); ligne(x, y, x + dx, y + dy, 0, 1); x += dx; y += dy; } } // éclair
+  const F = { T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'], H: ['#...#', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'], E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
+    C: ['.####', '#....', '#....', '#....', '#....', '#....', '.####'], U: ['#...#', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'], R: ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'], S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'] };
+  const texte = (t, x0, y0, k, c, ombre, esp) => { [...t].forEach((ch, i) => { const g = F[ch]; for (let pass = 0; pass < 3; pass++) for (let y = 0; y < 7; y++) for (let x = 0; x < 5; x++) if (g[y][x] === '#') for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) {
+      const X = x0 + i * (5 * k + esp) + x * k + a, Y = y0 + y * k + b;
+      if (pass === 0) { for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [2, 2], [1, 2], [2, 1]]) set(X + dx, Y + dy, 4); } else if (pass === 1) set(X + 1, Y + 1, ombre); else set(X, Y, c); } }); };
+  texte('THE', 33, 3, 2, 20, 21, 2);
+  texte('CURSE', 7, 76, 3, 22, 23, 3);
+  return d;
+}
+let DESSIN = Buffer.alloc(DESSIN_N * DESSIN_N, 0), dessinLogo = 0;
+try { const d = JSON.parse(fs.readFileSync(FICHIER_DESSIN, 'utf8')); const b = Buffer.from(String(d.d || ''), 'base64'); if (b.length === DESSIN_N * DESSIN_N) DESSIN = b; dessinLogo = d.logo ? 1 : 0; } catch {}
 const dessinPose = new Map();   // nom du compte -> heure du dernier pixel
 let dessinSale = null;
-const sauverDessin = () => { clearTimeout(dessinSale); dessinSale = setTimeout(() => { try { fs.writeFileSync(FICHIER_DESSIN, JSON.stringify({ d: DESSIN.toString('base64') })); } catch (e) { console.error('[dessin]', e.message); } }, 5000); };
+const sauverDessin = () => { clearTimeout(dessinSale); dessinSale = setTimeout(() => { try { fs.writeFileSync(FICHIER_DESSIN, JSON.stringify({ d: DESSIN.toString('base64'), logo: dessinLogo })); } catch (e) { console.error('[dessin]', e.message); } }, 5000); };
+if (!dessinLogo) { DESSIN = logoDessin(); dessinLogo = 1; sauverDessin(); console.log('[dessin] logo du jeu posé sur la toile'); } // une seule fois : ensuite la toile appartient aux joueurs
 const dessinAttente = moi => !moi.compte || moi.compte.admin ? 0 : Math.max(0, DESSIN_DELAI - (Date.now() - (dessinPose.get(moi.compte.nom) || 0)));
 function dessiner(moi, m) {
   if (!moi.compte) return;
   if (m.t === 'dessin') { envoyer(moi.ws, { t: 'dessin', d: DESSIN.toString('base64'), att: dessinAttente(moi) }); return; }
+  if (m.logo) { if (!moi.compte.admin) return; DESSIN = logoDessin(); sauverDessin(); console.log(`[dessin] ${moi.compte.nom} repose le logo`); diffuserPartout({ t: 'dessin', d: DESSIN.toString('base64') }); return; }
   if (m.raz) {                                                                      // tout effacer : admins seulement
     if (!moi.compte.admin) return;
     DESSIN.fill(0); sauverDessin(); console.log(`[dessin] ${moi.compte.nom} efface la toile`);
@@ -886,6 +912,28 @@ function maison(moi, m, salle) {
   } catch (e) { console.error('[maison]', e.message); }
 }
 
+// ---------- guerre des guildes : chaque heure, la guilde qui a tué le plus de monstres dans une zone des Plaines y gagne +10 % d'or et d'expérience pendant l'heure suivante ----------
+const GUERRE_PERIODE = Math.max(20000, +process.env.GUERRE_PERIODE || 3600000); // une heure (réglable pour les essais)
+const FICHIER_GUERRE = path.join(DATA_DIR, 'guerre.json'), GUERRE_BONUS = 1.10;
+const GUERRE = { heure: Math.floor(Date.now() / GUERRE_PERIODE), n: {}, tenant: {} }; // n : zone -> { gid: tués } · tenant : zone -> gid
+try { const g = JSON.parse(fs.readFileSync(FICHIER_GUERRE, 'utf8')); if (g && g.heure === GUERRE.heure) { GUERRE.n = g.n || {}; GUERRE.tenant = g.tenant || {}; } else if (g && g.heure === GUERRE.heure - 1) { GUERRE.n = g.n || {}; GUERRE.heure = g.heure; } } catch {}
+let guerreSale = false;
+const zoneDe = key => { const R = arbitre.regles(); return R && R.ZONES ? R.ZONES.findIndex(z => (z.pool || []).includes(key)) : -1; };
+function guerreTour() { // changement d'heure : les gagnants prennent les zones, les compteurs repartent de zéro
+  const h = Math.floor(Date.now() / GUERRE_PERIODE); if (h === GUERRE.heure) return false;
+  const tenant = {}; if (h === GUERRE.heure + 1) for (const z of Object.keys(GUERRE.n)) { let best = null, bn = 0; for (const [gid, n] of Object.entries(GUERRE.n[z])) if (guildes[gid] && n > bn) { bn = n; best = gid; } if (best) tenant[z] = best; }
+  GUERRE.heure = h; GUERRE.n = {}; GUERRE.tenant = tenant; guerreSale = true;
+  console.log('[guerre] nouvelle heure : ' + (Object.entries(tenant).map(([z, gid]) => z + '=' + guildes[gid].tag).join(' ') || 'aucune zone tenue')); return true;
+}
+function etatGuerre() { const R = arbitre.regles(), nb = R && R.ZONES ? R.ZONES.length : 7, zones = [];
+  for (let z = 0; z < nb; z++) { const t = guildes[GUERRE.tenant[z]], top = Object.entries(GUERRE.n[z] || {}).filter(([gid]) => guildes[gid]).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([gid, n]) => ({ tag: guildes[gid].tag, nom: guildes[gid].nom, n }));
+    zones.push({ t: t ? { tag: t.tag, nom: t.nom } : null, top }); }
+  return { t: 'guerre', zones, fin: (GUERRE.heure + 1) * GUERRE_PERIODE, bonus: Math.round((GUERRE_BONUS - 1) * 100) }; }
+function guerreTue(moi, key, sc) { if (sc !== 'r' || !moi.idJoueur) return; const z = zoneDe(key); if (z < 0) return; const [gid] = guildeDe(moi.idJoueur); if (!gid) return;
+  guerreTour(); const Z = GUERRE.n[z] || (GUERRE.n[z] = {}); Z[gid] = (Z[gid] || 0) + 1; guerreSale = true; }
+function guerreBonus(moi, key, sc) { if (sc !== 'r' || !moi.idJoueur) return 1; guerreTour(); const z = zoneDe(key); if (z < 0 || !GUERRE.tenant[z]) return 1; const [gid] = guildeDe(moi.idJoueur); return gid && gid === GUERRE.tenant[z] ? GUERRE_BONUS : 1; }
+setInterval(() => { const neuf = guerreTour(); if (guerreSale) { guerreSale = false; try { fs.writeFileSync(FICHIER_GUERRE, JSON.stringify({ heure: GUERRE.heure, n: GUERRE.n, tenant: GUERRE.tenant })); } catch (e) { console.error('[guerre]', e.message); } diffuserPartout(Object.assign(etatGuerre(), neuf ? { neuf: 1 } : {})); } }, 10000);
+
 // ---------- heure de Paris (semaine d'objectif, dimanche de pêche) ----------
 function paris() { const t = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Paris' }), [d, h] = t.split(' '), [y, m, j] = d.split('-').map(Number);
   const jr = new Date(Date.UTC(y, m - 1, j)), js = process.env.FAUX_DIMANCHE ? 0 : jr.getUTCDay(), /* FAUX_DIMANCHE : pour les essais */ lundi = new Date(jr.getTime() - ((js + 6) % 7) * 86400000);
@@ -975,5 +1023,5 @@ function reclamerKill(moi, m, nom, salle, essai) {
   const sc = String(m.s || ''), d = donjonsGardes.get(nom + '|' + sc);
   const G = gardienDe(salle, sc || 'r');
   if (!G && d && Date.now() - d.t < 8000 && essai < 25) { setTimeout(() => { if (moi.ws.readyState === 1) reclamerKill(moi, m, nom, salle, essai + 1); }, 400); return; }
-  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc) && !moi.compte.admin, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, boostServeur: bonusObjectif(), onTue: (key, s) => { concoursTue(moi, key, s); objectifTue(); }, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
+  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc) && !moi.compte.admin, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, boostServeur: bonusObjectif(), guerre: guerreBonus(moi, String(m.k || ''), sc), onTue: (key, s) => { concoursTue(moi, key, s); objectifTue(); guerreTue(moi, key, s); }, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
 }

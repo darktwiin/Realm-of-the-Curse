@@ -1,5 +1,20 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.49 (server.js, butin.js et arbitre.js modifiés ; wiki.html régénéré)
+- **Herboriste** : cinq plantes au lieu de deux. Potion de vie = Sanguine + Racine vermeille + Trèfle doré ; potion de mana = Azurine + Lunaire + Trèfle doré (le Trèfle sert aux deux). Chaque potion fabriquée rapporte 10 points de métier ; le métier monte jusqu'au niveau 20 (30 × niveau pour passer au suivant). Le niveau ne donne encore aucun avantage.
+- **Tour des Chevaliers** : scellée. Il faut une « Clef de la Tour », consommée à l'entrée. La clef n'a pas encore de source en jeu : elle se donne depuis l'onglet Objets du panneau admin, et un bouton « Tour des Chevaliers » dans le panneau admin permet d'y entrer directement.
+- **Talismans des deux boss du centre** : le Roi Bouffon lâche le Grelot du Bouffon (Talisman du Roi Bouffon : +6 vitesse d'attaque, +4 vitesse de déplacement) et le Béhémoth le Cœur d'obsidienne (Talisman du Béhémoth : +100 vie, +4 puissance), 20 % de chance, 10 ressources par talisman.
+- **Table à dessin** : le logo du jeu (100 × 100) est posé une fois sur la toile au démarrage du serveur ; la table reste libre, chacun peut redessiner dessus. Les admins ont un bouton « Reposer le logo ».
+- **Anti-triche resserré** :
+  - l'or ne peut plus apparaître sans raison : la marge passe de 450 à 15 pièces par minute. Les pièces viennent du serveur (monstres, hôtel des ventes, raid), des ventes au marchand, et des quêtes, dont la récompense n'est acceptée qu'au moment où la quête est validée, une seule fois ;
+  - un consommable doit maintenant être justifié : donné par le serveur, cadeau de connexion, kit d'un nouveau héros, fabriqué avec des plantes, ou acheté et payé (potion 5 pièces, croquette 500, œuf 300 pièces ou 50 Cursite, potion de caractéristique du jour 50 pièces). Une potion de caractéristique, un œuf ou une clef inventés sont refusés.
+
+## ver.0.0.48 (server.js, butin.js et arbitre.js modifiés ; wiki.html régénéré)
+- **Herboriste** : deux plantes poussent dans les Plaines Sauvages, la Sanguine (rouge) et l'Azurine (bleue). On les cueille en passant dessus ; elles vont dans une liste à part (bouton « Ressources et talismans »), pas dans le sac. Elles repoussent ailleurs toutes les 10 minutes. À l'atelier de l'herboriste, au Village, 3 Sanguines donnent une potion de vie et 3 Azurines une potion de mana.
+- **Les potions de vie et de mana ne tombent plus des monstres ni des boss.** Le marchand en vend toujours.
+- **Guerre des guildes** : dans chaque zone des Plaines, chaque heure, la guilde qui a tué le plus de monstres prend la zone ; ses membres y gagnent +10 % d'or et d'expérience pendant l'heure suivante, puis les compteurs repartent de zéro. Un panneau apparaît dans les Plaines (zone tenue, guilde en tête, score de sa guilde, temps restant) ; un clic ouvre le détail des sept zones.
+- **Tour des Chevaliers** : nouveau portail au Village, à gauche de celui de la Maison. Arène à vagues en solo, sans boss : huit nouveaux ennemis (Écuyer, Arbalétrier, Lancier, Chevalier de la Tour, Hallebardier, Cavalier, Paladin doré, Chevalier noir), chacun avec son dessin animé et son projectile. À chaque vague, la vie des chevaliers est multipliée par 1,22 et leurs dégâts par 1,13 ; une nouvelle vague part dès que la précédente est vaincue, ou d'office au bout de 40 secondes. La mort ne coûte rien (ni niveaux, ni objets). Aucune récompense pour l'instant ; le record (vague et temps) est gardé.
+
 ## ver.0.0.47 (index.html seulement ; wiki.html régénéré pour le numéro de version)
 - Correctif : le titre « Alpha testeur » ne pouvait pas être choisi dans les Options quand le joueur n'avait aucun autre titre (la liste restait grisée).
 

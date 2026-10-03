@@ -50,7 +50,7 @@ function tirer(R, key, cls, scene, sc) {
   if (d.tuto) { out.xp *= 2; out.tuto = 1; return out; }
   if (Math.random() < d.drop) { const n = d.n && d.boss ? d.n : 1; for (let i = 0; i < n; i++) { let t = ri(d.loot[0], d.loot[1]); if (Math.random() < 0.08) t = Math.min(6, t + 1); out.it.push(objetAuHasard(R, t, cls)); } }
   if (d.rel && (key === 'devoreur' || Math.random() < d.rel)) { out.rel = out.it.length; out.it.push(objetAuHasard(R, 7, cls)); }
-  if (Math.random() < (d.boss ? 1 : 0.12)) out.it.push(R.mkItem(Math.random() < 0.6 ? 'pvie' : 'pmana', 0));
+  // les potions de vie et de mana ne tombent plus : elles se fabriquent à l'atelier de l'herboriste avec les plantes des Plaines
   if (Math.random() < 0.005) { out.oeuf = 1; out.it.push(R.mkItem('egg', 0)); }
   // Clef du Temps : 1 % sur le boss des 6 grands donjons, 10 % sur chacun des 4 gardiens de l'Observatoire (jamais sur le Dévoreur)
   if (R.KINDS.cle && typeof sc === 'string' && sc[0] === 'd') {
@@ -63,6 +63,7 @@ function tirer(R, key, cls, scene, sc) {
     if (tous.length) out.it.push(R.mkItem(pick(miens.length && Math.random() < 0.5 ? miens : tous), 7)); }
   // ressource de boss (talismans) : 20 % sur le boss du donjon où l'on se trouve
   if (d.boss && typeof sc === 'string' && sc[0] === 'd' && R.TALIS && R.TALIS[sc[1]]) { const T = R.DTYPES[sc[1]]; if (T && (T.bk === key || T.bk2 === key) && Math.random() < TAUX_RESSOURCE) out.res = sc[1]; }
+  if ((key === 'dieu_fou' || key === 'colosse') && R.TALIS && Math.random() < TAUX_RESSOURCE) out.res = key === 'dieu_fou' ? 'j' : 'x'; // ressource des deux boss du centre de l'île
   if (d.midBoss || GARANTIS.includes(key)) out.spg.push(R.mkItem('sp_' + pick(R.SK), 0));
   out.sp = potionsCarac(R, key, d, scene).map(k => R.mkItem('sp_' + k, 0));
   if (d.or && Math.random() < d.or[0]) out.or = Math.max(1, Math.round(ri(d.or[1], d.or[2]) * 1.3)); // pièces +30 %
@@ -153,6 +154,7 @@ function reclamer(moi, m, ctx) {
   const r = tirer(R, key, cls, s === 'r' ? 'realm' : 'dungeon', s);
   if (ctx.boost && Date.now() < ctx.boost) r.xp = Math.round(r.xp * 1.3); // boost d'expérience (Cursite)
   if (ctx.boostServeur > 1) r.xp = Math.round(r.xp * ctx.boostServeur);     // objectif commun de la semaine atteint
+  if (ctx.guerre > 1) { r.xp = Math.round(r.xp * ctx.guerre); if (r.or) { const v = r.or * ctx.guerre; r.or = Math.floor(v) + (Math.random() < v - Math.floor(v) ? 1 : 0); } } // guerre des guildes : zone tenue par sa guilde
   const dons = ctx.dons; nettoyer(dons);
   dons.xp += r.xp; dons.kills += 1; dons.boss += r.b; dons.or += r.or;
   for (const it of [...r.it, ...r.spg, ...r.sp]) noter(dons, it);

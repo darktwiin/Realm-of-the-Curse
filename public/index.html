@@ -131,6 +131,7 @@ details.help dt{color:var(--gold)} details.help dd{margin:0}
 .shop-item .price .cur{display:inline-block;width:10px;height:10px;background:#3ff0ff;transform:rotate(45deg);margin-right:6px}
 .shop-sell{background:var(--panel2);border:2px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:6px}.shop-sell span{font-size:12px;color:var(--muted)}
 #parrMoi{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--panel2);border:2px solid var(--line);padding:8px}#parrMoi input{background:#1a1626;color:inherit;border:2px solid var(--line2);padding:3px 6px;font:inherit;font-size:14px;width:180px}.parrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--panel2);border:2px solid var(--line);padding:6px 8px}.parrow span{font-size:13px;opacity:.85}.parrow .ok{color:#7ed957}
+#gwBox{margin-top:6px;padding:5px 6px;background:rgba(11,10,18,.78);border:2px solid #c9973c;font-size:11px;line-height:1.35;cursor:pointer;pointer-events:auto;display:flex;flex-direction:column;gap:1px;max-width:150px}#gwBox[hidden]{display:none}#gwBox b{color:#ffd23f;font-size:11px}#gwBox i{font-style:normal}#gwBox:hover{border-color:#ffd23f}
 .hvtabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.hvtabs .on{border-color:var(--gold);color:var(--gold);background:#3a3020}
 #hvBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#hvBar select,#hvBar input{background:#1a1626;color:inherit;border:2px solid var(--line2);padding:3px 6px;font:inherit;font-size:14px}#hvBar input[type=number]{width:120px}
 .hvrow{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;background:var(--panel2);border:2px solid var(--line);padding:6px 8px}.hvrow img{width:44px;height:44px;image-rendering:pixelated}.hvrow b{display:block}.hvrow span{font-size:13px;opacity:.8}.hvrow .price{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:3px}
@@ -448,7 +449,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.47"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.49"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -464,7 +465,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.47</div>
+    <div class="verTag" id="verTag">ver.0.0.49</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -483,7 +484,7 @@ body.ton #opts{position:fixed;z-index:120}
         <h2>Administration</h2>
         <div class="admtabs" id="admTabs"><button type="button" data-at="moi" class="on">Moi</button><button type="button" data-at="joueurs">Joueurs</button><button type="button" data-at="bans">Bannis</button><button type="button" data-at="objets">Objets</button><button type="button" data-at="monstres">Monstres</button><button type="button" data-at="filtre">Filtre</button><button type="button" data-at="admins">Admins</button><button type="button" data-at="etats">États</button><button type="button" data-at="triche">Triche</button><button type="button" data-at="suspects">Suspects</button></div>
         <div class="admpane" data-ap="moi">
-          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Village)</button><button type="button" class="act" id="devVeng">🐟 Portail Vengeance sous-marine (Plaines)</button><button type="button" class="act" id="devConc">🏆 Concours : état</button><button type="button" class="act" id="devConcGo">🏆 Lancer le concours maintenant (double-clic)</button><button type="button" class="act" id="devConcReset">🏆 Effacer le gagnant (double-clic)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (5 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
+          <div class="acts"><button type="button" class="act" id="devGod">Mode GOD : désactivé</button><button type="button" class="act" id="devKill">💀 Tuer les monstres à l'écran</button><button type="button" class="act" id="devTour">🏰 Tour des Chevaliers</button><button type="button" class="act" id="devHub">🌀 Salle d'essai des donjons</button><button type="button" class="act" id="devTest">🧪 Salle de test (Village)</button><button type="button" class="act" id="devVeng">🐟 Portail Vengeance sous-marine (Plaines)</button><button type="button" class="act" id="devConc">🏆 Concours : état</button><button type="button" class="act" id="devConcGo">🏆 Lancer le concours maintenant (double-clic)</button><button type="button" class="act" id="devConcReset">🏆 Effacer le gagnant (double-clic)</button><button type="button" class="act" id="devRaid">🐉 Lancer le raid de guilde (5 min)</button><button type="button" class="act" id="devRaidStop">⏹ Finir le raid maintenant</button><button type="button" class="act" id="devInv">👻 Invisible : non</button><button type="button" class="act gold" id="devParty">✨ Fête pour tous (écran)</button><button type="button" class="act gold" id="devPartyMe">✨ Tester sur moi</button><button type="button" class="act danger" id="devKillPl">☠ Tuer les joueurs à l'écran (double-clic)</button></div>
           <div class="killbox" id="killBox" hidden><b id="killTxt"></b><span class="acts"><button type="button" class="act danger" id="killYes">Oui, je confirme</button><button type="button" class="act" id="killNo">Annuler</button></span></div>
           <p class="hint">Invisible : les monstres t'ignorent et les autres joueurs ne te voient plus (ni sur la carte, ni dans la liste).</p>
           <p class="hint">GOD : invulnérable. Clic droit dans le jeu ou clic sur la mini-carte pour te téléporter.</p>
@@ -627,7 +628,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.47</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.49</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -669,7 +670,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.47</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.49</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1246,6 +1247,7 @@ KINDS.egg={slot:'conso',type:'Œuf de familier',egg:true,noms:['Œuf de familier
 for(const k in PET_DEF)KINDS['egg_'+k]={slot:'conso',type:'Œuf de familier',egg:true,legacy:true,noms:['Œuf de familier']};
 KINDS.croquette={slot:'conso',type:'Nourriture de familier',food:true,noms:['Croquette de familier']};
 KINDS.cle={slot:'conso',type:'Clef de donjon',key:true,noms:['Clef du Temps']};
+KINDS.cle_tour={slot:'conso',type:'Clef',base:'cle',cleTour:true,noms:['Clef de la Tour']}; // ouvre la Tour des Chevaliers (pas encore de source en jeu : panneau admin)
 const RING_N=['Anneau de cuivre',"Anneau d'argent","Anneau d'or",'Anneau de saphir',"Anneau d'améthyste",'Anneau solaire','Anneau du Roi Bouffon',"Anneau de l'Infini"];
 const RING_S={vie:'de vitalité',mana:'de sagesse',puissance:'de force',vatt:'de dextérité',vdep:'du vent'};
 const SLOT_IDX={arme:0,capa:1,armure:2,anneau:3};
@@ -1460,8 +1462,19 @@ MON_SPR.chronos=[['..YYYY..','.YWWWWY.','YWWKWWWY','YWWKKWWY','YWWWWWWY','.YWWWW
 for(const k in MON){const d=MON[k];d.arm=(d.tuto||k==='dragon'||k==='mannequin')?0:d.boss?0.15:0.10;if(d.arm)d.hp=Math.round(d.hp*(1-d.arm));}
 for(const k of ['luciole','hibou','esprit_bois','gardien_luciole'])MON[k].dmg=Math.round(MON[k].dmg*0.8);            // Sanctuaire des Lucioles : dégâts −20 %
 for(const k of ['requin','calmar','lanterne','leviathan'])MON[k].bs=Math.round(MON[k].bs*0.7*10)/10;             // Abysses Engloutis : projectiles 30 % plus lents
+// Tour des Chevaliers : pas de butin, pas d'expérience ; leurs chiffres sont multipliés à chaque vague
+Object.assign(MON,{
+  tr_ecuyer:{nom:'Écuyer',hp:90,xp:0,spd:2.5,dmg:9,cd:1.5,pat:'single',bs:6,br:5,sz:0.8,loot:[0,0],drop:0,pref:2,bc:'#b07a48',or:[0,0,0],tour:true},
+  tr_arbaletrier:{nom:'Arbalétrier',hp:70,xp:0,spd:1.6,dmg:14,cd:2.2,pat:'sniper',n:1,bs:11,br:11,sz:0.8,loot:[0,0],drop:0,pref:7,bc:'#aab0c0',or:[0,0,0],tour:true},
+  tr_lancier:{nom:'Lancier',hp:130,xp:0,spd:2.2,dmg:12,cd:2,pat:'burst',n:3,bs:8,br:6,sz:0.85,loot:[0,0],drop:0,pref:3,bc:'#c8324a',mv:'charge',or:[0,0,0],tour:true},
+  tr_chevalier:{nom:'Chevalier de la Tour',hp:320,xp:0,spd:1.4,dmg:16,cd:2.2,pat:'shotgun',n:5,spread:0.16,bs:6,br:7,sz:0.95,loot:[0,0],drop:0,pref:2.5,bc:'#5a7fe0',or:[0,0,0],tour:true},
+  tr_hallebardier:{nom:'Hallebardier',hp:220,xp:0,spd:1.6,dmg:15,cd:2.6,pat:'ring',n:10,bs:5,br:7,sz:0.9,loot:[0,0],drop:0,pref:3,bc:'#c8b078',or:[0,0,0],tour:true},
+  tr_cavalier:{nom:'Cavalier',hp:260,xp:0,spd:3.6,dmg:18,cd:1.8,pat:'trio',bs:8,br:6,sz:1.1,loot:[0,0],drop:0,pref:1.5,bc:'#c8324a',mv:'charge',or:[0,0,0],tour:true},
+  tr_paladin:{nom:'Paladin doré',hp:480,xp:0,spd:1.5,dmg:20,cd:2.4,pat:'star',n:14,bs:5.5,br:9,sz:1,loot:[0,0],drop:0,pref:4,bc:'#ffd23f',or:[0,0,0],tour:true},
+  tr_noir:{nom:'Chevalier noir',hp:700,xp:0,spd:2,dmg:26,cd:1.8,pat:'tr_noir',bs:7,br:10,sz:1.1,loot:[0,0],drop:0,pref:4,bc:'#c8102e',or:[0,0,0],tour:true}});
 for(const k in MON)MON[k].sz=Math.round(MON[k].sz*(MON[k].boss?1.1:1.25)*100)/100; // monstres un peu plus grands à l'écran
 const MKEYS=Object.keys(MON);
+for(const k in MON)if(!MON_SPR[k])MON_SPR[k]=MON_SPR.squelette; // les chevaliers de la tour n'ont qu'un dessin en 32 pixels
 const MSPR={};for(const k in MON)MSPR[k]=makeSprite(MON_SPR[k][0],MON_SPR[k][1],6);
 // Dragon en pixel art dessiné par code : 72×64 pixels logiques, palette limitée, contour sombre
 function makeDragonFrame(f,part){part=part||'all'; // f: 0 repos ailes basses, 1 ailes hautes, 2 attaque (gueule ouverte, flammes)
@@ -1944,8 +1957,17 @@ Object.assign(BOSS_BULLET,{g_belier:'corne',g_scorpion:'dard',g_serpent:'venin',
   T('coucou','d',['....pp....','..ppPPp...','wwPPPPKPyy','.wwPPPPPyY','wwPPPPPp..','..ppPPp...','....pp....'],{p:'#5a3a8a',P:'#8a5ad0',w:'#c8a0ff',K,y:'#e8a020',Y:'#ffd23f'});
   T('aiguille','d',['...........','.y.........','yYyyyyyyy..','yYYYYYYYYYW','yYyyyyyyy..','.y.........','...........'],{y:'#8a6a2a',Y:'#ffd23f',W});
   T('chiffre','f',['ccccccccc','.cC.cC.c.','..cCcC...','...cC....','..cCcC...','.cC.cC.c.','ccccccccc'],{c:'#1e8a9a',C:'#3ff0ff'});
+  // --- Tour des Chevaliers
+  T('tr_epee','d',['..........','gg....ssS.','gGhsSSSSSW','gg....ssS.','..........'],{g:'#8a6a2a',G:'#ffd23f',h:'#c9973c',s:'#8a93a3',S:'#dfe6f2',W});
+  T('tr_carreau','d',['r..........','rrbbbbbbsS.','rrbbbbbbsSW','r..........'],{r:'#c8324a',b:'#6a4424',s:'#8a93a3',S:'#dfe6f2',W});
+  T('tr_lance','d',['...rr....s..','..rRr...sS..','bbbbbbbbsSSW','..rRr...sS..','...rr....s..'],{r:'#8a1f2e',R:'#c8324a',b:'#6a4424',s:'#8a93a3',S:'#dfe6f2',W});
+  T('tr_taille','d',['...bB....','.....bBW.','......bBW','......bBW','.....bBW.','...bB....'],{b:'#3f5fb0',B:'#8fd0ff',W});
+  T('tr_hallebarde','s',['....s....','...sSs...','..sSWSs..','.sSS.b...','.....b...','....b....','...b.....','..b......'],{s:'#8a93a3',S:'#dfe6f2',b:'#6a4424',W});
+  T('tr_marteau','s',['.yyyyyy..','yYYWWYYy.','yYYYYYYy.','.yyyyyy..','...bb....','...bb....','...bb....'],{y:'#a8862a',Y:'#ffd23f',b:'#6a4424',W:'#fff1b0'});
+  T('tr_fer','s',['.sSSSs.','sS...Ss','S.....S','S.....S','sS...Ss','.s...s.'],{s:'#6a7084',S:'#c8d0e0'});
+  T('tr_lame_noire','d',['..........r.','.nn....nnrR.','nNNnnnnNNrRW','.nn....nnrR.','..........r.'],{n:'#14101c',N:'#3a2a40',r:'#8a1020',R:'#ff3b4a',W:'#ffb0b0'});
   // --- quel projectile pour quel monstre (un tableau = le boss change d'attaque à chaque salve)
-  const M={slime:'goutte_slime',gobelin:'couteau',crabe:'pince',mouette:'plume_grise',squelette:'femur',loup:'griffure',champignon:'spore',crapaud:'bave',feu_follet:'flamme_verte',noye:'eau_croupie',sangsue:'ventouse',
+  const M={tr_ecuyer:'tr_epee',tr_arbaletrier:'tr_carreau',tr_lancier:'tr_lance',tr_chevalier:'tr_taille',tr_hallebardier:'tr_hallebarde',tr_cavalier:'tr_fer',tr_paladin:'tr_marteau',tr_noir:'tr_lame_noire',slime:'goutte_slime',gobelin:'couteau',crabe:'pince',mouette:'plume_grise',squelette:'femur',loup:'griffure',champignon:'spore',crapaud:'bave',feu_follet:'flamme_verte',noye:'eau_croupie',sangsue:'ventouse',
     ogre:'gourdin',spectre:'ame',sylvain:'feuille',araignee:'toile',golem:'ecrou',harpie:'plume_brune',scorpion:'dard_scorpion',bandit:'dague',salamandre:'boule_feu',imp:'trident',cendreux:'braise',wyrm:'lave',
     demon:'croissant',sentinelle:'rayon',spectre_vide:'vide',chimere:'souffle',dieu_fou:['carte','balle','grelot'],colosse:['obsidienne','magma'],acolyte:'rune',gargouille:'eclat_pierre',ombre:'lame_ombre',
     fantome:'ectoplasme',armure:'epee_spectrale',chauve:'ultrason',liche:['chauve','crane_violet'],momie:'bandelette',scarabee:'boule_sable',djinn:'cimeterre',pharaon:['scarabee','ankh'],
@@ -2549,6 +2571,59 @@ function makeJester(f){const {c,g,poly,ell,line}=bossCanvas(),cx=32,w=f===1?1:0,
     px(X-1,22,'#c9973c',1,3);px(X+2,22,'#c9973c',1,3);};
 }
 // mise en place : trois images par monstre redessiné
+/*TOUR_ART_DEBUT*/
+// ---------- la Tour des Chevaliers : huit ennemis en armure, dessinés en 32 pixels (repos A, repos B, attaque) ----------
+{const A=MON_ART,ACIER='#dfe6f2',BOIS='#6a4424',OR='#ffd23f';
+  // chevalier de face : casque, armure, arme à droite, écu à gauche
+  const chev=o=>({poly,ell,line,px},f)=>{const s=f===1?1:0,atk=f===2,b=s;
+    if(o.cape){poly([[9,14+b],[23,14+b],[26-s,29],[6+s,29]],o.cape);poly([[9,14+b],[12,14+b],[9,29],[6+s,29]],o.cape2||o.cape);}
+    // jambes (une se lève à l'image B) et solerets
+    px(11,23,o.D,4,5-s);px(17,23,o.D,4,5-(s?0:1));px(10,27-s,o.A,5,2);px(17,27-(s?0:1),o.A,5,2);px(12,24,o.L,1,2);px(18,24,o.L,1,2);
+    // torse, plastron, ceinture
+    poly([[10,14+b],[22,14+b],[21,24],[11,24]],o.A);px(12,15+b,o.L,8,2);px(15,17+b,o.D,2,6);px(11,22,o.G||'#c9973c',10,2);px(15,22,'#fff1d0',2,2);
+    if(o.tab){poly([[12,17+b],[20,17+b],[19,26],[13,26]],o.tab);px(15,19+b,o.tabE||'#fff1d0',2,4);px(14,20+b,o.tabE||'#fff1d0',4,1);}
+    ell(9.5,15.5+b,3.2,2.8,o.L);ell(22.5,15.5+b,3.2,2.8,o.L);ell(9.5,16.2+b,2.4,1.6,o.A);ell(22.5,16.2+b,2.4,1.6,o.A);
+    // casque
+    const hy=b;
+    if(o.h==='nu'){ell(16,9+hy,4.2,4.4,'#f0c8a0');poly([[11,8+hy],[12,4+hy],[16,3+hy],[20,4+hy],[21,8+hy],[18,6+hy],[14,6+hy]],o.cheveux||'#7a4a22');px(14,9+hy,'#1a1420');px(18,9+hy,'#1a1420');px(15,12+hy,atk?'#7a1a1a':'#c08a70',2,1);}
+    else if(o.h==='chapel'){ell(16,10+hy,4,4,'#f0c8a0');px(14,10+hy,'#1a1420');px(18,10+hy,'#1a1420');px(15,13+hy,'#a06a50',2,1);ell(16,5.5+hy,4.6,3.2,o.L);px(9,7+hy,o.A,14,2);px(9,8+hy,o.D,14,1);}
+    else if(o.h==='salade'){ell(16,8+hy,5.6,5.2,o.A);ell(15,6.5+hy,3.2,2.2,o.L);px(11,9+hy,'#12101c',10,1);px(11,10+hy,o.D,10,3);px(21,7+hy,o.A,3,2);}
+    else{px(11,4+hy,o.A,10,10);px(12,3+hy,o.L,8,1);px(11,4+hy,o.L,1,10);px(12,8+hy,'#12101c',8,1);px(15,5+hy,o.L,2,8);for(let i=0;i<3;i++){px(12,11+hy+i-(i?0:0),'#12101c',1,1);px(19-(i%2),11+hy,'#12101c',1,1);}px(13,8+hy,o.E||'#12101c');px(18,8+hy,o.E||'#12101c');
+      if(o.h==='aile'){for(const d of [-1,1]){poly([[16+d*5,6+hy],[16+d*11,1+hy],[16+d*10,5+hy],[16+d*12,6+hy],[16+d*8,9+hy],[16+d*5,9+hy]],'#f4f1e8');px(16+d*8+(d<0?-1:0),4+hy,OR,1,3);}}
+      if(o.h==='cornu'){for(const d of [-1,1])poly([[16+d*5,5+hy],[16+d*9,3+hy],[16+d*10,-1+hy],[16+d*7,1+hy],[16+d*5,3+hy]],'#2a2030');}}
+    if(o.plume)poly([[15,3+hy],[17,3+hy],[22+s,0+hy],[23,3+hy],[19,3+hy]],o.plume);
+    // écu
+    if(o.S){const x0=atk?5:4;poly([[x0,13+b],[x0+7,13+b],[x0+7,21+b],[x0+3.5,26+b],[x0,21+b]],o.S);poly([[x0+1,14+b],[x0+3,14+b],[x0+3,23+b],[x0+1,20+b]],o.S2||o.S);px(x0+3,15+b,o.SE||'#fff1d0',1,7);px(x0+1,17+b,o.SE||'#fff1d0',5,1);}
+    else px(7,16+b,o.A,3,6);
+    // arme
+    const w=o.w;
+    if(w==='epee'||w==='espadon'){const L=w==='espadon'?1:0,c=o.lame||ACIER;px(22,16+b,o.A,3,5);if(atk){line(23,19,31,7-L*2,2+L*0.6,c);line(24,18,30,8-L,0.8,'#ffffff');line(21,16,26,21,1.6,OR);}else{line(25,21,27-L,5-L*3,2+L*0.6,c);line(26,19,27,7,0.8,'#ffffff');px(23,20+b,OR,6,2);px(25,22+b,BOIS,2,3);}}
+    else if(w==='lance'||w==='hallebarde'||w==='marteau'){px(22,16+b,o.A,3,5);
+      if(atk){line(15,22,31,13,1.4,BOIS);if(w==='lance'){poly([[28,11],[32,12],[29,16]],ACIER);poly([[22,16],[25,13],[26,18]],'#c8324a');}else if(w==='hallebarde'){poly([[25,10],[31,9],[31,16],[27,17]],ACIER);px(30,11,'#ffffff',1,4);}else{px(26,9,OR,6,7);px(27,10,'#ffe98a',4,2);}}
+      else{line(25,30,25,2,1.4,BOIS);if(w==='lance'){poly([[23.5,4],[25,-1],[26.5,4]],ACIER);poly([[26,5],[31,6+s],[26,9]],'#c8324a');}else if(w==='hallebarde'){poly([[25,1],[30,3],[30,9],[25,10]],ACIER);poly([[25,3],[21,5],[25,8]],ACIER);px(29,4,'#ffffff',1,4);poly([[24,0],[25,-2],[26,0]],ACIER);}else{px(21,1,OR,9,6);px(22,2,'#ffe98a',7,2);px(21,6,'#c9973c',9,1);}}}
+    else if(w==='arbalete'){px(21,17+b,o.A,3,4);const y=19+b;line(12,y,27,y,1.6,BOIS);line(25,y-6,25,y+6,1.4,'#8a5a2b');line(25,y-6,atk?25:19,y,0.6,'#f4f1e8');line(25,y+6,atk?25:19,y,0.6,'#f4f1e8');if(!atk){line(19,y,29,y,1,ACIER);poly([[29,y-1.5],[32,y],[29,y+1.5]],ACIER);}px(11,y-1,OR,2,3);}
+  };
+  A.tr_ecuyer=chev({h:'nu',A:'#8a5a32',D:'#5a3a22',L:'#b07a48',w:'epee',S:'#6a4424',S2:'#8a5a2b',SE:'#c9973c',tab:'#3f7fe0',tabE:'#fff1d0'});
+  A.tr_arbaletrier=chev({h:'chapel',A:'#6a7084',D:'#44485a',L:'#aab0c0',w:'arbalete',tab:'#4a7a3a',tabE:'#ffd23f'});
+  A.tr_lancier=chev({h:'salade',A:'#8a90a4',D:'#5a6074',L:'#c8d0e0',w:'lance',S:'#c8324a',S2:'#e0566a',SE:'#fff1d0',plume:'#c8324a'});
+  A.tr_chevalier=chev({h:'heaume',A:'#aab0c0',D:'#6a7084',L:'#e8ecf4',w:'epee',S:'#3f5fb0',S2:'#5a7fe0',SE:OR,plume:'#3f7fe0',tab:'#3f5fb0',tabE:OR});
+  A.tr_hallebardier=chev({h:'salade',A:'#7a6a4a',D:'#4a3e28',L:'#c8b078',w:'hallebarde',plume:'#ffd23f',tab:'#8a2f44',tabE:OR,G:'#3a2a20'});
+  A.tr_paladin=chev({h:'aile',A:'#e8c860',D:'#a8862a',L:'#fff1b0',w:'marteau',S:'#f4f1e8',S2:'#ffffff',SE:OR,cape:'#f4f1e8',cape2:'#d8d4c4',tab:'#f4f1e8',tabE:OR,E:'#3ff0ff',G:'#fff1d0'});
+  A.tr_noir=chev({h:'cornu',A:'#2a2434',D:'#14101c',L:'#4a4258',w:'espadon',lame:'#3a2a40',cape:'#6a0e1a',cape2:'#4a0812',plume:'#c8102e',E:'#ff3b4a',G:'#8a1020',tab:'#14101c',tabE:'#c8102e'});
+  // cavalier : de profil, tourné vers la droite (le jeu le retourne vers le joueur)
+  A.tr_cavalier=({poly,ell,line,px},f)=>{const s=f===1?1:0,atk=f===2,R='#c8324a',H='#6a4a32',HD='#4a3222';
+    line(5,19,2,24+s,1.6,'#2a1a12');                                            // queue
+    for(const [x,d] of [[8,s?-2:1],[11,s?2:-1],[20,s?2:-2],[23,s?-1:2]]){line(x,22,x+d,29,1.8,HD);px(x+d-1,29,'#1a1210',3,2);}
+    ell(15,20,10,5,H);poly([[6,17],[22,17],[23,24],[7,25]],R);px(7,23,OR,16,1);px(7,24,'#8a1f2e',16,1);for(let i=0;i<4;i++)px(8+i*4,19,OR,1,2); // caparaçon
+    poly([[21,18],[25,9-s],[29,10-s],[26,20]],H);poly([[25,9-s],[31,11-s],[31,15-s],[27,15-s]],H);px(29,12-s,'#12101c');px(31,14-s,HD,1,1);poly([[24,9-s],[25,6-s],[27,9-s]],H);line(22,12,25,8-s,1.4,'#2a1a12'); // encolure, tête, crinière
+    px(26,11-s,R,5,1);px(27,10-s,OR,1,3);                                        // bride
+    px(12,9,'#8a90a4',6,9);px(13,10,'#c8d0e0',4,2);px(12,16,'#c9973c',6,1);px(13,17,'#5a6074',3,5);px(12,21,'#aab0c0',5,2); // cavalier
+    px(12,3,'#aab0c0',6,6);px(13,5,'#12101c',5,1);px(12,3,'#e8ecf4',6,1);poly([[14,3],[16,3],[11,0],[10,3]],R);
+    poly([[9,10],[13,10],[13,17],[11,19],[9,17]],'#3f5fb0');px(10,12,OR,2,4);     // écu
+    if(atk){line(14,14,32,13,1.5,BOIS);poly([[29,11],[33,13],[29,15]],ACIER);poly([[22,13],[25,10],[26,14]],R);}else{line(15,16,27,0,1.5,BOIS);poly([[25,2],[28,-2],[29,3]],ACIER);poly([[23,5],[20,3+s],[22,8]],R);}
+  };
+}
+/*TOUR_ART_FIN*/
 const MFR={};
 for(const k in MON_ART)if(MON[k]){MFR[k]=[0,1,2].map(f=>{const o=bc32();MON_ART[k](o,f);return pix32(o.c,[11,10,18]);});MSPR[k]=MFR[k][0];if(BOSS_ATK[k])BOSS_ATK[k]=MFR[k][2];}
 MFR.dieu_fou=[0,1,2].map(makeJester);MSPR.dieu_fou=MFR.dieu_fou[0];BOSS_ALT.dieu_fou=MFR.dieu_fou[1];
@@ -2908,7 +2983,8 @@ const TALIS={b:{res:'Dent du Roi Gobelin',nom:'Talisman du Terrier',st:{vie:20},
   m:{res:'Éclat de filon',nom:'Talisman de la Mine',st:{armure:3},ic:'roche'},f:{res:'Rouage incandescent',nom:'Talisman de la Forge',st:{vatt:3},ic:'engrenage'},v:{res:'Écaille dorée',nom:'Talisman des Profondeurs',st:{vdep:3},ic:'ecaille_or'},
   c:{res:'Cendre du Comte',nom:'Talisman de Morvane',st:{puissance:5},ic:'crane_violet'},s:{res:'Scarabée d\'or',nom:'Talisman du Pharaon',st:{vdep:5},ic:'scarabee'},o:{res:'Écaille du Léviathan',nom:'Talisman des Abysses',st:{mana:60},ic:'bulle'},
   p:{res:'Plume déchue',nom:'Talisman Céleste',st:{vatt:5},ic:'plume'},e:{res:'Braise éternelle',nom:'Talisman de la Fournaise',st:{vie:80},ic:'braise'},g:{res:'Cristal de givre',nom:'Talisman de Givre',st:{armure:6},ic:'glace'},
-  a:{res:'Poussière d\'étoile',nom:'Talisman des Étoiles',st:{puissance:5,vatt:5},ic:'etoile'},h:{res:'Sable du temps',nom:'Talisman de Chronos',st:{puissance:6,vatt:6,vie:60},ic:'grain_sablier'}},TALIS_COUT=10,TALIS_ORDRE='brkmfvcsopegah';
+  a:{res:'Poussière d\'étoile',nom:'Talisman des Étoiles',st:{puissance:5,vatt:5},ic:'etoile'},h:{res:'Sable du temps',nom:'Talisman de Chronos',st:{puissance:6,vatt:6,vie:60},ic:'grain_sablier'},
+  j:{res:'Grelot du Bouffon',nom:'Talisman du Roi Bouffon',st:{vatt:6,vdep:4},ic:'grelot'},x:{res:'Cœur d\'obsidienne',nom:'Talisman du Béhémoth',st:{vie:100,puissance:4},ic:'obsidienne'}},TALIS_COUT=10,TALIS_ORDRE='brkmfvcsopegjxah';
 const REG_DUN='csopeg',MID_DUN='rkmf';
 for(const t of REG_DUN){for(const k of DTYPES[t].pool)MON[k].ai=2;MON[DTYPES[t].bk].ai=2;}
 const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -3010,14 +3086,14 @@ const keys=new Set();
 const mouse={x:0,y:0,down:false};
 const joy={id:null,ox:0,oy:0,x:0,y:0};
 let aimTouch=null;
-const sceneKey=()=>scene==='ghall'?'G'+(GUILD?GUILD.id:'x'):scene==='raid'?'W'+(GUILD?GUILD.id:'x'):scene==='nexus'?'n':scene==='realm'?'r':scene==='vault'?'v'+(VIS?'#'+VIS.id:AUTH.id?'#'+AUTH.id:(myPeer||'x')):scene==='hub'?'h'+(hubOwner||myPeer||'x'):scene==='tuto'?'u'+(myPeer||'x'):scene==='arena'?'x'+(DU?DU.key:'0'):'d'+dungeonT+dungeonId.toString(36);
+const sceneKey=()=>scene==='ghall'?'G'+(GUILD?GUILD.id:'x'):scene==='raid'?'W'+(GUILD?GUILD.id:'x'):scene==='nexus'?'n':scene==='realm'?'r':scene==='vault'?'v'+(VIS?'#'+VIS.id:AUTH.id?'#'+AUTH.id:(myPeer||'x')):scene==='hub'?'h'+(hubOwner||myPeer||'x'):scene==='tuto'?'u'+(myPeer||'x'):scene==='tour'?'t'+(myPeer||'x'):scene==='arena'?'x'+(DU?DU.key:'0'):'d'+dungeonT+dungeonId.toString(36);
 const safe=()=>scene==='vault'||scene==='hub'||scene==='ghall';
 const canFight=()=>!safe()||scene==='ghall'; // le hall de guilde reste sûr, mais on peut y frapper le mannequin
 let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000047;let newerWarned=false;
+const NETV=2,BUILD=2600000049;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -3061,7 +3137,7 @@ function makeNetRoom(){
       else if(m.t==='p'){other(m.peer,m.presence);schedule();}
       else if(m.t==='join'){other(m.peer,{});schedule();}
       else if(m.t==='leave'){others.delete(m.peer);schedule();}
-      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'||m.t==='butin'||m.t==='serveurs'||m.t==='maj'||m.t==='cle'||m.t==='vengeance'||m.t==='concours'||m.t==='bienvenue'||m.t==='dessin'||m.t==='px'||m.t==='objectif'||m.t==='tournoi'||m.t==='hv'||m.t==='parr'||m.t==='maison'||m.t==='titres'){for(const f of rawH){try{f(m);}catch(err){console.error('message '+m.t,err&&err.message);}}}};
+      else if(m.t==='top'||m.t==='dev'||m.t==='devres'||m.t==='tr'||m.t==='g'||m.t==='authres'||m.t==='authout'||m.t==='savefix'||m.t==='butin'||m.t==='serveurs'||m.t==='maj'||m.t==='cle'||m.t==='vengeance'||m.t==='concours'||m.t==='bienvenue'||m.t==='dessin'||m.t==='px'||m.t==='objectif'||m.t==='tournoi'||m.t==='hv'||m.t==='parr'||m.t==='maison'||m.t==='titres'||m.t==='guerre'){for(const f of rawH){try{f(m);}catch(err){console.error('message '+m.t,err&&err.message);}}}};
     ws.onclose=e=>{if(e.code===4004){setConn(false);others.clear();me=null;emitPeers();authKicked();return;}if(e.code===4002||e.code===4003){setConn(false);others.clear();me=null;emitPeers();kickedScreen(e.code);return;}const full=e.code===4001;setConn(false);others.clear();me=null;emitPeers();if(full)note('Salle pleine (16 joueurs)');setTimeout(connect,full?15000:2000);};
     ws.onerror=()=>{};
   }
@@ -3078,8 +3154,8 @@ async function initRoom(){
   if(window.claude&&typeof window.claude.use==='function'){let r=null;try{r=await window.claude.use('room');}catch(e){r=null;}if(r)room=r;}
   if(!room){if(!/^https?:$/.test(location.protocol))return;room=makeNetRoom();}
   room.onConnection(c=>{netOn=c;if(c)setTimeout(sendScore,1000);},()=>{netOn=false;room=null;});
-  if(room.onRaw)room.onRaw(m=>{if((window.GARDIEN_MODE||window.BOT_MODE)&&(m.t==='objectif'||m.t==='tournoi'||m.t==='hv'||m.t==='parr'||m.t==='maison'))return; // le Gardien et les bots n'ont pas d'interface
-    if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}if(m.t==='butin'){onButin(m);return;}if(m.t==='maj'){onMaj(m);return;}if(m.t==='cle'){onCle(m);return;}if(m.t==='vengeance'){openFishPortal(m.id);return;}if(m.t==='bienvenue'){onBienvenue(m);return;}if(m.t==='dessin'||m.t==='px'){onPix(m);return;}if(m.t==='objectif'){onObjectif(m);return;}if(m.t==='tournoi'){onTournoi(m);return;}if(m.t==='hv'){onHV(m);return;}if(m.t==='parr'){onParr(m);return;}if(m.t==='maison'){onMaison(m);return;}if(m.t==='titres'){SRVT=new Set((Array.isArray(m.l)?m.l:[]).filter(k=>TITLES[k]));try{fillTitles();}catch(e){}if(SRVT.size&&!save.title){note('Nouveau titre disponible : '+TITLES[[...SRVT][0]].t+' (Options → Titre)');}return;}if(m.t==='concours'){onConcours(m);return;}if(m.t==='serveurs'){srvData=m;if(!srvEl.hidden)renderServeurs();return;}
+  if(room.onRaw)room.onRaw(m=>{if((window.GARDIEN_MODE||window.BOT_MODE)&&(m.t==='objectif'||m.t==='tournoi'||m.t==='hv'||m.t==='parr'||m.t==='maison'||m.t==='guerre'||m.t==='titres'))return; // le Gardien et les bots n'ont pas d'interface
+    if(m.t==='authres'||m.t==='authout'){onAuthRes(m);return;}if(m.t==='savefix'){onSaveFix(m);return;}if(m.t==='butin'){onButin(m);return;}if(m.t==='maj'){onMaj(m);return;}if(m.t==='cle'){onCle(m);return;}if(m.t==='vengeance'){openFishPortal(m.id);return;}if(m.t==='bienvenue'){onBienvenue(m);return;}if(m.t==='dessin'||m.t==='px'){onPix(m);return;}if(m.t==='objectif'){onObjectif(m);return;}if(m.t==='tournoi'){onTournoi(m);return;}if(m.t==='hv'){onHV(m);return;}if(m.t==='parr'){onParr(m);return;}if(m.t==='maison'){onMaison(m);return;}if(m.t==='guerre'){onGuerre(m);return;}if(m.t==='titres'){SRVT=new Set((Array.isArray(m.l)?m.l:[]).filter(k=>TITLES[k]));try{fillTitles();}catch(e){}if(SRVT.size&&!save.title){note('Nouveau titre disponible : '+TITLES[[...SRVT][0]].t+' (Options → Titre)');}return;}if(m.t==='concours'){onConcours(m);return;}if(m.t==='serveurs'){srvData=m;if(!srvEl.hidden)renderServeurs();return;}
     if(m.t==='tr'){tradeMsg(m);return;}
     if(m.t==='g'){guildMsg(m);return;}
     if(m.t==='dev'&&m.cmd==='party'){startParty(m.arg);return;}
@@ -3399,6 +3475,7 @@ function wantSong(){const w=wantSong0();if(w==='boss'||w==='final'){bossSong={w,
   bossSong=null;return w;}
 function wantSong0(){if(PARTY)return 'fun';
   if(scene==='raid')return dragonUp()?'dragon':raidOn()?'wardrums':'crypte';
+  if(scene==='tour')return TOURS&&TOURS.vague>=10?'final':'boss';
   if(scene==='arena')return 'boss';
   if(scene==='dungeon'&&fight===1&&inArena(P.x,P.y))return dungeonT==='a'?'final':'boss';
   if(scene==='realm'&&monsters.some(m=>m.d.boss&&m.hp>0&&Math.hypot(m.x-P.x,m.y-P.y)<14))return 'boss';
@@ -3647,6 +3724,96 @@ function genTuto(){const w=66,h=17,sol=new Uint8Array(w*h).fill(1);const carve=(
       {x:40.5,y:5.2,l:['E : ramasser un sac, prendre un portail, parler','I : inventaire · C : statistiques','F : potion de vie · V : potion de mana']},
       {x:40.5,y:11.4,l:['Glisse un objet sur ton équipement pour l\'équiper','R : retour au Village (seul moyen de quitter les Plaines Sauvages)']},
       {x:56.5,y:3.3,l:['Le Gardien d\'entraînement','Ses invocations ne font rien : bats le Gardien !']}]};}
+/* ================= herboriste : plantes des Plaines, atelier au Village ================= */
+// une plante par case tirée au hasard (elles repoussent ailleurs toutes les 10 minutes) ; chaque joueur a les siennes
+const HERBES={s:{nom:'Sanguine',col:'#e0404c',col2:'#ff8a94',f:0},r:{nom:'Racine vermeille',col:'#b3363a',col2:'#ff7a2a',f:1},a:{nom:'Azurine',col:'#3f7fe0',col2:'#9ac8f4',f:0},l:{nom:'Lunaire',col:'#8a4ae0',col2:'#c8a0ff',f:1},t:{nom:'Trèfle doré',col:'#c9973c',col2:'#ffd23f',f:2}};
+const RECETTES={pvie:['s','r','t'],pmana:['a','l','t']},HERBO_XP=10,HERBO_MAX=20,ATELIER={x:27.5,y:27.6};
+// métier d'herboriste : 10 points par potion, 30 × niveau pour passer au suivant, jusqu'au niveau 20
+function herboNiv(){let xp=(save.herbo&&save.herbo.xp)|0,n=1;while(n<HERBO_MAX&&xp>=30*n){xp-=30*n;n++;}return{n,xp,need:n<HERBO_MAX?30*n:0};}
+let herbePris=new Set(),herbeLot=0;
+const herbeSlot=()=>Math.floor(Date.now()/600000);
+function herbeAt(tx,ty){if(!realm||tx<1||ty<1||tx>=RN-1||ty>=RN-1)return null;const i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]<0)return null;const sl=herbeSlot()%997;if(hx(tx,ty,9000+sl)<0.9988)return null;return 'srlat'[Math.min(4,Math.floor(hx(tx,ty,77+sl)*5))];}
+function herbeTick(){const sl=herbeSlot();if(sl!==herbeLot){herbeLot=sl;herbePris=new Set();}if(!canFight())return;const X=Math.floor(P.x),Y=Math.floor(P.y);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const tx=X+dx,ty=Y+dy,k=tx+','+ty;if(herbePris.has(k))continue;const h=herbeAt(tx,ty);if(!h||Math.hypot(tx+.5-P.x,ty+.5-P.y)>0.95)continue;
+    herbePris.add(k);save.herbes=save.herbes||{};save.herbes[h]=(save.herbes[h]|0)+1;persist();ft(tx+.5,ty,'+1 '+HERBES[h].nom,HERBES[h].col2);burst(tx+.5,ty+.5,HERBES[h].col,8,2);sfx('item',0.5);}}
+function drawHerbes(x0,x1,y0,y1){const u=TS/16;for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const h=herbeAt(tx,ty);if(!h||herbePris.has(tx+','+ty))continue;const H=HERBES[h],X=Math.floor(sx(tx)),Y=Math.floor(sy(ty)),b=Math.sin(time*2.5+tx)*u*0.5;
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(X+4*u,Y+13*u,8*u,2*u);R(X+7*u,Y+6*u,2*u,8*u,'#3f8a3a');R(X+4*u,Y+9*u,3*u,2*u,'#4fa548');R(X+9*u,Y+8*u,3*u,2*u,'#4fa548');
+    if(H.f===2){R(X+4*u+b,Y+3*u,4*u,4*u,H.col);R(X+8*u+b,Y+3*u,4*u,4*u,H.col);R(X+6*u+b,Y+0*u,4*u,4*u,H.col2);R(X+7*u+b,Y+4*u,2*u,2*u,'#fff1a0');}
+    else if(H.f===1){R(X+6*u+b,Y+1*u,4*u,3*u,H.col2);R(X+5*u+b,Y+3*u,6*u,4*u,H.col);R(X+4*u+b,Y+4*u,2*u,2*u,H.col2);R(X+10*u+b,Y+4*u,2*u,2*u,H.col2);R(X+7*u+b,Y+4*u,2*u,2*u,'#ffffff');}
+    else{R(X+5*u+b,Y+2*u,6*u,5*u,H.col);R(X+6*u+b,Y+1*u,4*u,7*u,H.col);R(X+7*u+b,Y+3*u,2*u,2*u,H.col2);}
+    if(Math.sin(time*4+tx*3+ty)>0.8)R(X+12*u,Y+2*u,u,u,'#ffffff');}}
+const herbEl=document.createElement('div');herbEl.className='overlay';herbEl.id='herbWin';herbEl.hidden=true;herbEl.innerHTML='<div class="shop-inner" role="dialog" aria-label="Atelier de l\'herboriste" style="max-width:520px"><h2>Atelier de l\'herboriste</h2><p class="hint">Les plantes se cueillent dans les Plaines Sauvages, en passant dessus. Elles ne prennent pas de place dans le sac. Chaque potion demande trois plantes différentes, et le Trèfle doré sert aux deux.</p><div id="herbNiv"></div><div id="herbList" class="qlist"></div><div class="shop-foot"><span class="hint" id="herbFoot"></span><button type="button" class="act" id="herbClose">Fermer · Échap</button></div></div>';document.getElementById('hvWin').parentNode.appendChild(herbEl);
+function openHerb(){if(!save.current)return;herbEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderHerb();sfx('item');}
+function closeHerb(){herbEl.hidden=true;paused=false;cv.focus();}
+function renderHerb(){const h=save.herbes=save.herbes||{},libre=C().inv.filter(x=>!x).length,N=herboNiv();
+  document.getElementById('herbNiv').innerHTML='<b style="color:#9fe07a">Herboriste · niveau '+N.n+'</b>'+(N.need?' <span class="hint">'+N.xp+' / '+N.need+' points</span><div style="height:6px;background:#1a1626;border:1px solid var(--line2);margin-top:3px"><div style="height:100%;width:'+Math.round(N.xp/N.need*100)+'%;background:#7ed957"></div></div>':' <span class="hint">niveau maximum</span>');
+  document.getElementById('herbList').innerHTML=Object.keys(RECETTES).map(k=>{const rc=RECETTES[k],it=mkItem(k,0),max=Math.min(libre,...rc.map(p=>h[p]|0));return '<div class="qrow"><img src="'+icon(it)+'" alt="" style="width:44px;height:44px;image-rendering:pixelated"><div><b>'+it.name+'</b><span style="display:block;font-size:13px;opacity:.9">'+rc.map(p=>'<span style="display:inline;color:'+HERBES[p].col2+'">'+HERBES[p].nom+'</span> <b style="display:inline;color:'+((h[p]|0)?'inherit':'#ff5a6a')+'">× '+(h[p]|0)+'</b>').join(' + ')+'</span></div><div style="display:flex;gap:4px"><button type="button" class="act main" data-herb="'+k+'" data-nb="1" '+(max<1?'disabled':'')+'>Fabriquer</button><button type="button" class="act" data-herb="'+k+'" data-nb="'+max+'" '+(max<2?'disabled':'')+'>× '+max+'</button></div></div>';}).join('');
+  document.getElementById('herbFoot').textContent='+'+HERBO_XP+' points de métier par potion · '+libre+' place'+(libre>1?'s':'')+' libre'+(libre>1?'s':'')+' dans ton sac';}
+herbEl.addEventListener('click',e=>{if(e.target===herbEl||e.target.closest('#herbClose')){closeHerb();return;}const b=e.target.closest('[data-herb]');if(!b)return;const k=b.dataset.herb,rc=RECETTES[k],h=save.herbes||{};let nb=+b.dataset.nb|0,fait=0;const n0=herboNiv().n;
+  while(nb-->0&&rc.every(p=>(h[p]|0)>=1)){const f=freeInv();if(f<0)break;for(const p of rc)h[p]-=1;C().inv[f]=mkItem(k,0);fait++;}
+  if(fait){save.herbo=save.herbo||{xp:0};save.herbo.xp=(save.herbo.xp|0)+fait*HERBO_XP;persist();pushSave(true);invDirty=true;sfx('buy');note(fait+' '+mkItem(k,0).name+(fait>1?' fabriquées':' fabriquée')+' · +'+fait*HERBO_XP+' points de métier');const n1=herboNiv().n;if(n1>n0){showBanner('Herboriste niveau '+n1+' !',n1>=HERBO_MAX?'Niveau maximum atteint':'Continue à fabriquer des potions','#9fe07a');sfx('level');}}else sfx('deny');renderHerb();});
+/* ================= guerre des guildes ================= */
+let GW=null;
+const gwEl=document.createElement('div');gwEl.id='gwBox';gwEl.hidden=true;document.getElementById('hudTL').appendChild(gwEl);
+const gwWin=document.createElement('div');gwWin.className='overlay';gwWin.id='gwWin';gwWin.hidden=true;gwWin.innerHTML='<div class="shop-inner" role="dialog" aria-label="Guerre des guildes" style="max-width:600px"><h2>Guerre des guildes</h2><p class="hint" id="gwIntro"></p><div id="gwList" class="qlist"></div><div class="shop-foot"><span class="hint" id="gwFoot"></span><button type="button" class="act" id="gwClose">Fermer · Échap</button></div></div>';document.getElementById('hvWin').parentNode.appendChild(gwWin);
+function onGuerre(m){const avant=GW;GW={zones:Array.isArray(m.zones)?m.zones:[],fin:+m.fin||0,bonus:m.bonus|0||10};
+  if(m.neuf&&avant&&GUILD){const miennes=GW.zones.map((z,i)=>z.t&&z.t.tag===GUILD.tag?ZONES[i]&&ZONES[i].nom:null).filter(Boolean);if(miennes.length){showBanner('⚔ Ta guilde tient '+miennes.length+' zone'+(miennes.length>1?'s':'')+' !','+'+GW.bonus+' % d\'or et d\'expérience pendant une heure : '+miennes.join(', '),'#ffd23f');sfx('level');}}
+  gwMaj();if(!gwWin.hidden)renderGw();}
+const gwReste=()=>{const s=Math.max(0,Math.ceil(((GW?GW.fin:0)-Date.now())/60000));return s+' min';};
+function gwMaj(){const vis=!!GW&&scene==='realm'&&!!save.current;gwEl.hidden=!vis;if(!vis)return;const z=curZone>=0&&curZone<GW.zones.length?GW.zones[curZone]:null,tag=GUILD?GUILD.tag:null;
+  if(!z){gwEl.innerHTML='<b>⚔ GUERRE DE GUILDES</b>';return;}const moi=tag?z.top.find(t=>t.tag===tag):null,t0=z.top[0];
+  gwEl.innerHTML='<b>⚔ GUERRE DE GUILDES</b><span>'+(z.t?'Zone tenue par <i style="color:'+(z.t.tag===tag?'#7ed957':'#ffd23f')+'">['+hvEsc(z.t.tag)+']</i>'+(z.t.tag===tag?' · +'+GW.bonus+' %':''):'Zone libre')+'</span><span>En tête : '+(t0?'['+hvEsc(t0.tag)+'] '+t0.n:'personne')+'</span><span>'+(tag?'Ta guilde : '+(moi?moi.n:0):'Rejoins une guilde')+' · fin dans '+gwReste()+'</span>';}
+setInterval(gwMaj,2000);
+function renderGw(){if(!GW)return;const tag=GUILD?GUILD.tag:null;document.getElementById('gwIntro').textContent='Chaque heure, dans chaque zone des Plaines Sauvages, la guilde qui a tué le plus de monstres prend la zone : ses membres y gagnent +'+GW.bonus+' % d\'or et d\'expérience pendant l\'heure suivante. Puis les compteurs repartent de zéro.';
+  document.getElementById('gwList').innerHTML=GW.zones.map((z,i)=>'<div class="qrow" style="grid-template-columns:1fr auto"><div><b>'+(ZONES[i]?ZONES[i].nom:'Zone '+i)+'</b><span style="display:block;font-size:13px;opacity:.85">'+(z.t?'Tenue par <b style="color:'+(z.t.tag===tag?'#7ed957':'#ffd23f')+'">['+hvEsc(z.t.tag)+'] '+hvEsc(z.t.nom)+'</b>':'Zone libre')+'</span></div><span style="font-size:13px;text-align:right">'+(z.top.length?z.top.slice(0,3).map((t,j)=>(j+1)+'. <span style="color:'+(t.tag===tag?'#7ed957':'inherit')+'">['+hvEsc(t.tag)+'] '+t.n+'</span>').join('<br>'):'<i class="hint">aucun monstre tué</i>')+'</span></div>').join('');
+  document.getElementById('gwFoot').textContent='Prochaine attribution dans '+gwReste();}
+function openGw(){if(!GW)return;gwWin.hidden=false;paused=true;keys.clear();mouse.down=false;renderGw();sfx('item');}
+function closeGw(){gwWin.hidden=true;paused=false;cv.focus();}
+gwEl.addEventListener('click',openGw);gwWin.addEventListener('click',e=>{if(e.target===gwWin||e.target.closest('#gwClose'))closeGw();});
+/* ================= Tour des Chevaliers : arène à vagues, en solo ================= */
+const KPORT={x:9,y:30.2},TW=33,TC=16.5,TGATES=[{x:16.5,y:3.5},{x:29.5,y:16.5},{x:16.5,y:29.5},{x:3.5,y:16.5}];
+let TOURS=null,tourMap=null;
+function genTour(){const sol=new Uint8Array(TW*TW);for(let y=0;y<TW;y++)for(let x=0;x<TW;x++){const d=Math.hypot(x+.5-TC,y+.5-TC);sol[y*TW+x]=d>14.2?1:0;}
+  for(const [px,py] of [[9,9],[22,9],[9,22],[22,22]])for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++)sol[(py+dy)*TW+px+dx]=1; // quatre piliers
+  return{kind:'tour',w:TW,h:TW,sol};}
+// vague n : quels chevaliers, combien, et de combien leurs chiffres sont multipliés
+const TOUR_TYPES=[['tr_ecuyer',1],['tr_arbaletrier',2],['tr_lancier',3],['tr_chevalier',5],['tr_hallebardier',6],['tr_cavalier',8],['tr_paladin',10],['tr_noir',12]];
+function tourVague(n){const dispo=TOUR_TYPES.filter(t=>n>=t[1]).map(t=>t[0]),nb=Math.min(22,4+Math.floor(n*1.2)),l=[];
+  for(let i=0;i<nb;i++){const fort=Math.random()<0.45;l.push(fort?dispo[dispo.length-1-Math.floor(Math.random()*Math.min(3,dispo.length))]:pick(dispo));}
+  return{l,hp:Math.pow(1.22,n-1),dmg:Math.pow(1.13,n-1)};}
+function tourPorte(){const ch=C(),i=ch.inv.findIndex(it=>it&&it.kind==='cle_tour');if(i<0){note('La Tour est scellée : il faut une Clef de la Tour');sfx('deny');return;}ch.inv[i]=null;persist();pushSave(true);invDirty=true;enterTour();}
+function enterTour(){if(!save.current)return;tourMap=tourMap||genTour();scene='tour';MAP=tourMap;P.x=TC;P.y=TC;resetScene();sceneT=Date.now();curZone=-2;amHost=true;exitOpen=false;camA=0;
+  TOURS={vague:0,t:0,file:[],hp:1,dmg:1,sortT:0,debut:0,pause:2.5,tues:0,porte:0};const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.invul=2;
+  const r=save.tour;updZone();showBanner('Tour des Chevaliers',r&&r.v?'Ton record : vague '+r.v+' en '+fmtDuree(r.t*1000):'Tiens le plus de vagues possible · rien à perdre','#d8dce8');sfx('portal');sendPresence();}
+function tourTick(dt){const T=TOURS;if(!T||paused)return;T.t+=dt;
+  const vivants=monsters.filter(m=>m.hp>0).length;
+  if(T.file.length){T.sortT-=dt;if(T.sortT<=0){T.sortT=0.3;const k=T.file.shift(),g=TGATES[T.porte++%4],d=Object.assign({},MON[k],{hp:Math.round(MON[k].hp*T.hp),dmg:Math.round(MON[k].dmg*T.dmg)});
+      const m=addMon(k,g.x+rnd(-0.8,0.8),g.y+rnd(-0.8,0.8),0);m.d=d;m.hp=m.max=d.hp;m.cd=rnd(0.8,1.8);burst(m.x,m.y,'#d8dce8',10,3);}return;}
+  // vague suivante : dès que tout est mort (petit répit), ou d'office 40 s après le début de la vague
+  if(vivants===0||T.t-T.debut>40){T.pause-=dt;if(vivants>0||T.pause<=0){T.vague++;const V=tourVague(T.vague);T.file=V.l;T.hp=V.hp;T.dmg=V.dmg;T.debut=T.t;T.pause=2;T.sortT=0.6;
+      showBanner('Vague '+T.vague,V.l.length+' chevaliers · vie × '+(V.hp<10?V.hp.toFixed(1):Math.round(V.hp))+' · dégâts × '+(V.dmg<10?V.dmg.toFixed(1):Math.round(V.dmg)),'#d8dce8');sfx('boss',0.6);}}}
+function tourDeath(src){const T=TOURS||{vague:0,t:0,tues:0},v=Math.max(0,T.vague-1),r=save.tour||{v:0,t:0},rec=v>r.v||(v===r.v&&v>0&&T.t>r.t);
+  if(rec){save.tour={v,t:Math.round(T.t)};persist();}
+  const tx='Vague '+T.vague+' · '+fmtDuree(T.t*1000)+' · '+T.tues+' chevaliers vaincus';TOURS=null;enterNexus();P.x=KPORT.x;P.y=KPORT.y+1.6;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;P.invul=2;keys.clear();mouse.down=false;
+  showBanner(rec?'Nouveau record à la Tour !':'Tu es tombé dans la Tour',tx+' · rien n\'est perdu','#d8dce8');sfx(rec?'level':'hurt');}
+function drawTour(x0,x1,y0,y1){const u=TS/16,d=MAP,HS=HOUSE_SKINS.chateau;
+  for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const X=Math.floor(sx(tx)),Y=Math.floor(sy(ty));
+    if(tx<0||ty<0||tx>=d.w||ty>=d.h){R(X,Y,TS+1,TS+1,'#0b0a12');continue;}
+    const s0=d.sol[ty*d.w+tx],v=Math.floor(h2(tx,ty)*4);
+    if(s0){const adj=(ty+1<d.h&&!d.sol[(ty+1)*d.w+tx])||(ty>0&&!d.sol[(ty-1)*d.w+tx])||(tx>0&&!d.sol[ty*d.w+tx-1])||(tx+1<d.w&&!d.sol[ty*d.w+tx+1]);if(adj)T16(HS.wall(v),X,Y);else R(X,Y,TS+1,TS+1,'#0b0a12');continue;}
+    T16(HS.floor(v),X,Y);
+    const dc=Math.hypot(tx+.5-TC,ty+.5-TC);
+    if(Math.abs(tx+.5-TC)<1.2||Math.abs(ty+.5-TC)<1.2){ctx.globalAlpha=0.55;R(X,Y,TS+1,TS+1,'#6b2334');ctx.globalAlpha=1;if(Math.abs(tx+.5-TC)>=0.6&&Math.abs(ty+.5-TC)>=0.6)R(X+7*u,Y+7*u,2*u,2*u,'#c9973c');}
+    if(dc>4.6&&dc<5.4){ctx.globalAlpha=0.35;R(X+3*u,Y+3*u,10*u,10*u,'#c9973c');ctx.globalAlpha=1;}}
+  // les quatre portes d'où sortent les chevaliers, et leurs bannières
+  TGATES.forEach((g,i)=>{const X=sx(g.x),Y=sy(g.y),pu=TOURS&&TOURS.file.length?0.5+0.5*Math.sin(time*8):0.15;ctx.fillStyle='rgba(20,10,30,.85)';ctx.beginPath();ctx.ellipse(X,Y,TS*1.1,TS*0.9,0,0,TAU);ctx.fill();ctx.strokeStyle='rgba(216,220,232,'+(0.3+0.6*pu)+')';ctx.lineWidth=Math.max(2,u*1.5);ctx.stroke();
+    const bx=X+(i%2?0:TS*1.6),by=Y+(i%2?TS*1.5:0);R(bx-u,by-TS*1.2,2*u,TS*1.4,'#6a4424');R(bx+u,by-TS*1.2,8*u,10*u,i%2?'#3f5fb0':'#8a2f44');R(bx+4*u,by-TS*1.2+3*u,2*u,4*u,'#ffd23f');R(bx+3*u,by-TS*1.2+4*u,4*u,2*u,'#ffd23f');});
+  for(const [px,py] of [[9,9],[22,9],[9,22],[22,22]])drawTorch(sx(px+1),sy(py+2.4),px+py);}
+function drawTourHud(){const T=TOURS;if(!T)return;const fs=Math.round(Math.max(14,TS*0.34)),X=(W)/2,Y=58,viv=monsters.filter(m=>m.hp>0).length+T.file.length,r=save.tour;
+  ctx.fillStyle='rgba(11,10,18,.72)';ctx.fillRect(X-190,Y-fs*0.95,380,fs*3.1);ctx.strokeStyle='#d8dce8';ctx.lineWidth=2;ctx.strokeRect(X-190,Y-fs*0.95,380,fs*3.1);
+  label(T.vague?'VAGUE '+T.vague:'PRÉPARE-TOI',X,Y,'#ffd23f',Math.round(fs*1.15),700);
+  label(fmtDuree(T.t*1000)+' · '+viv+' chevalier'+(viv>1?'s':'')+' · '+T.tues+' vaincu'+(T.tues>1?'s':''),X,Y+fs*1.05,'#ebe6f6',Math.round(fs*0.8));
+  label(r&&r.v?'Record : vague '+r.v+' ('+fmtDuree(r.t*1000)+')':'Aucun record pour l\'instant',X,Y+fs*1.9,'#9a93ad',Math.round(fs*0.7));}
 function enterTuto(){
   if(!save.current)return;closeAdmin&&closeAdmin();
   tutoMap=genTuto();scene='tuto';MAP=tutoMap;P.x=MAP.start.x;P.y=MAP.start.y;resetScene();sceneT=Date.now();curZone=-2;amHost=true;exitOpen=false;camA=0;
@@ -3811,7 +3978,7 @@ let KP=null,keyWait=0;
 function keyPortals(){const out=[],sk=sceneKey(),now=Date.now();if(KP&&KP.fin>now&&KP.s===sk)out.push(KP);
   for(const r of remotes.values()){if(!r.p||typeof r.p.kp!=='string'||now-r.upd>4000)continue;const f=r.p.kp.split('|');if(f[0]!==sk)continue;const id=parseInt(f[3],36),rem=+f[4];if(!(id>0)||!(rem>0))continue;out.push({s:f[0],x:(+f[1]||0)/10,y:(+f[2]||0)/10,id,fin:now+rem*1000,ty:f[5]==='v'?'v':'h'});}return out;}
 function nearKeyPortal(){for(const k of keyPortals())if(Math.hypot(P.x-k.x,P.y-k.y)<1.6)return k;return null;}
-function useKey(){if(scene==='dungeon'||scene==='raid'||scene==='arena'||scene==='tuto'){note('Impossible d\'ouvrir un portail ici');sfx('deny');return;}
+function useKey(){if(scene==='dungeon'||scene==='raid'||scene==='arena'||scene==='tuto'||scene==='tour'){note('Impossible d\'ouvrir un portail ici');sfx('deny');return;}
   if(KP&&KP.fin>Date.now()){note('Ton portail est déjà ouvert');return;}
   if(ONLINE&&AUTH.ok&&room&&room.raw){if(Date.now()-keyWait<3000)return;keyWait=Date.now();room.raw({t:'cle'});}else openKeyPortal(1+Math.floor(Math.random()*2e9));}
 // pêche dans les Plaines : très rarement, les poissons se vengent et un portail s'ouvre (tirage fait par le serveur)
@@ -3838,6 +4005,7 @@ function openPix(){if(!save.current)return;pixEl.hidden=false;paused=true;keys.c
   requestAnimationFrame(()=>{pixZ=Math.max(2,Math.floor(Math.min(pixView.clientWidth,pixView.clientHeight)/PIX_N));pixOx=pixOy=0;pixLay();});pixFoot();sfx('item');}
 function closePix(){pixEl.hidden=true;paused=false;cv.focus();}
 document.getElementById('pixClose').addEventListener('click',closePix);pixEl.addEventListener('click',e=>{if(e.target===pixEl)closePix();});
+{const b=document.createElement('button');b.type='button';b.className='act';b.id='pixLogo';b.textContent='Reposer le logo';b.hidden=true;const rz=document.getElementById('pixRaz');rz.parentNode.insertBefore(b,rz);b.addEventListener('click',()=>{if(room&&room.raw&&confirm('Remplacer toute la toile par le logo du jeu ?'))room.raw({t:'px',logo:1});});setInterval(()=>{b.hidden=rz.hidden;},1000);}
 document.getElementById('pixRaz').addEventListener('click',()=>{if(room&&room.raw&&confirm('Effacer toute la toile pour tout le monde ?'))room.raw({t:'px',raz:1});});
 pixView.addEventListener('wheel',e=>{e.preventDefault();const r=pixView.getBoundingClientRect(),mx=e.clientX-r.left-pixView.clientLeft,my=e.clientY-r.top-pixView.clientTop,z0=pixZ;pixZ=clamp(Math.round(pixZ*(e.deltaY<0?1.25:0.8)*4)/4,1,40);if(pixZ===z0)pixZ=clamp(pixZ+(e.deltaY<0?1:-1),1,40);
   pixOx=mx-(mx-pixOx)*pixZ/z0;pixOy=my-(my-pixOy)*pixZ/z0;pixLay();},{passive:false});
@@ -3860,11 +4028,12 @@ const talisTxt=t=>Object.entries(TALIS[t].st).map(([k,v])=>'+'+v+' '+(k==='vie'?
 function openRes(table){if(!save.current)return;resTable=!!table;resEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderRes();sfx('item');}
 function closeRes(){resEl.hidden=true;paused=false;cv.focus();}
 function renderRes(){const box=document.getElementById('resList');box.textContent='';save.res=save.res||{};save.talis=save.talis||{};
+  {const h=save.herbes||{},d=document.createElement('div');d.className='qrow';d.style.gridTemplateColumns='1fr';d.innerHTML='<div><b style="color:#9fe07a">Plantes</b><span style="display:block;font-size:13px;opacity:.9">'+Object.keys(HERBES).map(k=>'<span style="display:inline;color:'+HERBES[k].col2+'">'+HERBES[k].nom+'</span> : <b style="display:inline">'+(h[k]|0)+'</b>').join(' · ')+' — à transformer en potions à l\'atelier de l\'herboriste, au Village · métier niveau '+herboNiv().n+'</span></div>';box.append(d);}
   document.getElementById('resTitle').textContent=resTable?'Table enchantée':'Ressources et talismans';
-  document.getElementById('resIntro').textContent=(resTable?'Pose '+TALIS_COUT+' ressources d\'un même boss pour fabriquer son talisman.':'Les talismans se fabriquent à la table enchantée, au fond de la forge.')+' Chaque boss de donjon a 20 % de chance de lâcher sa ressource. Un seul talisman porté à la fois, son bonus s\'ajoute à tous tes héros.';
+  document.getElementById('resIntro').textContent=(resTable?'Pose '+TALIS_COUT+' ressources d\'un même boss pour fabriquer son talisman.':'Les talismans se fabriquent à la table enchantée, au fond de la forge.')+' Chaque boss de donjon, et les deux boss du centre de l\'île, ont 20 % de chance de lâcher leur ressource. Un seul talisman porté à la fois, son bonus s\'ajoute à tous tes héros.';
   for(const t of TALIS_ORDRE){const T=TALIS[t],n=save.res[t]|0,a=!!save.talis[t],on=save.talisEq===t,row=document.createElement('div');row.className='qrow'+(a?' done got':'');
     const ic=document.createElement('img');ic.className='qicon';ic.alt='';ic.style.imageRendering='pixelated';ic.style.objectFit='contain';try{const c=BULLET_ART[T.ic].c;ic.src=c._u||(c._u=c.toDataURL());}catch(e){}
-    const mid=document.createElement('div');const b=document.createElement('b');b.textContent=T.res+' · '+n+' / '+TALIS_COUT;const r=document.createElement('span');r.className='qr';r.textContent=DTYPES[t].nom+' · '+DTYPES[t].boss;
+    const mid=document.createElement('div');const b=document.createElement('b');b.textContent=T.res+' · '+n+' / '+TALIS_COUT;const r=document.createElement('span');r.className='qr';r.textContent=DTYPES[t]?DTYPES[t].nom+' · '+DTYPES[t].boss:'Plaines Sauvages · '+MON[t==='j'?'dieu_fou':'colosse'].nom;
     const bar=document.createElement('div');bar.className='qbar';const f=document.createElement('i');f.style.width=Math.min(100,n/TALIS_COUT*100)+'%';bar.append(f);
     const ti=document.createElement('span');ti.className='qr';ti.style.color=a?'#c8a0ff':'';ti.textContent=T.nom+' : '+talisTxt(t)+(on?' · porté':'');mid.append(b,r,bar,ti);
     const bt=document.createElement('button');bt.type='button';bt.className='act'+(a&&!on?' main':'');
@@ -4209,6 +4378,8 @@ const PAT={
       if(Math.hypot(P.x-m.x,P.y-m.y)<26){strikes.push({x:P.x+(P.vx||0)*0.8,y:P.y+(P.vy||0)*0.8,t:1.1,r:1.7,dmg:m.d.dmg*1.2,src:m.d.nom,fire:1});for(let k=0;k<7;k++)strikes.push({x:P.x+rnd(-6,6),y:P.y+rnd(-6,6),t:1.1+k*0.14,r:1.7,dmg:m.d.dmg,src:m.d.nom,fire:1});}}
     else{ // boules de feu géantes qui explosent en gerbes
       for(let k=-1;k<=1;k++){const an=a+k*0.5;eb.push({x:mouth.x,y:mouth.y,bx:mouth.x,by:mouth.y,vx:Math.cos(an)*5,vy:Math.sin(an)*5,life:1.3,dmg:m.d.dmg*1.3,r:0.6,col:'#ffd23f',src:m.d.nom,pw:true,fl:1,t:0,burstF:1});}}},
+  // Chevalier noir : spirale de lames, puis lames qui suivent, puis grand cercle
+  tr_noir:(m,a)=>{m.phase=(m.phase||0)+1;const p=m.phase%3;if(p===0){m.spin+=0.5;for(let i=0;i<6;i++)shoot(m,m.spin+i*TAU/6,{bs:6});}else if(p===1){for(let i=-1;i<=1;i++)shoot(m,a+i*0.4,{hom:1.4,bs:5,r:0.24});}else{for(let i=0;i<16;i++)shoot(m,a+i*TAU/16,{bs:4.5});}},
   single:(m,a)=>shoot(m,a),
   none:()=>{},
   tuteur:(m,a)=>{for(let i=-1;i<=1;i++)shoot(m,a+i*0.35,{bs:3.2});},
@@ -4279,6 +4450,7 @@ function handleDeath(id,key,x,y){
   const d=MON[key];const m=monsters.find(q=>q.id===id);if(m)m.hp=0;
   if(safe())return;
   {const dd=Math.hypot(x-P.x,y-P.y);if(dd<18){burst(x,y,d.bc,d.boss?60:14,d.boss?6:3);deathSfx(key,d.boss?1:clamp(1.15-dd/16,0.25,1));}}
+  if(scene==='tour'){if(TOURS)TOURS.tues++;return;} // la tour ne donne rien : ni butin, ni expérience, ni quête
   // donjon à deux boss : la sortie s'ouvre quand les deux sont vaincus
   const duo=scene==='dungeon'&&MAP.bossKey2&&(key===MAP.bossKey||key===MAP.bossKey2),reste=duo&&monsters.some(q=>q.hp>0&&q.id!==id&&(q.key===MAP.bossKey||q.key===MAP.bossKey2));
   if(d.boss&&d.star==null)showBanner(d.nom+' est vaincu'+(key==='liche'||key==='b_koi'?'e':'')+' !',scene==='realm'?'Un boss du centre apparaît tous les 20 monstres tués':reste?'Il reste l\'autre poisson légendaire !':'Le portail de sortie est ouvert','#ff5a6a');
@@ -4361,6 +4533,7 @@ function themeTick(dt,st,T,mv){
     if(P.hp<=0){die(why);return;}}
 }
 function die(src){
+  if(scene==='tour'){tourDeath(src);return;}
   if(scene!=='tuto'&&scene!=='arena')myEv=(++evSeq)+'|d|'+Math.round(P.x*10)+'|'+Math.round(P.y*10)+'|'+sceneKey(); // une tombe apparaît chez les autres joueurs de la scène
   if(scene==='raid'){raidDeath(src);return;}
   enterNexus();const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;paused=true;keys.clear();mouse.down=false;
@@ -4430,7 +4603,7 @@ function dropLoc(l){
   lset(l,null);addToBag(P.x,P.y,[it],true);SEL=null;done();
 }
 function drink(i){
-  {const it0=C().inv[i];if(it0&&KINDS[it0.kind]&&KINDS[it0.kind].key){useKey();return;}}
+  {const it0=C().inv[i];if(it0&&KINDS[it0.kind]&&KINDS[it0.kind].key){useKey();return;}if(it0&&it0.kind==='cle_tour'){note('Cette clef s\'utilise au portail de la Tour des Chevaliers, au Village');return;}}
   const ch=C(),it=ch.inv[i];if(!it||it.slot!=='conso')return;if(KINDS[it.kind].egg){note('Apporte cet œuf à l\'éleveur du Village pour le faire éclore');return;}if(KINDS[it.kind].food){note('La croquette sert à faire évoluer un familier, dans le parc de ta maison');return;}const st=S();
   const spk=KINDS[it.kind].sp;
   if(spk){ch.sp=ch.sp||{};const d=SP_DEF[spk];if((ch.sp[spk]||0)>=d.n){note(SL[spk]+' : maximum atteint ('+d.n+' potions)');sfx('deny');return;}ch.sp[spk]=(ch.sp[spk]||0)+1;ft(P.x,P.y-0.9,'+'+d.step+' '+SL[spk]+' (définitif)',d.col,true);burst(P.x,P.y,d.col,26,3);sfx('level');const s2=S();if(spk==='vie')P.hp=Math.min(s2.tot.vie,P.hp+d.step);if(spk==='mana')P.mp=Math.min(s2.tot.mana,P.mp+d.step);}
@@ -4446,7 +4619,7 @@ function done(){clampBars();invDirty=true;statsDirty=true;persist();}
 const iconCache={};
 function icon(it){
   const key=it.kind+it.tier;if(iconCache[key])return iconCache[key];
-  const alt=KINDS[it.kind]&&KINDS[it.kind].alt,t7=KINDS[it.kind]&&KINDS[it.kind].t7;let col=alt?ALT_COL:t7?'#5c5c68':TIER_COL[it.tier];if(KINDS[it.kind]&&KINDS[it.kind].art)col=ART_COL;if(it.kind==='cristal')col='#3ff0ff';if(it.kind==='pvie')col='#e0404c';if(it.kind==='pmana')col='#3f7fe0';const spk=KINDS[it.kind]&&KINDS[it.kind].sp;if(spk)col=SP_DEF[spk].col;const egk=KINDS[it.kind]&&KINDS[it.kind].egg;if(egk)col='#f0dca0';if(it.kind==='croquette')col='#b0703a';if(it.kind==='cle')col='#3ff0ff';
+  const alt=KINDS[it.kind]&&KINDS[it.kind].alt,t7=KINDS[it.kind]&&KINDS[it.kind].t7;let col=alt?ALT_COL:t7?'#5c5c68':TIER_COL[it.tier];if(KINDS[it.kind]&&KINDS[it.kind].art)col=ART_COL;if(it.kind==='cristal')col='#3ff0ff';if(it.kind==='cle_tour')col='#d8dce8';if(it.kind==='pvie')col='#e0404c';if(it.kind==='pmana')col='#3f7fe0';const spk=KINDS[it.kind]&&KINDS[it.kind].sp;if(spk)col=SP_DEF[spk].col;const egk=KINDS[it.kind]&&KINDS[it.kind].egg;if(egk)col='#f0dca0';if(it.kind==='croquette')col='#b0703a';if(it.kind==='cle')col='#3ff0ff';
   const pal={X:col,D:shade(col,0.6),W:'#ffffff',H:alt?'#fff1a0':it.tier>=7?'#ff4fd8':spk?'#f2c14e':'#8a5a2b',R:'#d2202e',V:'#7a0c18',Q:'#ff9aa0',P:'#e8d8b0'};
   if(t7){pal.D='#1e1e24';pal.W='#d0d0d8';pal.H='#2e2e36';}
   if(egk)pal.D='#d08a3a';const c=makeSprite(ICONS[egk?'oeuf':spk?'sp':baseKind(it.kind)],pal,4);iconCv[key]=c;
@@ -4765,7 +4938,7 @@ $('#lbTabs').addEventListener('click',e=>{const b=e.target.closest('[data-lb]');
 /* ================= skins, pupitre, Cursite ================= */
 function mySkin(){const c=save.current;const k=save.skinSel&&save.skinSel[c];return k&&SKINS[c]&&SKINS[c][k]&&save.skins[c+':'+k]?k:null;}
 const skinsEl=$('#skins'),pupEl=$('#pupitre');
-function nearAltarObj(){let best=null,bd=2.4;for(const [k,o] of [['pup',PUPITRE],['statue',STATUE],['altar',ALTAR],['guide',GUIDE],['quest',QUESTNPC],['eleveur',ELEVEUR],['forge',FORGE],['pecheur',PECHEUR],['table',TABLE],['craft',CRAFT],['hv',HVNPC]]){const d=Math.hypot(P.x-o.x,P.y-o.y);if(d<bd){bd=d;best=k;}}if(!best&&Math.hypot(P.x-FONT.x,P.y-FONT.y)<3.5)best='srv';return best;}
+function nearAltarObj(){let best=null,bd=2.4;for(const [k,o] of [['pup',PUPITRE],['statue',STATUE],['altar',ALTAR],['guide',GUIDE],['quest',QUESTNPC],['eleveur',ELEVEUR],['forge',FORGE],['pecheur',PECHEUR],['table',TABLE],['craft',CRAFT],['hv',HVNPC],['herbo',ATELIER]]){const d=Math.hypot(P.x-o.x,P.y-o.y);if(d<bd){bd=d;best=k;}}if(!best&&Math.hypot(P.x-FONT.x,P.y-FONT.y)<3.5)best='srv';return best;}
 function namePrice(){return save.nameChanges>0?NAME_PRICE:0;}
 function openPupitre(){pupEl.hidden=false;paused=true;$('#pseudo2').value=pseudo;const p=namePrice();$('#pupMsg').textContent=p?'Changement payant : '+p+' Cursite (tu en as '+save.cursite+')':'Premier changement gratuit. Les suivants coûteront '+NAME_PRICE+' Cursite.';$('#pupSave').textContent=p?'Payer '+p+' Cursite':'Enregistrer (gratuit)';setTimeout(()=>$('#pseudo2').focus(),30);}
 function closePupitre(){pupEl.hidden=true;paused=false;cv.focus();}
@@ -5065,7 +5238,7 @@ function petFollow(o,tx,ty,dt){if(o.px==null){o.px=tx;o.py=ty;}const k=1-Math.ex
   if(dt>0){const v=Math.hypot(o.px-ax,o.py-ay)/dt;o.pmv=v>0.5;if(Math.abs(o.px-ax)/dt>0.4)o.pf=o.px>ax?1:-1;}}
 function petTick(dt){const pe=eqPet();if(pe){const d=0.7+0.25*(pe.t||0);petFollow(P,P.x-(P.face||1)*d,P.y+0.25,dt);}
   for(const r of remotes.values())if(r.p&&typeof r.p.pe==='string'&&PET_DEF[r.p.pe])petFollow(r,r.x-(r.p.f||1)*0.75,r.y+0.2,dt);
-  if(scene==='vault')parkTick(dt);}
+  if(scene==='vault')parkTick(dt);if(scene==='tour')tourTick(dt);if(scene==='realm')herbeTick();}
 function drawPet(k,x,y,seed,t,face,mv){t=PET_TIERS[t]?t:0;if(!PET_DEF[k])return;const A=PET_ANIM[k]||{hz:6},vol=A.ailes!=null,s=TS*PET_SIZE[t];
   // image : au repos la tête bouge doucement ; en marche les pattes alternent ; le colibri bat toujours des ailes
   const f=vol?2+(Math.floor(time*A.hz+seed)%2):mv?2+(Math.floor(time*A.hz+seed)%2):(Math.floor(time*1.6+seed)%4===0?1:0);
@@ -5399,7 +5572,7 @@ $('#devAdmRef').addEventListener('click',()=>adminReq('admins'));$('#devAnoRef')
 $('#fpMe').addEventListener('click',()=>{setFPV(!FPV);renderEffGrid();});
 $('#admClose').addEventListener('click',closeAdmin);
 admEl.addEventListener('click',e=>{if(e.target===admEl)closeAdmin();});
-$('#devHub').addEventListener('click',()=>{closeAdmin();enterHub();});
+$('#devHub').addEventListener('click',()=>{closeAdmin();enterHub();});$('#devTour').addEventListener('click',()=>{closeAdmin();enterTour();});
 $('#devRaid').addEventListener('click',()=>devSend(myPeer,'raid'));$('#devRaidStop').addEventListener('click',()=>devSend(myPeer,'raidstop'));
 $('#devConc').addEventListener('click',()=>devSend(null,'concours','etat'));$('#devConcGo').addEventListener('dblclick',()=>devSend(null,'concours','0'));$('#devConcReset').addEventListener('dblclick',()=>devSend(null,'concours','reset'));
 $('#devVeng').addEventListener('click',()=>{if(scene!=='realm'){note('Va d\'abord dans les Plaines Sauvages');return;}closeAdmin();fishVengeance(true);});
@@ -5727,7 +5900,7 @@ $('#resetBtn').addEventListener('click',()=>{const b=$('#resetBtn');if(Date.now(
 const plEl=$('#plist'),nsEl=$('#netState'),plWin=document.getElementById('plWin');
 function togglePl(){plWin.hidden=!plWin.hidden;if(!plWin.hidden){plSig='';renderPlayers();sfx('item');}else cv.focus();}
 document.getElementById('plBtn').addEventListener('click',togglePl);document.getElementById('plClose').addEventListener('click',togglePl);
-function sceneLabel(s){return typeof s==='string'&&s[0]==='G'?'Hall de guilde':typeof s==='string'&&s[0]==='W'?'Raid de guilde':s==='n'?'Village':s==='r'?'Plaines Sauvages':typeof s==='string'&&s[0]==='d'?'Donjon':typeof s==='string'&&s[0]==='v'?'Maison':typeof s==='string'&&s[0]==='h'?'Salle d\'essai':typeof s==='string'&&s[0]==='u'?'Tutoriel':typeof s==='string'&&s[0]==='x'?'Arène':'?';}
+function sceneLabel(s){return typeof s==='string'&&s[0]==='G'?'Hall de guilde':typeof s==='string'&&s[0]==='W'?'Raid de guilde':s==='n'?'Village':s==='r'?'Plaines Sauvages':typeof s==='string'&&s[0]==='d'?'Donjon':typeof s==='string'&&s[0]==='v'?'Maison':typeof s==='string'&&s[0]==='h'?'Salle d\'essai':typeof s==='string'&&s[0]==='u'?'Tutoriel':typeof s==='string'&&s[0]==='t'?'Tour des Chevaliers':typeof s==='string'&&s[0]==='x'?'Arène':'?';}
 let plSig='';
 function renderPlayers(){
   const on=!!room&&netOn;nsEl.textContent=!room?'Solo':on?'En ligne · serveur '+(SRV_NOMS[salleNom]||salleNom):'Connexion…';nsEl.classList.toggle('on',on);
@@ -5743,13 +5916,14 @@ function renderPlayers(){
 }
 function updWho(){if(!save.current)return;$('#avatar').src=heroURL[save.current];$('#cname').textContent=CLASSES[save.current].nom;}
 function updZone(){
-  let z=scene==='ghall'?105:scene==='raid'?106:scene==='nexus'?-1:scene==='vault'?101:scene==='hub'?102:scene==='tuto'?103:scene==='arena'?104:scene==='dungeon'?100:regionAt(P.x,P.y);if(z<0&&scene==='realm'){z=curZone>=0&&curZone<ZONES.length?curZone:0;if(!(curZone>=0&&curZone<ZONES.length)){let f=false;for(let r=1;r<30&&!f;r++)for(let a=0;a<12&&!f;a++){const q=regionAt(P.x+Math.cos(a*TAU/12)*r*2,P.y+Math.sin(a*TAU/12)*r*2);if(q>=0){z=q;f=true;}}}} // dans un lac : on garde la zone autour
+  let z=scene==='ghall'?105:scene==='raid'?106:scene==='nexus'?-1:scene==='vault'?101:scene==='hub'?102:scene==='tuto'?103:scene==='tour'?107:scene==='arena'?104:scene==='dungeon'?100:regionAt(P.x,P.y);if(z<0&&scene==='realm'){z=curZone>=0&&curZone<ZONES.length?curZone:0;if(!(curZone>=0&&curZone<ZONES.length)){let f=false;for(let r=1;r<30&&!f;r++)for(let a=0;a<12&&!f;a++){const q=regionAt(P.x+Math.cos(a*TAU/12)*r*2,P.y+Math.sin(a*TAU/12)*r*2);if(q>=0){z=q;f=true;}}}} // dans un lac : on garde la zone autour
   if(z!==curZone){curZone=z;
     if(z===-1){$('#zone').textContent='Village';$('#zoneLvl').textContent='Zone sûre · la fontaine soigne';}
     else if(z===105){$('#zone').textContent='Hall de guilde';$('#zoneLvl').textContent=GUILD?'['+GUILD.tag+'] '+GUILD.nom:'';}
     else if(z===106){$('#zone').textContent='Raid de guilde';$('#zoneLvl').textContent='Dragon de Guilde · 5 minutes';}
     else if(z===101){$('#zone').textContent=VIS?'Maison de '+VIS.n:'Ta maison';$('#zoneLvl').textContent=VIS?'En visite · ♥ '+VIS.coeurs:'Coffres · parc des familiers';}
     else if(z===104){$('#zone').textContent='Arène';$('#zoneLvl').textContent='Duel contre '+(DU?DU.name:'…');}
+    else if(z===107){$('#zone').textContent='Tour des Chevaliers';$('#zoneLvl').textContent='Vagues sans fin · rien à perdre';}
     else if(z===103){$('#zone').textContent='Tutoriel';$('#zoneLvl').textContent='Apprends les commandes · R pour passer';}
     else if(z===102){$('#zone').textContent='Salle d\'essai';$('#zoneLvl').textContent='Mode admin · tous les donjons';}
     else if(z===100){$('#zone').textContent=DTYPES[dungeonT].nom;$('#zoneLvl').textContent=DTYPES[dungeonT].niv;}
@@ -5763,10 +5937,11 @@ function interact(){
   {const k=nearKeyPortal();if(k){enterDungeon(k.id,k.ty||'h');return;}}
   if(scene==='nexus'){
     if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6){enterRealm();return;}
-    {const c=nearAltarObj();if(c==='forge'){openForge();return;}if(c==='eleveur'){openPets();return;}if(c==='srv'){openServeurs();return;}if(c==='pecheur'){openFishWin();return;}if(c==='table'){openPix();return;}if(c==='craft'){openRes(true);return;}if(c==='hv'){openHV();return;}if(c==='quest'){openQuests();return;}if(c==='guide'){enterTuto();return;}if(c==='pup'){openPupitre();return;}if(c==='statue'){openSkins();return;}if(c==='altar'){openSelect();return;}}
+    {const c=nearAltarObj();if(c==='forge'){openForge();return;}if(c==='eleveur'){openPets();return;}if(c==='srv'){openServeurs();return;}if(c==='pecheur'){openFishWin();return;}if(c==='table'){openPix();return;}if(c==='craft'){openRes(true);return;}if(c==='hv'){openHV();return;}if(c==='herbo'){openHerb();return;}if(c==='quest'){openQuests();return;}if(c==='guide'){enterTuto();return;}if(c==='pup'){openPupitre();return;}if(c==='statue'){openSkins();return;}if(c==='altar'){openSelect();return;}}
     if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9){openShop();return;}
     if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5){enterVault();return;}
     if(Math.hypot(P.x-GPORT.x,P.y-GPORT.y)<1.5){enterGuildHall();return;}
+    if(Math.hypot(P.x-KPORT.x,P.y-KPORT.y)<1.5){tourPorte();return;}
     if(!FISH&&nearWater()){startFishing();return;}
   }else if(scene==='tuto'){
     if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6){finishTuto();return;}
@@ -5889,7 +6064,7 @@ function doAct(a,e){
 const MOVE_ACTS=['up','down','left','right'];
 window.addEventListener('keydown',e=>{
   if(cguOuvert)return;
-  if(e.key==='Escape'){if(DECO.on){decoFin();return;}if(!plWin.hidden){togglePl();return;}if(!mapEl.hidden){toggleMap();return;}if(!concEl.hidden){closeConc();return;}if(!forgeEl.hidden){closeForge();return;}if(!succEl.hidden){closeSucces();return;}if(!resEl.hidden){closeRes();return;}if(!hvEl.hidden){closeHV();return;}if(!parrEl.hidden){closeParr();return;}if(!pixEl.hidden){closePix();return;}if(!srvEl.hidden){closeServeurs();return;}if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!presEl.hidden){closePresWin();return;}if(!$('#gshopWin').hidden){closeGShop();return;}if(!$('#inspWin').hidden){closeInspect();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
+  if(e.key==='Escape'){if(DECO.on){decoFin();return;}if(!plWin.hidden){togglePl();return;}if(!mapEl.hidden){toggleMap();return;}if(!concEl.hidden){closeConc();return;}if(!forgeEl.hidden){closeForge();return;}if(!succEl.hidden){closeSucces();return;}if(!resEl.hidden){closeRes();return;}if(!hvEl.hidden){closeHV();return;}if(!herbEl.hidden){closeHerb();return;}if(!gwWin.hidden){closeGw();return;}if(!parrEl.hidden){closeParr();return;}if(!pixEl.hidden){closePix();return;}if(!srvEl.hidden){closeServeurs();return;}if(!rrEl.hidden){closeRaidRes();return;}if(!pmEl.hidden){closePMenu();return;}if(!guildEl.hidden){closeGuildWin();return;}if(!caseEl.hidden){closeCase();return;}if(!fishEl.hidden){closeFishWin();return;}if(FISH&&optEl.hidden&&shopEl.hidden){FISH=null;note('Tu ranges ta canne');return;}if(!kbWin.hidden){closeKb();return;}if(!petsEl.hidden){closePets();return;}if(!presEl.hidden){closePresWin();return;}if(!$('#gshopWin').hidden){closeGShop();return;}if(!$('#inspWin').hidden){closeInspect();return;}if(!houseEl.hidden){closeHouseWin();return;}if(!dlEl.hidden){closeDaily();return;}if(!qEl.hidden){closeQuests();return;}if(!trEl.hidden){closeTrade('Échange annulé',true);return;}if(!admEl.hidden){closeAdmin();return;}if(!skinsEl.hidden){closeSkins();return;}if(!pupEl.hidden){closePupitre();return;}if(!lbEl.hidden){closeLb();return;}if(!curWin.hidden){curWin.hidden=true;renderOpts();return;}if(!optEl.hidden){closeOpts();return;}if(!shopEl.hidden){closeShop();return;}}
   if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox'&&e.target.type!=='color'))return;
   const A=actsOf(e.code);
   if(!kbWin.hidden)return;
@@ -6067,7 +6242,7 @@ function update(dt){
       if(m.inv){m.wasInv=1;m.tx=m.x;m.ty=m.y;continue;}
       if(m.wasInv){m.wasInv=0;comteBurst(m);}
       if(m.key==='chronos')chronoTick(m,dt);
-      const aggro=m.d.boss?16:scene==='dungeon'?11.5:10.4,myD=Math.hypot(P.x-m.x,P.y-m.y);
+      const aggro=scene==='tour'?99:m.d.boss?16:scene==='dungeon'?11.5:10.4,myD=Math.hypot(P.x-m.x,P.y-m.y);
       // tirs : simulés localement par chaque joueur proche
       if(tg&&d<aggro&&myD<20){
         const lead=AI_LEAD[m.d.ai||0]*(Math.random()<0.78?1:0),tt=d/Math.max(1,m.d.bs),aimA=Math.atan2(tg.y+(tg.vy||0)*tt*lead-m.y,tg.x+(tg.vx||0)*tt*lead-m.x);
@@ -6653,6 +6828,7 @@ function drawNexus(x0,x1,y0,y1){
     {const X=sx(QUESTNPC.x),Y=sy(QUESTNPC.y),bb=Math.abs(Math.sin(time*2))*u2,qs=TS*0.9;ctx.drawImage(QUESTER,X-qs/2,Y-qs*0.62-bb,qs,qs);
       R(X+3*u2,Y-3*u2,6*u2,8*u2,'#f4f1e8');R(X+3*u2,Y-3*u2,6*u2,u2,'#c8b088');for(let k=0;k<3;k++)R(X+4*u2,Y-u2+k*2*u2,4*u2,u2*0.6,'#8a7a6a');
       const rd=questReady();label(rd?'!':'?',X,Y-TS*1.05-Math.abs(Math.sin(time*4))*u2*3,rd?'#ffd23f':'#9fd0ff',Math.round(TS*0.55),700);label('Quêtes du jour',X,Y-TS*0.72,'#ffd23f',Math.round(TS*0.28));}
+    {const X=sx(ATELIER.x),Y=sy(ATELIER.y);R(X-10*u2,Y,20*u2,6*u2,'#5a3a20');R(X-10*u2,Y,20*u2,1.5*u2,'#8a5a2b');R(X-9*u2,Y+6*u2,2*u2,4*u2,'#3a2616');R(X+7*u2,Y+6*u2,2*u2,4*u2,'#3a2616');R(X-7*u2,Y-6*u2,5*u2,6*u2,'#9ac8f4');R(X-6*u2,Y-8*u2,3*u2,2*u2,'#dcd8e4');R(X-6*u2,Y-4*u2,3*u2,3*u2,'#e0404c');R(X+1*u2,Y-5*u2,5*u2,5*u2,'#9ac8f4');R(X+2*u2,Y-7*u2,3*u2,2*u2,'#dcd8e4');R(X+2*u2,Y-3*u2,3*u2,2*u2,'#3f7fe0');R(X-2*u2,Y-3*u2,3*u2,u2,'#c9973c');if(Math.sin(time*5)>0)R(X-5*u2,Y-10*u2,u2,u2,'#ffffff');R(X+7*u2,Y-4*u2,2*u2,4*u2,'#4fa548');R(X+6*u2,Y-6*u2,4*u2,3*u2,'#e0404c');label('Herboriste',X,Y-TS*0.85,'#9fe07a',Math.round(TS*0.28));}
     {const X=sx(HVNPC.x),Y=sy(HVNPC.y),bb=Math.abs(Math.sin(time*2+1))*u2,qs=TS*0.9;R(X-9*u2,Y+2*u2,18*u2,5*u2,'#5a3a20');R(X-9*u2,Y+2*u2,18*u2,1.4*u2,'#8a5a2b');ctx.drawImage(AUCTIONEER,X-qs/2,Y-qs*0.62-bb,qs,qs);label('Hôtel des ventes',X,Y-TS*0.72,'#ffd23f',Math.round(TS*0.28));R(X+5*u2,Y-1*u2,5*u2,2*u2,'#c9973c');R(X+7*u2,Y+0.6*u2,1.2*u2,3*u2,'#8a5a2b');}
     {const X=sx(ELEVEUR.x),Y=sy(ELEVEUR.y),bb=Math.abs(Math.sin(time*2))*u2,qs=TS*0.9;ctx.drawImage(BREEDER,X-qs/2,Y-qs*0.62-bb,qs,qs);
       // panier d'œufs
@@ -6665,6 +6841,7 @@ function drawNexus(x0,x1,y0,y1){
   drawGateP(NPORT.x,NPORT.y);drawGateM(VPORT.x,VPORT.y);
   drawPortal(NPORT.x,NPORT.y,'#a45be8','#ff7bf2','Plaines Sauvages','',{frame:false});
   drawPortal(VPORT.x,VPORT.y,'#b8862b','#ffd96a','Maison','',{frame:false});
+  drawPortal(KPORT.x,KPORT.y,'#3a3c48','#d8dce8','Tour des Chevaliers',save.tour&&save.tour.v?'record : vague '+save.tour.v:'scellée · clef requise',{scale:0.85});
   drawPortal(GPORT.x,GPORT.y,'#6a3ab0','#ffd23f','Guilde',GUILD?'['+GUILD.tag+']':'créer ou rejoindre',{scale:0.85});
 }
 const ICON_IMG={};
@@ -7314,7 +7491,7 @@ function render(){
   const rw=camA?Math.hypot(W,H)/2/TS:W/2/TS,rh=camA?rw:H/2/TS;
   const x0=Math.floor(P.x-rw)-1,x1=Math.ceil(P.x+rw)+1,y0=Math.floor(P.y-rh)-1,y1=Math.ceil(P.y+rh)+1;
   ctx.save();if(camA){ctx.translate(W/2,H/2);ctx.rotate(camA);ctx.translate(-W/2,-H/2);}inWorld=true;
-  if(scene==='realm')drawRealm(x0,x1,y0,y1);else if(scene==='dungeon')drawDungeon(x0,x1,y0,y1);else if(scene==='vault')drawVault(x0,x1,y0,y1);else if(scene==='hub')drawHub(x0,x1,y0,y1);else if(scene==='tuto')drawTuto(x0,x1,y0,y1);else if(scene==='arena')drawArena(x0,x1,y0,y1);else if(scene==='ghall')drawGHall(x0,x1,y0,y1);else if(scene==='raid')drawRaid(x0,x1,y0,y1);else drawNexus(x0,x1,y0,y1);
+  if(scene==='realm'){drawRealm(x0,x1,y0,y1);drawHerbes(x0,x1,y0,y1);}else if(scene==='dungeon')drawDungeon(x0,x1,y0,y1);else if(scene==='vault')drawVault(x0,x1,y0,y1);else if(scene==='hub')drawHub(x0,x1,y0,y1);else if(scene==='tuto')drawTuto(x0,x1,y0,y1);else if(scene==='tour')drawTour(x0,x1,y0,y1);else if(scene==='arena')drawArena(x0,x1,y0,y1);else if(scene==='ghall')drawGHall(x0,x1,y0,y1);else if(scene==='raid')drawRaid(x0,x1,y0,y1);else drawNexus(x0,x1,y0,y1);
   drawTombs();drawSummons();
   for(const k of keyPortals()){const rem=Math.max(0,Math.ceil((k.fin-Date.now())/1000))+' s';if(k.ty==='v')drawPortal(k.x,k.y,'#0a4a5a','#ffd23f','La Vengeance sous-marine','Donjon rare · '+rem,{scale:1.35,fast:true});else drawPortal(k.x,k.y,'#141034','#3ff0ff',"L'Horloge Brisée",'Donjon à clef · '+rem,{scale:1.35,fast:true,clock:true});}
   if(scene==='realm'){for(const d of dportals){const T=DTYPES[d.t||'c'];drawPortal(d.x,d.y,T.col[0],T.col[1],T.nom,(d.t==='a'?'World boss · ':'')+Math.ceil(d.life)+' s',d.t==='a'?{scale:1.45,world:true,fast:true,th:'a'}:{th:d.t});}}
@@ -7426,11 +7603,12 @@ function render(){
   ctx.restore();inWorld=false;
   if(FPV&&save.current)drawFP();
   if(scene==='dungeon'&&dungeonT!=='a'){drawThemeFx();drawThemeHud();}
-  if(scene==='tuto')drawTutoHud();
+  if(scene==='tuto')drawTutoHud();if(scene==='tour')drawTourHud();
   let prompt=null;
   if(nearKeyPortal())prompt=nearKeyPortal().ty==='v'?'E · Plonger dans La Vengeance sous-marine':'E · Entrer dans l\'Horloge Brisée (donjon à clef)';
+  else if(scene==='nexus'&&Math.hypot(P.x-KPORT.x,P.y-KPORT.y)<1.5)prompt=C().inv.some(it=>it&&it.kind==='cle_tour')?'E · Tour des Chevaliers : utiliser une Clef de la Tour':'Tour des Chevaliers · scellée (il faut une Clef de la Tour)';
   else if(scene==='nexus'&&Math.hypot(P.x-GPORT.x,P.y-GPORT.y)<1.5)prompt=GUILD?'E · Hall de guilde ['+GUILD.tag+']':'E · Guildes : créer ou rejoindre';
-  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans les Plaines Sauvages';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)',srv:'E · Fontaine : changer de serveur',pecheur:'E · Parler au pêcheur (quête : tous les poissons)',table:'E · Table à dessin (1 pixel par minute)',craft:'E · Table enchantée (fabriquer un talisman)',hv:'E · Hôtel des ventes (acheter et vendre entre joueurs)',forge:'E · Forgeron (améliorer ton équipement)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
+  else if(scene==='nexus'){if(Math.hypot(P.x-NPORT.x,P.y-NPORT.y)<1.6)prompt='E · Entrer dans les Plaines Sauvages';else if(nearAltarObj())prompt={pup:'E · Changer de pseudo',statue:'E · Choisir un skin',altar:'E · Changement de classe',guide:'E · Parler au guide (refaire le tutoriel)',quest:'E · Quêtes du jour',eleveur:'E · Éleveur de familiers (faire éclore les œufs)',srv:'E · Fontaine : changer de serveur',pecheur:'E · Parler au pêcheur (quête : tous les poissons)',table:'E · Table à dessin (1 pixel par minute)',craft:'E · Table enchantée (fabriquer un talisman)',hv:'E · Hôtel des ventes (acheter et vendre entre joueurs)',herbo:'E · Atelier de l\'herboriste (fabriquer des potions avec tes plantes)',forge:'E · Forgeron (améliorer ton équipement)'}[nearAltarObj()];else if(Math.hypot(P.x-SHOP.x,P.y-SHOP.y)<1.9)prompt='E · Parler au marchand';else if(Math.hypot(P.x-VPORT.x,P.y-VPORT.y)<1.5)prompt='E · Salle des coffres';else if(groundBag)prompt='G · Tout ramasser';else if(!FISH&&nearWater())prompt='E · Pêcher dans l\'étang';}
   else if(scene==='vault'&&VIS){if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt=VIS.aime?'Tu as déjà laissé un cœur ici ♥':'E · Laisser un cœur ♥ à '+VIS.n;else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';}
   else if(scene==='vault'){const c=nearChest();if(DECO.on)prompt=null;else if(Math.hypot(P.x-VBACK.x,P.y-VBACK.y)<1.4)prompt='E · Retour au Village';else if(Math.hypot(P.x-HDECO.x,P.y-HDECO.y)<1.6)prompt='E · Décorer la maison, acheter des meubles';else if(nearSalleDoor())prompt='E · Agrandir la maison : une salle en plus ('+SALLE.prix+' pièces)';else if(Math.hypot(P.x-PRESNPC.x,P.y-PRESNPC.y)<1.6)prompt='E · Gardien du Prestige (niveau maximum)';else if(Math.hypot(P.x-FBOARD.x,P.y-FBOARD.y)<1.5)prompt='E · Tableau de pêche';else if(!FISH&&nearWater())prompt='E · Pêcher dans le lac';else if(Math.hypot(P.x-PSIGN.x,P.y-PSIGN.y)<1.6||inPark(P.x,P.y))prompt='E · Gérer mes familiers';else if(c>=save.vault.n)prompt=c===save.vault.n?'E · Débloquer le coffre '+(c+1)+' · '+VAULT_PRICES[c]+' pièces':'Coffre '+(c+1)+' verrouillé';else if(c>=0)prompt='Coffre '+(c+1)+' ouvert · glisse tes objets dans le panneau';else if(groundBag)prompt='G · Tout ramasser';}
   else if(scene==='tuto'){if(exitOpen&&MAP.bossExit&&Math.hypot(P.x-MAP.bossExit.x,P.y-MAP.bossExit.y)<1.6)prompt='E · Village (terminer le tutoriel)';else if(groundBag)prompt='G · Tout ramasser';}
@@ -7489,7 +7667,7 @@ function drawMini(){
   }else if(scene==='arena'||scene==='ghall'||scene==='raid'){
     const d=MAP,k=Wm/d.w,oy=(Wm-d.h*k)/2;if(scene==='raid')for(const m of monsters){mctx.fillStyle='#ffd23f';mctx.fillRect(m.x*k-4,oy+m.y*k-4,8,8);}for(let y=0;y<d.h;y++)for(let x=0;x<d.w;x++)if(!d.sol[y*d.w+x]){mctx.fillStyle='#5a3a2a';mctx.fillRect(x*k,oy+y*k,k+0.5,k+0.5);}
     mctx.fillStyle='#ff5a6a';for(const r of others)mctx.fillRect(r.x*k-3,oy+r.y*k-3,6,6);mctx.fillStyle='#fff';mctx.fillRect(P.x*k-3,oy+P.y*k-3,6,6);
-  }else if(scene==='tuto'){
+  }else if(scene==='tuto'||scene==='tour'){
     const d=MAP,k=Wm/d.w,oy=(Wm-d.h*k)/2;for(let y=0;y<d.h;y++)for(let x=0;x<d.w;x++)if(!d.sol[y*d.w+x]){mctx.fillStyle='#3a3551';mctx.fillRect(x*k,oy+y*k,k+0.5,k+0.5);}
     for(const m of monsters){mctx.fillStyle=m.d.boss?'#7ed957':'#ff4d5e';mctx.fillRect(m.x*k-2,oy+m.y*k-2,4,4);}mctx.fillStyle='#fff';mctx.fillRect(P.x*k-2,oy+P.y*k-2,4,4);
   }else if(scene==='hub'){
@@ -7506,7 +7684,7 @@ function drawMini(){
     for(let y=0;y<NH;y++)for(let x=-13;x<NW;x++){const f=x<0;mctx.fillStyle=y>33&&x>=0&&nLake(x,y)&&!nPont(x,y)?'#2c6a96':x>=0&&nFence(x,y)?'#8a5a32':sol[y*st+x+O]?(f&&!(inForge(x,y)||x===-13)?'#0b0a12':'#231f33'):f?(inForge(x,y)?'#5a3a2a':'#0b0a12'):y>33?(nPont(x,y)||nPath(x,y)?'#b89a6a':'#3f6a3a'):'#3a3551';mctx.fillRect(ox+x*k,oy+y*k,k+0.5,k+0.5);}
     mctx.fillStyle='#6a4424';mctx.fillRect(ox+NHUT.x0*k,oy+NHUT.y0*k,(NHUT.x1-NHUT.x0+1)*k,(NHUT.y1-NHUT.y0+1)*k);
     const dot=(p,c,z)=>{mctx.fillStyle=c;mctx.fillRect(ox+p.x*k-z/2,oy+p.y*k-z/2,z,z);};
-    mctx.fillStyle='#2f6fbf';mctx.fillRect(ox+14*k,oy+15*k,4*k,4*k);dot(NPORT,'#b16cff',6);dot(VPORT,'#b8862b',6);dot(GPORT,'#8a5ad0',5);dot(ALTAR,'#e8b04a',4);dot(PUPITRE,'#dcd8e4',4);dot(STATUE,'#7df0e0',4);dot(GUIDE,'#7ed957',4);dot(SHOP,'#ffd96a',6);dot(FORGE,'#ff7a2a',6);dot(CRAFT,'#c8a0ff',4);dot(HVNPC,'#ff6a6a',5);dot(TABLE,'#ff9ac8',4);dot(PECHEUR,'#8fd0ff',4);dot(ELEVEUR,'#9fe07a',4);
+    mctx.fillStyle='#2f6fbf';mctx.fillRect(ox+14*k,oy+15*k,4*k,4*k);dot(NPORT,'#b16cff',6);dot(VPORT,'#b8862b',6);dot(GPORT,'#8a5ad0',5);dot(KPORT,'#d8dce8',5);dot(ATELIER,'#9fe07a',4);dot(ALTAR,'#e8b04a',4);dot(PUPITRE,'#dcd8e4',4);dot(STATUE,'#7df0e0',4);dot(GUIDE,'#7ed957',4);dot(SHOP,'#ffd96a',6);dot(FORGE,'#ff7a2a',6);dot(CRAFT,'#c8a0ff',4);dot(HVNPC,'#ff6a6a',5);dot(TABLE,'#ff9ac8',4);dot(PECHEUR,'#8fd0ff',4);dot(ELEVEUR,'#9fe07a',4);
     mctx.fillStyle='#4fb8e8';for(const r of others)mctx.fillRect(ox+r.x*k-2,oy+r.y*k-2,4,4);
     mctx.fillStyle='#fff';mctx.fillRect(ox+P.x*k-2,oy+P.y*k-2,4,4);
   }
