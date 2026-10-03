@@ -1,5 +1,8 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.47 (index.html seulement ; wiki.html régénéré pour le numéro de version)
+- Correctif : le titre « Alpha testeur » ne pouvait pas être choisi dans les Options quand le joueur n'avait aucun autre titre (la liste restait grisée).
+
 ## ver.0.0.46 (server.js et arbitre.js modifiés ; wiki.html régénéré)
 - **Prestige et équipement** : à la mort définitive, chaque objet porté augmente le prestige gagné. Tier 2 : +1 %, Tier 3 : +2 %, Tier 4 : +3 %, Tier 5 : +4 %, Tier 6 : +5 %, Tier 7 : +6 %, Relique : +10 %, et +1 % par niveau de forge. Les pourcentages des quatre objets s'additionnent (quatre Reliques +2 : +48 %). L'écran de mort affiche le bonus.
 - **Hôtel des ventes** : la mise en vente coûte 15 % du prix demandé, payés tout de suite et jamais rendus (objet vendu, retiré ou invendu). La taxe de 5 % à la vente reste en place.

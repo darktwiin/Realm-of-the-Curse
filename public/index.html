@@ -448,7 +448,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.46"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.47"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -464,7 +464,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.46</div>
+    <div class="verTag" id="verTag">ver.0.0.47</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -627,7 +627,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.46</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.47</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -669,7 +669,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.46</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.47</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -3017,7 +3017,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000046;let newerWarned=false;
+const NETV=2,BUILD=2600000047;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -5679,7 +5679,7 @@ function renderCurWin(){
 function setCurCol(c){if(!/^#[0-9a-f]{6}$/i.test(c))return;opts.ccol=c.toLowerCase();applyCursor();saveOpts();renderCurWin();renderOpts();}
 function fillTitles(){const sel=$('#titleSel');sel.textContent='';const o0=document.createElement('option');o0.value='';o0.textContent='Aucun titre';sel.append(o0);
   for(const k of (save.titles||[]).concat((AUTH.admin||devMode)?['admin']:[]).concat(TOUR&&TOUR.roiMoi?['roipeche']:[]).concat([...SRVT]))if(TITLES[k]){const o=document.createElement('option');o.value=k;o.textContent=TITLES[k].t;sel.append(o);}
-  sel.value=myTitle()||'';sel.disabled=!(save.titles||[]).length&&!devMode&&!AUTH.admin&&!(TOUR&&TOUR.roiMoi);sel.title=sel.disabled?'Gagne des titres avec les récompenses de connexion':'';}
+  sel.value=myTitle()||'';sel.disabled=!(save.titles||[]).length&&!devMode&&!AUTH.admin&&!(TOUR&&TOUR.roiMoi)&&!SRVT.size;sel.title=sel.disabled?'Gagne des titres avec les récompenses de connexion':'';}
 $('#titleSel').addEventListener('change',e=>{save.title=e.target.value||null;persist();sendPresence();});
 function openOpts(){fillTitles();TU.opt=1;optEl.hidden=false;keys.clear();mouse.down=false;renderOpts();}
 function closeOpts(){optEl.hidden=true;curWin.hidden=true;kbWin.hidden=true;KB_CAP=null;cv.focus();}
