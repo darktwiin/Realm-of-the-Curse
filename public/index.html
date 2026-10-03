@@ -448,7 +448,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.44"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.45"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -464,7 +464,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.44</div>
+    <div class="verTag" id="verTag">ver.0.0.45</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -627,7 +627,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.44</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.45</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -669,7 +669,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.44</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.45</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1268,7 +1268,7 @@ const ALT_COL='#ffd23f',T7_COL='#8d8d9b',ART_COL='#b45aff'; // Reliques de Chron
   baton2:{base:'baton',nom:'Bâton de la Nova',dk:0.6,desc:'12 projectiles tout autour de toi, portée courte, dégâts +30 % : énorme au corps à corps'},
   epee2:{base:'epee',nom:'Lame du Colosse',dk:4,ex:1,desc:'Frappe 3 fois moins vite mais inflige 400 % des dégâts · portée réduite de 20 %'},
   arc2:{base:'arc',nom:'Arc de la Tempête',dt:2,desc:'5 flèches, vitesse d\'attaque doublée, dégâts d\'un arc Tier 2'},
-  baguette2:{base:'baguette',nom:'Baguette de Miséricorde',dk:0,desc:'Aucun dégât : chaque tir est une large vague qui soigne les alliés qu\'elle traverse (3 % de leur vie)'},
+  baguette2:{base:'baguette',nom:'Baguette de Miséricorde',dk:0,desc:'Aucun dégât : chaque attaque pose une zone de soin sous ton curseur, qui soigne les alliés dedans (3 % de leur vie, toi compris)'},
   dague2:{base:'dague',nom:'Crocs Jumeaux',dk:0.33,desc:'3 lames, vitesse d\'attaque doublée, dégâts très réduits'}};
   for(const k in A){const B=KINDS[A[k].base];KINDS[k]=Object.assign({},B,A[k],{alt:true,noms:Array(8).fill(A[k].nom),type:B.type+' de Chronos'});}
   /* Tier 7 (obsidienne) : mêmes effets que le Tier 6, seulement plus de dégâts et de caractéristiques. Ce n'est PAS une relique.
@@ -3017,7 +3017,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000044;let newerWarned=false;
+const NETV=2,BUILD=2600000045;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -4014,8 +4014,8 @@ function dashTick(dt){if(P.dashCd>0)P.dashCd=Math.max(0,P.dashCd-dt);if(P.dashK)
 function aimWorld(){if(FPV)return{x:P.x+Math.cos(fpA)*6,y:P.y+Math.sin(fpA)*6};if(PAD.on&&PAD.aim!=null)return{x:P.x+Math.cos(PAD.aim)*6,y:P.y+Math.sin(PAD.aim)*6};return aimTouch?screenToWorld(aimTouch.x,aimTouch.y):screenToWorld(mouse.x,mouse.y);}
 // Lame de l'Aura : chaque seconde, les 8 monstres les plus proches dans l'aura prennent (dégâts de l'arme × vitesse d'attaque)
 function auraTick(w,b,st){const l=monsters.filter(m=>m.hp>0&&!m.inv&&Math.hypot(m.x-P.x,m.y-P.y)<=b.range+m.d.sz*0.3).sort((p,q)=>Math.hypot(p.x-P.x,p.y-P.y)-Math.hypot(q.x-P.x,q.y-P.y)).slice(0,b.am||8);
-  vfx.push({k:'healring',x:P.x,y:P.y,r:b.range,t:0,life:0.9,col:b.col});if(!l.length)return;
-  for(const m of l){hitMon(m,Math.round(rnd(w.dmg[0],w.dmg[1])*upK(w)*st.mult*st.rate),b.col);}
+  P.auraHit=time;vfx.push({k:'healring',x:P.x,y:P.y,r:b.range,t:0,life:0.5,col:'#e0b8ff'});if(!l.length)return;
+  for(const m of l){burst(m.x,m.y,'#d8a0ff',7,2.5);vfx.push({k:'healring',x:m.x,y:m.y,r:0.9,t:0,life:0.35,col:'#ffffff'});hitMon(m,Math.round(rnd(w.dmg[0],w.dmg[1])*upK(w)*st.mult*st.rate),b.col);}
   {const ch=C();ch.shots=(ch.shots||0)+1;ch.hits=(ch.hits||0)+1;}sfx('shoot_guerrier',0.35);if(P.backProt){P.backProt=0;P.invul=0;}}
 function fire(st){
   const w=C().equip[0];if(!w)return;const b=WB[w.kind],a=aimWorld(),ang=Math.atan2(a.y-P.y,a.x-P.x);
@@ -4023,8 +4023,10 @@ function fire(st){
   P.face=Math.cos(ang+camA)<0?-1:1;P.thrust=1;
   if(b.invoc){summonMain(a);return;}
   const shots=b.shots+(w.extra||0),spread=b.spread||(w.extra&&!b.par?0.18:0),fx=skinFx(save.current,mySkin()),alt=KINDS[w.kind].alt,bk=baseKind(w.kind);
-  if(b.heal){ // Baguette de Miséricorde : une vague qui ne blesse personne et soigne les alliés traversés
-    pb.push({x:P.x,y:P.y,vx:Math.cos(ang)*b.spd,vy:Math.sin(ang)*b.spd,life:b.range/b.spd,dmg:0,r:b.r,col:b.col,kind:'vague',hit:null,cosm:true,healw:1,trail:b.col});
+  if(b.heal){ // Baguette de Miséricorde : une zone de soin posée sous le curseur (3 % de la vie des alliés qui s'y trouvent), au plus deux par seconde
+    const dz=Math.min(b.range,Math.hypot(a.x-P.x,a.y-P.y)),zx=P.x+Math.cos(ang)*dz,zy=P.y+Math.sin(ang)*dz,RZ=2.4;
+    if(!(P.hzT>time)){P.hzT=time+0.5;vfx.push({k:'healring',x:zx,y:zy,r:RZ,t:0,life:0.6,col:b.col});myHeal=(++healSeq)+'|p3|'+RZ.toFixed(1)+'||'+Math.round(zx*10)+','+Math.round(zy*10);sendPresence();
+      if(Math.hypot(P.x-zx,P.y-zy)<RZ){const mx=S().tot.vie,got=Math.min(Math.round(mx*0.03),mx-P.hp);if(got>0){P.hp+=got;ft(P.x,P.y-0.8,'+'+Math.round(got),'#7ed957');}}}
     classVfx(save.current,P.x,P.y,ang,false);sfx('shoot_'+save.current,0.5);return;}
   for(let i=0;i<shots;i++){
     let an=ang,ox=0,oy=0;
@@ -4687,7 +4689,7 @@ document.querySelectorAll('#shopTabs button').forEach(b=>b.addEventListener('cli
 const shopEl=$('#shop');
 function openShop(){paused=true;shopEl.hidden=false;renderShop();sfx('coin');}
 function closeShop(){shopEl.hidden=true;paused=false;cv.focus();}
-const SELL_PRICE=[0,0,0,1,3,5,10,25];
+const SELL_PRICE=[0,0,0,1,3,5,10,25],sellPrice=it=>KINDS[it.kind]&&KINDS[it.kind].t7?15:SELL_PRICE[it.tier];
 let sellArm=-1,sellT=0;
 function renderShop(){
   $('#shopGold').textContent=save.gold;
@@ -4698,15 +4700,15 @@ function renderShop(){
   if(shopTab==='cu'){$('#shopList').innerHTML=daily+'<div class="shop-sec"><h3>Boutique Cursite</h3><div class="shop-grid">'+CU_ITEMS.map(s=>{const own=s.owned(),can=save.cursite>=s.prix;
       const img=s.img?'<img src="'+s.img+'" alt="">':'<div style="width:48px;height:48px;display:grid;place-items:center;font-size:26px;color:#7ed957;font-weight:700">XP</div>';
       return '<div class="shop-card">'+img+'<div class="sc-t"><b>'+s.nom+'</b><span>'+s.desc+'</span></div><button type="button" class="act main" data-cubuy="'+s.id+'" '+(own||!can?'disabled':'')+'><i class="cur" style="display:inline-block;width:10px;height:10px;background:#3ff0ff;transform:rotate(45deg);margin-right:6px"></i>'+(own?(s.ownTxt||'Acheté'):s.prix)+'</button></div>';}).join('')+'</div></div>';return;}
-  const ch=C();let sell='';ch.inv.forEach((it,i)=>{if(!it)return;const can=it.slot!=='conso'&&it.slot!=='meuble';const p=can?SELL_PRICE[it.tier]:0;
+  const ch=C();let sell='';ch.inv.forEach((it,i)=>{if(!it)return;const can=it.slot!=='conso'&&it.slot!=='meuble';const p=can?sellPrice(it):0;
     sell+=`<button type="button" class="tslot sellb ${!can?'empty':''} ${sellArm===i?'arm':''}" ${can?`data-sell="${i}"`:''} title="${it.name.replace(/"/g,'')}${can?' · '+TIER_NOM[it.tier]+' · '+p+' pièce'+(p>1?'s':''):' · invendable'}"><img src="${icon(it)}" alt=""><em>${can?(sellArm===i?'OK ?':p):'✕'}</em></button>`;});
-  const sellBox=`<div class="shop-sell"><b>Vendre ton équipement</b><span>Tier 0 à 2 : 0 pièce · Tier 3 : 1 · Tier 4 : 3 · Tier 5 : 5 · Tier 6 : 10 · Relique : 25. Les potions ne se vendent pas. Clic sur un objet, puis clic encore pour confirmer.</span><div class="sellgrid">${sell||'<i class="hint">Ton sac est vide.</i>'}</div></div>`;
+  const sellBox=`<div class="shop-sell"><b>Vendre ton équipement</b><span>Tier 0 à 2 : 0 pièce · Tier 3 : 1 · Tier 4 : 3 · Tier 5 : 5 · Tier 6 : 10 · Tier 7 : 15 · Relique : 25. Les potions ne se vendent pas. Clic sur un objet, puis clic encore pour confirmer.</span><div class="sellgrid">${sell||'<i class="hint">Ton sac est vide.</i>'}</div></div>`;
   const secs=SHOP_SECS.map(([k,t])=>`<div class="shop-sec"><h3>${t}</h3><div class="shop-grid">`+SHOP_ITEMS.filter(q=>q.sec===k).map(s=>{const own=s.owned(),can=save.gold>=s.prix;return `<div class="shop-card${s.id==='spjour'?' hot':''}"><img src="${s.img}" alt=""><div class="sc-t"><b>${s.nom}</b><span>${s.desc}</span></div><button type="button" class="act main" data-buy="${s.id}" ${own||!can?'disabled':''}><i class="coin"></i>${own?(s.ownTxt||'Acheté'):s.prix}</button></div>`;}).join('')+`</div></div>`).join('');
   $('#shopList').innerHTML=daily+secs+sellBox;
 }
 $('#shopList').addEventListener('click',e=>{const sb=e.target.closest('[data-sell]');if(sb){const i=+sb.dataset.sell,it=C().inv[i];if(!it||it.slot==='conso'||it.slot==='meuble')return;
     if(sellArm!==i||Date.now()-sellT>4000){sellArm=i;sellT=Date.now();renderShop();return;}
-    const p=SELL_PRICE[it.tier];C().inv[i]=null;save.gold+=p;sellArm=-1;persist();invDirty=true;if(p>0)coinBurst(SHOP.x,SHOP.y-1.2,p);else sfx('item');note(it.name+' vendu'+(p?' pour '+p+' pièce'+(p>1?'s':''):''));renderShop();return;}
+    const p=sellPrice(it);C().inv[i]=null;save.gold+=p;sellArm=-1;persist();invDirty=true;if(p>0)coinBurst(SHOP.x,SHOP.y-1.2,p);else sfx('item');note(it.name+' vendu'+(p?' pour '+p+' pièce'+(p>1?'s':''):''));renderShop();return;}
   if(e.target.closest('[data-daily]')){const [dc,dk]=dailySkin(),dp=skinPrice(dc,dk);if(save.skins[dc+':'+dk]||save.cursite<dp){sfx('deny');return;}save.cursite-=dp;save.skins[dc+':'+dk]=true;if(dc===save.current){save.skinSel[dc]=dk;sendPresence();}persist();sfx('relic');burst(P.x,P.y,'#3ff0ff',20,3);note(SKINS[dc][dk].nom+' débloqué ('+CLASSES[dc].nom+') !');renderShop();invDirty=true;return;}
   {const c=e.target.closest('[data-cubuy]');if(c){const s=CU_ITEMS.find(q=>q.id===c.dataset.cubuy);if(!s||s.owned()||save.cursite<s.prix){sfx('deny');return;}if(s.buy()===false){sfx('deny');return;}save.cursite-=s.prix;persist();invDirty=true;renderShop();note(s.nom+' acheté'+(s.id==='boost'?' !':' !'));sfx('relic');burst(P.x,P.y,'#3ff0ff',16,3);return;}}
   const b=e.target.closest('[data-buy]');if(!b)return;const s=SHOP_ITEMS.find(q=>q.id===b.dataset.buy);if(!s||s.owned()||save.gold<s.prix)return;if(s.buy()===false){sfx('deny');return;}save.gold-=s.prix;persist();invDirty=true;renderShop();note(s.nom+' acheté'+(s.id.startsWith('sac')?' !':'e !'));sfx('buy');burst(P.x,P.y,'#ffd96a',16,3);});
@@ -6038,7 +6040,7 @@ function update(dt){
     if(r.bubble){r.bubble.life-=dt;if(r.bubble.life<=0)r.bubble=null;}
     if(canFight()&&activeIn(r,sk)&&typeof r.p.sh==='number'&&WB[r.p.w]&&Math.hypot(r.x-P.x,r.y-P.y)<18){
       r.shT-=dt;if(r.shT<=0){r.shT=1/clamp(num(r.p.r,20)/10,0.5,12);const b=WB[r.p.w],ang=r.p.sh/100;
-        if(b.heal){pb.push({x:r.x,y:r.y,vx:Math.cos(ang)*b.spd,vy:Math.sin(ang)*b.spd,life:b.range/b.spd,dmg:0,r:b.r,col:b.col,kind:'vague',hit:null,cosm:true,healw:1,src:r.peer,trail:b.col});}
+        if(b.heal||b.aura){/* zone de soin ou aura : rien à tirer, l'effet arrive par un autre message */}
         else for(let i=0;i<b.shots;i++){let an=ang,ox=0,oy=0;if(b.ring)an=ang+i*TAU/b.shots;else if(b.spread)an+=(i-(b.shots-1)/2)*b.spread;if(b.par){const o=(i-(b.shots-1)/2)*b.par*2;ox=-Math.sin(ang)*o;oy=Math.cos(ang)*o;}
           const fx=skinFx(r.p.c,r.p.sk);pb.push({x:r.x+ox,y:r.y+oy,vx:Math.cos(an)*b.spd,vy:Math.sin(an)*b.spd,life:b.range/b.spd,dmg:duelFrom(r)?clamp(num(r.p.dd,20),1,2000):0,duel:duelFrom(r),r:b.r,col:KINDS[r.p.w]&&KINDS[r.p.w].alt?ALT_COL:fx?fx.col:b.col,kind:baseKind(r.p.w),hit:null,cosm:true,trail:fx?fx.trail:TRAIL[baseKind(r.p.w)]});}
         classVfx(r.p.c,r.x,r.y,ang,false);r.thrust=1;}
@@ -7398,7 +7400,10 @@ function render(){
       ctx.save();ctx.translate(X,Y);ctx.rotate(ba.dir?Math.atan2(b.vy,b.vx):ba.fix?0:time*7+b.bx);ctx.drawImage(ba.c,-z/2,-z/2,z,z);ctx.restore();continue;}
     ctx.globalAlpha=0.22;ctx.fillStyle=b.col;ctx.beginPath();ctx.arc(X,Y,s*1.8,0,TAU);ctx.fill();ctx.globalAlpha=1;
     ctx.fillStyle='#0b0a12';ctx.beginPath();ctx.arc(X,Y,s+(heavyOut?Math.max(4,TS*0.1):2),0,TAU);ctx.fill();ctx.fillStyle=b.col;ctx.beginPath();ctx.arc(X,Y,s,0,TAU);ctx.fill();ctx.fillStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.arc(X-s*0.25,Y-s*0.25,s*0.35,0,TAU);ctx.fill();}
-  {const w0=save.current&&C().equip[0],b0=w0&&WB[w0.kind];if(b0&&b0.aura&&canFight()&&!safe()&&scene!=='nexus'){const X=sx(P.x),Y=sy(P.y),rr=TS*b0.range,pu=0.5+0.5*Math.sin(time*6.28);ctx.globalAlpha=1;ctx.fillStyle='rgba(180,90,255,'+(0.07+0.05*pu)+')';ctx.beginPath();ctx.arc(X,Y,rr,0,TAU);ctx.fill();ctx.strokeStyle='rgba(200,130,255,'+(0.35+0.3*pu)+')';ctx.lineWidth=Math.max(2,TS*0.06);ctx.stroke();for(let i=0;i<6;i++){const an=time*1.4+i*TAU/6;ctx.fillStyle='#d8b0ff';ctx.fillRect(X+Math.cos(an)*rr-2,Y+Math.sin(an)*rr-2,4,4);}}}
+  {const dessAura=(wx,wy,rg,ph)=>{const X=sx(wx),Y=sy(wy),rr=TS*rg,pu=0.5+0.5*Math.sin(time*6.28);ctx.globalAlpha=1;ctx.fillStyle='rgba(180,90,255,'+(0.07+0.05*pu)+')';ctx.beginPath();ctx.arc(X,Y,rr,0,TAU);ctx.fill();ctx.strokeStyle='rgba(200,130,255,'+(0.35+0.3*pu)+')';ctx.lineWidth=Math.max(2,TS*0.06);ctx.stroke();for(let i=0;i<6;i++){const an=time*1.4+i*TAU/6;ctx.fillStyle='#d8b0ff';ctx.fillRect(X+Math.cos(an)*rr-2,Y+Math.sin(an)*rr-2,4,4);}
+      if(ph>=0&&ph<0.4){const k=ph/0.4;ctx.globalAlpha=1-k;ctx.strokeStyle='#f0d8ff';ctx.lineWidth=Math.max(3,TS*0.16*(1-k)+2);ctx.beginPath();ctx.arc(X,Y,rr*(0.2+0.8*k),0,TAU);ctx.stroke();ctx.lineWidth=Math.max(2,TS*0.08);for(let i=0;i<4;i++){const a0=i*TAU/4+k*1.6;ctx.beginPath();ctx.arc(X,Y,rr*0.72,a0,a0+0.9);ctx.stroke();}ctx.globalAlpha=1;}};
+    const w0=save.current&&C().equip[0],b0=w0&&WB[w0.kind];if(b0&&b0.aura&&canFight()&&!safe()&&scene!=='nexus')dessAura(P.x,P.y,b0.range,time-(P.auraHit||-9));
+    if(!safe()&&scene!=='nexus'){const sk=sceneKey();for(const r of remotes.values())if(activeIn(r,sk)&&!r.p.hid&&WB[r.p.w]&&WB[r.p.w].aura)dessAura(r.x,r.y,WB[r.p.w].range,(time+(r.peer.charCodeAt(0)||0)*0.1)%1);}}
   for(const v of vfx){const k=v.t/v.life,X=sx(v.x),Y=sy(v.y);ctx.globalAlpha=1-k;ctx.strokeStyle=v.col;
     if(v.k==='flamep'){ctx.globalAlpha=1-k*k;const h=TS*2.4*(0.7+k*0.5);ctx.drawImage(FLAME_SPR[Math.floor(time*12+v.x)%3],X-h*0.4,Y-h*0.85,h*0.8,h);}
     else if(v.k==='ring'){ctx.lineWidth=Math.max(2,TS*0.06);ctx.beginPath();ctx.arc(X,Y,TS*(v.r+k*0.5),0,TAU);ctx.stroke();}

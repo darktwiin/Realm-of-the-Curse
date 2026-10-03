@@ -234,7 +234,7 @@ function verifier(ancien, nouveau, ctx) {
   for (const [cls, ch1] of Object.entries(nouveau.chars)) { const ch0 = ancien.chars[cls]; const n0 = ch0 ? ch0.inv.length : 8; if (ch1.inv.length > n0) orDepenseMin += (n0 < 16 && ch1.inv.length >= 16 ? 250 : 0) + (ch1.inv.length >= 24 && n0 < 24 ? 1500 : 0); }
   // valeur de revente des équipements disparus (vendus au marchand ou jetés)
   let ventes = 0;
-  for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0); if (moins > 0) { const t = +k.split('|')[1], K = R.KINDS[k.split('|')[0]]; if (K && K.slot !== 'conso') ventes += moins * (R.SELL_PRICE[t] || 0); } }
+  for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0); if (moins > 0) { const t = +k.split('|')[1], K = R.KINDS[k.split('|')[0]]; if (K && K.slot !== 'conso') ventes += moins * (K.t7 ? 15 : (R.SELL_PRICE[t] || 0)); } }
   // familiers vendus : 40, 150, 600 ou 2500 pièces selon le rang
   { const PRIX = [40, 150, 600, 2500], ids1 = new Set((nouveau.pets || []).map(p => p.id)); for (const p of (ancien.pets || [])) if (!ids1.has(p.id)) ventes += PRIX[Math.min(3, p.t | 0)] || 0; }
   const gainBrut = d('gold') + orDepenseMin + (ctx.aPayer || 0); // aPayer : objets achetés à l'hôtel des ventes
@@ -322,7 +322,9 @@ function verifier(ancien, nouveau, ctx) {
     let bu = 0; for (const [cls, ch1] of Object.entries(nouveau.chars)) { const ch0 = ancien.chars[cls]; if (ch0 && (ch1.lvl | 0) >= 1) bu += Math.max(0, ((ch1.sp || {})[k] | 0) - ((ch0.sp || {})[k] | 0)); }
     if (!bu) continue;
     const avant = nbKind(o0, it => it.kind === 'sp_' + k), apres = nbKind(o1, it => it.kind === 'sp_' + k);
-    if (bu > Math.max(0, avant - apres) + (dons.objets || 0)) pb.push('potions de ' + k + ' bues sans potion');
+    // une potion donnée par le serveur et bue aussitôt (ramassée puis bue entre deux sauvegardes) n'est jamais passée par le sac : elle compte aussi
+    let recues = 0; { const L = liste[signature(R.mkItem('sp_' + k, 0))]; const manque = bu - Math.max(0, avant - apres); while (L && L.length && recues < manque) { L.shift(); recues++; } }
+    if (bu > Math.max(0, avant - apres) + recues + (dons.objets || 0)) pb.push('potions de ' + k + ' bues sans potion');
   }
 
   // --- familiers : un œuf pour chaque nouveau familier commun, 3 identiques + 1 croquette pour monter d'un rang ---

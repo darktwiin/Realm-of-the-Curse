@@ -1,5 +1,11 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.45 (arbitre.js modifié ; server.js inchangé depuis la 0.0.44 ; wiki.html régénéré)
+- **Anti-triche, faux positif corrigé** : une potion de caractéristique donnée par un boss et bue aussitôt (avant la sauvegarde suivante) était jugée « bue sans potion », ce qui refusait la sauvegarde. Elle est maintenant reconnue.
+- Les objets **Tier 7** se vendent 15 pièces au marchand (10 avant).
+- **Baguette de Miséricorde** : l'attaque n'est plus une vague à viser mais une zone de soin posée sous le curseur (2,4 cases de rayon, 3 % de la vie des alliés dedans, le prêtre compris, deux fois par seconde au plus).
+- **Lame de l'Aura** : une onde et des arcs à chaque frappe, un éclat sur chaque monstre touché, et l'aura est maintenant visible par les autres joueurs.
+
 ## ver.0.0.44 (server.js et gardien.js modifiés ; wiki.html régénéré)
 - **Concours** : plus de portail au Village. À l'heure dite le donjon est annoncé, et il faut trouver son portail dans les Plaines Sauvages. Tous les joueurs présents dans le donjon à la mort du boss gagnent ensemble : la récompense est divisée par leur nombre.
 - **Objectif commun** : 5 000 monstres par semaine au lieu de 15 000 (le compteur en cours est conservé), bonus d'expérience de 10 % au lieu de 25 %.
