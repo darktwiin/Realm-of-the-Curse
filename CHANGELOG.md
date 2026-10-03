@@ -1,5 +1,17 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.51 (index.html seulement ; server.js inchangé depuis la 0.0.49 ; wiki.html régénéré)
+- **Mage** : le héros de base et le Pyromancien sont redessinés (grand chapeau à pointe courbée pour le Mage ; capuche, visage dans l'ombre et crête de flammes pour le Pyromancien).
+- **Mystificateur** : le bonnet à pointes est remplacé par des oreilles de renard, sur le héros de base et sur ses deux skins.
+- **Anciens skins premium** redessinés dans le style des nouveaux héros : Champion des flammes, Seigneur de la mort, Rôdeur sylvestre, Haut prêtre, Illusionniste, Lame du Néant, Chevalier noir, Démon d'azur. Le Paladin d'ivoire et le Démon de cendre ont maintenant leur propre dessin.
+- **Plantes** : elles poussent aussi dans les Plaines d'Émeraude, avec la même densité que dans la Forêt des Murmures.
+
+## ver.0.0.50 (index.html seulement ; server.js inchangé depuis la 0.0.49 ; wiki.html régénéré)
+- **Héros redessinés** : les huit héros de base sont refaits en double résolution (casque à plumet du Guerrier, chapeau pointu du Mage, capuche et bandoulière de l'Archer, étole dorée du Prêtre, bonnet à grelots du Mystificateur, écharpe de l'Assassin, heaume et écu du Porte-bouclier, cornes et crocs du Démoniste).
+- **Huit nouveaux skins** à la boutique (500 Cursite, un par héros) : Seigneur du Nord, Pyromancien, Traqueur des neiges, Oracle de jade, Arlequin écarlate, Vipère des sables, Paladin d'ivoire, Démon de cendre.
+- **Plantes** : elles ne poussent plus que dans la Forêt des Murmures, où elles sont 30 % plus denses qu'avant.
+- **Herboriste** : son étal du hall est remplacé par une échoppe dans les prés du sud du Village, juste au-dessus des enclos.
+
 ## ver.0.0.49 (server.js, butin.js et arbitre.js modifiés ; wiki.html régénéré)
 - **Herboriste** : cinq plantes au lieu de deux. Potion de vie = Sanguine + Racine vermeille + Trèfle doré ; potion de mana = Azurine + Lunaire + Trèfle doré (le Trèfle sert aux deux). Chaque potion fabriquée rapporte 10 points de métier ; le métier monte jusqu'au niveau 20 (30 × niveau pour passer au suivant). Le niveau ne donne encore aucun avantage.
 - **Tour des Chevaliers** : scellée. Il faut une « Clef de la Tour », consommée à l'entrée. La clef n'a pas encore de source en jeu : elle se donne depuis l'onglet Objets du panneau admin, et un bouton « Tour des Chevaliers » dans le panneau admin permet d'y entrer directement.

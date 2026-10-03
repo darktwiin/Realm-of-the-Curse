@@ -449,7 +449,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.49"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.51"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -465,7 +465,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.49</div>
+    <div class="verTag" id="verTag">ver.0.0.51</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -628,7 +628,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.49</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.51</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -670,7 +670,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.49</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.51</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -1012,6 +1012,7 @@ const ICONS={
 };
 const BAG=['...KK...','..BKKB..','.BBBBBB.','BBBBBBBB','BBBWBBBB','BBBBBBBB','.BBBBBB.','........'];
 const BAGS={orange:makeSprite(BAG,{B:'#ff8a1f',K:'#8a3f08',W:'#ffd08a'},6),brun:makeSprite(BAG,{B:'#8a5a2b',K:'#4d3016',W:'#c08a50'},6),violet:makeSprite(BAG,{B:'#8d4fd0',K:'#4c2378',W:'#c79bff'},6),blanc:makeSprite(BAG,{B:'#f3eedc',K:'#b59a4a',W:'#ffffff'},6),relique:makeSprite(BAG,{B:'#1a1030',K:'#ff4fd8',W:'#3ff0ff'},6)};
+const HERBO_SPR=makeSprite(['..GGGG..','.GGGGGG.','.HSESEH.','..SSSS..','.WWGGWW.','S.WGGW.S','..WWWW..','..L..L..'],{G:'#3f8a3a',H:'#7a4a22',S:'#f0c8a0',E:'#1a1420',W:'#f4f1e8',L:'#3a2a20'},6);
 const BREEDER=makeSprite(['.YYYYYY.','YYYYYYYY','.HSESEH.','..SSSS..','.GGGGGG.','S.GBBG.S','..GGGG..','..L..L..'],{Y:'#e8c860',H:'#8a5a2b',S:'#f0c8a0',E:'#1a1420',G:'#5a8a3a',B:'#c9973c',L:'#3a2a20'},6);
 const QUESTER=makeSprite(['...YY...','..PPPP..','.PPPPPP.','.PSESEP.','..SSSS..','.PPWWPP.','S.PWWP.S','..P..P..'],{Y:'#ffd23f',P:'#5a3a8a',S:'#f0c8a0',E:'#1a1420',W:'#f4f1e8'},6);
 const MERCHANT=makeSprite(['..GGGG..','.GGGGGG.','.GSESEG.','..SSSS..','.BBBBBB.','S.BYYB.S','..BBBB..','..L..L..'],{G:'#3f7a4a',S:'#f0c8a0',E:'#1a1420',B:'#8a5a2b',Y:'#e8b04a',L:'#3a2a20'},6);
@@ -2809,6 +2810,7 @@ function genNexus(){
     if((x===14||x===17)&&(y===2||y===3||y===29||y===30))s=true; // piliers des portes
     for(const q of NSTATUES)if((x===q.x||x===q.x+1)&&y===q.y)s=true; // socles des statues
     if(x>=35&&x<=40&&y===12)s=true;                          // comptoir
+    if(x>=28&&x<=30&&y===43)s=true;                          // échoppe de l'herboriste (prés du sud)
     if((x===32&&y>=19&&y<=21)||(x===42&&y>=14&&y<=20))s=true; // étals (la porte x=31, y=15–17 reste libre)
     if(y===10&&x>=32)s=true;if(y===11&&(x<35||x>40)&&x>=32)s=true;
     if(x===2&&(y===11||y===19||y===22))s=true;                // autel, pupitre, statue des skins (contre le mur, de part et d'autre de la forge)
@@ -3093,7 +3095,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000049;let newerWarned=false;
+const NETV=2,BUILD=2600000051;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -3727,12 +3729,12 @@ function genTuto(){const w=66,h=17,sol=new Uint8Array(w*h).fill(1);const carve=(
 /* ================= herboriste : plantes des Plaines, atelier au Village ================= */
 // une plante par case tirée au hasard (elles repoussent ailleurs toutes les 10 minutes) ; chaque joueur a les siennes
 const HERBES={s:{nom:'Sanguine',col:'#e0404c',col2:'#ff8a94',f:0},r:{nom:'Racine vermeille',col:'#b3363a',col2:'#ff7a2a',f:1},a:{nom:'Azurine',col:'#3f7fe0',col2:'#9ac8f4',f:0},l:{nom:'Lunaire',col:'#8a4ae0',col2:'#c8a0ff',f:1},t:{nom:'Trèfle doré',col:'#c9973c',col2:'#ffd23f',f:2}};
-const RECETTES={pvie:['s','r','t'],pmana:['a','l','t']},HERBO_XP=10,HERBO_MAX=20,ATELIER={x:27.5,y:27.6};
+const RECETTES={pvie:['s','r','t'],pmana:['a','l','t']},HERBO_XP=10,HERBO_MAX=20,ATELIER={x:29.5,y:44.5},HERBE_ZONES=[1,3]; // l'échoppe est dans les prés du sud, au-dessus des enclos ; les plantes ne poussent que dans les Plaines d'Émeraude et la Forêt des Murmures
 // métier d'herboriste : 10 points par potion, 30 × niveau pour passer au suivant, jusqu'au niveau 20
 function herboNiv(){let xp=(save.herbo&&save.herbo.xp)|0,n=1;while(n<HERBO_MAX&&xp>=30*n){xp-=30*n;n++;}return{n,xp,need:n<HERBO_MAX?30*n:0};}
 let herbePris=new Set(),herbeLot=0;
 const herbeSlot=()=>Math.floor(Date.now()/600000);
-function herbeAt(tx,ty){if(!realm||tx<1||ty<1||tx>=RN-1||ty>=RN-1)return null;const i=ty*RN+tx;if(realm.sol[i]||realm.reg[i]<0)return null;const sl=herbeSlot()%997;if(hx(tx,ty,9000+sl)<0.9988)return null;return 'srlat'[Math.min(4,Math.floor(hx(tx,ty,77+sl)*5))];}
+function herbeAt(tx,ty){if(!realm||tx<1||ty<1||tx>=RN-1||ty>=RN-1)return null;const i=ty*RN+tx;if(realm.sol[i]||!HERBE_ZONES.includes(realm.reg[i]))return null;const sl=herbeSlot()%997;if(hx(tx,ty,9000+sl)<0.99844)return null;return 'srlat'[Math.min(4,Math.floor(hx(tx,ty,77+sl)*5))];}
 function herbeTick(){const sl=herbeSlot();if(sl!==herbeLot){herbeLot=sl;herbePris=new Set();}if(!canFight())return;const X=Math.floor(P.x),Y=Math.floor(P.y);
   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const tx=X+dx,ty=Y+dy,k=tx+','+ty;if(herbePris.has(k))continue;const h=herbeAt(tx,ty);if(!h||Math.hypot(tx+.5-P.x,ty+.5-P.y)>0.95)continue;
     herbePris.add(k);save.herbes=save.herbes||{};save.herbes[h]=(save.herbes[h]|0)+1;persist();ft(tx+.5,ty,'+1 '+HERBES[h].nom,HERBES[h].col2);burst(tx+.5,ty+.5,HERBES[h].col,8,2);sfx('item',0.5);}}
@@ -3742,7 +3744,7 @@ function drawHerbes(x0,x1,y0,y1){const u=TS/16;for(let ty=y0;ty<=y1;ty++)for(let
     else if(H.f===1){R(X+6*u+b,Y+1*u,4*u,3*u,H.col2);R(X+5*u+b,Y+3*u,6*u,4*u,H.col);R(X+4*u+b,Y+4*u,2*u,2*u,H.col2);R(X+10*u+b,Y+4*u,2*u,2*u,H.col2);R(X+7*u+b,Y+4*u,2*u,2*u,'#ffffff');}
     else{R(X+5*u+b,Y+2*u,6*u,5*u,H.col);R(X+6*u+b,Y+1*u,4*u,7*u,H.col);R(X+7*u+b,Y+3*u,2*u,2*u,H.col2);}
     if(Math.sin(time*4+tx*3+ty)>0.8)R(X+12*u,Y+2*u,u,u,'#ffffff');}}
-const herbEl=document.createElement('div');herbEl.className='overlay';herbEl.id='herbWin';herbEl.hidden=true;herbEl.innerHTML='<div class="shop-inner" role="dialog" aria-label="Atelier de l\'herboriste" style="max-width:520px"><h2>Atelier de l\'herboriste</h2><p class="hint">Les plantes se cueillent dans les Plaines Sauvages, en passant dessus. Elles ne prennent pas de place dans le sac. Chaque potion demande trois plantes différentes, et le Trèfle doré sert aux deux.</p><div id="herbNiv"></div><div id="herbList" class="qlist"></div><div class="shop-foot"><span class="hint" id="herbFoot"></span><button type="button" class="act" id="herbClose">Fermer · Échap</button></div></div>';document.getElementById('hvWin').parentNode.appendChild(herbEl);
+const herbEl=document.createElement('div');herbEl.className='overlay';herbEl.id='herbWin';herbEl.hidden=true;herbEl.innerHTML='<div class="shop-inner" role="dialog" aria-label="Atelier de l\'herboriste" style="max-width:520px"><h2>Atelier de l\'herboriste</h2><p class="hint">Les plantes ne poussent que dans les Plaines d\'Émeraude et la Forêt des Murmures (Plaines Sauvages) : on les cueille en passant dessus. Elles ne prennent pas de place dans le sac. Chaque potion demande trois plantes différentes, et le Trèfle doré sert aux deux.</p><div id="herbNiv"></div><div id="herbList" class="qlist"></div><div class="shop-foot"><span class="hint" id="herbFoot"></span><button type="button" class="act" id="herbClose">Fermer · Échap</button></div></div>';document.getElementById('hvWin').parentNode.appendChild(herbEl);
 function openHerb(){if(!save.current)return;herbEl.hidden=false;paused=true;keys.clear();mouse.down=false;renderHerb();sfx('item');}
 function closeHerb(){herbEl.hidden=true;paused=false;cv.focus();}
 function renderHerb(){const h=save.herbes=save.herbes||{},libre=C().inv.filter(x=>!x).length,N=herboNiv();
@@ -6828,8 +6830,17 @@ function drawNexus(x0,x1,y0,y1){
     {const X=sx(QUESTNPC.x),Y=sy(QUESTNPC.y),bb=Math.abs(Math.sin(time*2))*u2,qs=TS*0.9;ctx.drawImage(QUESTER,X-qs/2,Y-qs*0.62-bb,qs,qs);
       R(X+3*u2,Y-3*u2,6*u2,8*u2,'#f4f1e8');R(X+3*u2,Y-3*u2,6*u2,u2,'#c8b088');for(let k=0;k<3;k++)R(X+4*u2,Y-u2+k*2*u2,4*u2,u2*0.6,'#8a7a6a');
       const rd=questReady();label(rd?'!':'?',X,Y-TS*1.05-Math.abs(Math.sin(time*4))*u2*3,rd?'#ffd23f':'#9fd0ff',Math.round(TS*0.55),700);label('Quêtes du jour',X,Y-TS*0.72,'#ffd23f',Math.round(TS*0.28));}
-    {const X=sx(ATELIER.x),Y=sy(ATELIER.y);R(X-10*u2,Y,20*u2,6*u2,'#5a3a20');R(X-10*u2,Y,20*u2,1.5*u2,'#8a5a2b');R(X-9*u2,Y+6*u2,2*u2,4*u2,'#3a2616');R(X+7*u2,Y+6*u2,2*u2,4*u2,'#3a2616');R(X-7*u2,Y-6*u2,5*u2,6*u2,'#9ac8f4');R(X-6*u2,Y-8*u2,3*u2,2*u2,'#dcd8e4');R(X-6*u2,Y-4*u2,3*u2,3*u2,'#e0404c');R(X+1*u2,Y-5*u2,5*u2,5*u2,'#9ac8f4');R(X+2*u2,Y-7*u2,3*u2,2*u2,'#dcd8e4');R(X+2*u2,Y-3*u2,3*u2,2*u2,'#3f7fe0');R(X-2*u2,Y-3*u2,3*u2,u2,'#c9973c');if(Math.sin(time*5)>0)R(X-5*u2,Y-10*u2,u2,u2,'#ffffff');R(X+7*u2,Y-4*u2,2*u2,4*u2,'#4fa548');R(X+6*u2,Y-6*u2,4*u2,3*u2,'#e0404c');label('Herboriste',X,Y-TS*0.85,'#9fe07a',Math.round(TS*0.28));}
     {const X=sx(HVNPC.x),Y=sy(HVNPC.y),bb=Math.abs(Math.sin(time*2+1))*u2,qs=TS*0.9;R(X-9*u2,Y+2*u2,18*u2,5*u2,'#5a3a20');R(X-9*u2,Y+2*u2,18*u2,1.4*u2,'#8a5a2b');ctx.drawImage(AUCTIONEER,X-qs/2,Y-qs*0.62-bb,qs,qs);label('Hôtel des ventes',X,Y-TS*0.72,'#ffd23f',Math.round(TS*0.28));R(X+5*u2,Y-1*u2,5*u2,2*u2,'#c9973c');R(X+7*u2,Y+0.6*u2,1.2*u2,3*u2,'#8a5a2b');}
+    { // échoppe de l'herboriste : étal en bois, auvent rayé vert, bocaux et bouquets, l'herboriste derrière
+      const X0=Math.floor(sx(28)),Y0=Math.floor(sy(43)),Wd=TS*3,bb=Math.abs(Math.sin(time*2+2))*u2;
+      R(X0-2*u2,Y0-TS*1.5,2*u2,TS*2.4,'#5a3a20');R(X0+Wd,Y0-TS*1.5,2*u2,TS*2.4,'#5a3a20');                                  // poteaux
+      R(X0+4*u2,Y0-TS*0.9,Wd-8*u2,TS*0.9,'#3a2616');for(let i=0;i<4;i++){R(X0+7*u2+i*10*u2,Y0-TS*0.8,6*u2,7*u2,['#e0404c','#3f7fe0','#8a4ae0','#c9973c'][i]);R(X0+8*u2+i*10*u2,Y0-TS*0.92,4*u2,2*u2,'#dcd8e4');} // étagère de bocaux
+      {const qs=TS*0.9;ctx.drawImage(HERBO_SPR,X0+Wd/2-qs/2,Y0-qs*0.55-bb,qs,qs);}
+      R(X0,Y0+2*u2,Wd,TS-2*u2,'#6a4424');R(X0,Y0+2*u2,Wd,3*u2,'#a86a3a');R(X0,Y0+2*u2,Wd,u2,'#c88a52');for(let i=1;i<6;i++)R(X0+i*8*u2,Y0+5*u2,u2,TS-5*u2,'#4a2e18'); // comptoir
+      R(X0+3*u2,Y0-2*u2,5*u2,5*u2,'#9ac8f4');R(X0+4*u2,Y0-4*u2,3*u2,2*u2,'#dcd8e4');R(X0+4*u2,Y0,3*u2,2*u2,'#e0404c');R(X0+Wd-9*u2,Y0-2*u2,5*u2,5*u2,'#9ac8f4');R(X0+Wd-8*u2,Y0-4*u2,3*u2,2*u2,'#dcd8e4');R(X0+Wd-8*u2,Y0,3*u2,2*u2,'#3f7fe0');
+      R(X0+Wd-18*u2,Y0-u2,2*u2,4*u2,'#4fa548');R(X0+Wd-19*u2,Y0-4*u2,4*u2,4*u2,'#ffd23f');R(X0+12*u2,Y0-u2,2*u2,4*u2,'#4fa548');R(X0+11*u2,Y0-4*u2,4*u2,4*u2,'#c8a0ff');
+      for(let i=0;i<9;i++){const x=X0-4*u2+i*(Wd+8*u2)/9;R(x,Y0-TS*1.75,(Wd+8*u2)/9+1,TS*0.42,i%2?'#f4f1e8':'#3f8a3a');R(x,Y0-TS*1.33,(Wd+8*u2)/9+1,2*u2,i%2?'#d8d4c4':'#2a6a2a');} // auvent
+      R(X0-4*u2,Y0-TS*1.8,Wd+8*u2,2*u2,'#5a3a20');label('Herboriste',X0+Wd/2,Y0-TS*2.05,'#9fe07a',Math.round(TS*0.3));}
     {const X=sx(ELEVEUR.x),Y=sy(ELEVEUR.y),bb=Math.abs(Math.sin(time*2))*u2,qs=TS*0.9;ctx.drawImage(BREEDER,X-qs/2,Y-qs*0.62-bb,qs,qs);
       // panier d'œufs
       R(X-11*u2,Y+1*u2,8*u2,4*u2,'#8a5a2b');R(X-10*u2,Y-u2,2*u2,2.4*u2,'#fff1d0');R(X-7.5*u2,Y-1.4*u2,2*u2,2.6*u2,'#bfe8ff');R(X-5*u2,Y-u2,2*u2,2.4*u2,'#ffb3b3');
@@ -7200,32 +7211,26 @@ const WEAP_GRID={
 };
 // Skins premium (payés en Cursite)
 const SKINS={
-  guerrier:{or:{nom:'Champion des flammes',prix:500,tpl:'casque',pal:{H:'#f2c14e',A:'#e8a82a',Y:'#fff1a0',L:'#8a5a1a'},aura:'flammes'}},
-  mage:{mort:{nom:'Seigneur de la mort',prix:500,tpl:'capuche',pal:{H:'#1a1216',A:'#2a1418',Y:'#d23c3c',L:'#120a0c',E:'#ff3b4a'},aura:'mort'}},
-  archer:{foret:{nom:'Rôdeur sylvestre',prix:500,tpl:'capuche',pal:{H:'#2f5a2d',A:'#3f6a2a',Y:'#9fd06a',L:'#2a3a1a'},aura:'foret'}},
-  pretre:{halo:{nom:'Haut prêtre',prix:500,tpl:'robe',pal:{H:'#f4f1e8',A:'#f4f1e8',Y:'#e8b04a',L:'#f4f1e8'},aura:'halo'}},
-  trickster:{illusion:{nom:'Illusionniste',prix:500,tpl:'bouffon',pal:{H:'#ff4fd8',A:'#2a1a4a',Y:'#3ff0ff',L:'#1a1030'},aura:'prisme'}},
-  assassin:{ombre:{nom:'Lame du Néant',prix:500,tpl:'masque',pal:{H:'#0b0a12',A:'#1a1016',Y:'#ff3b4a',L:'#0b0a12',E:'#ff3b4a'},aura:'ombre'}},
-  bouclier:{noir:{nom:'Chevalier noir',prix:500,tpl:'heaume',pal:{H:'#15161c',C:'#2c2e38',M:'#08090c',A:'#0e0f14',Y:'#2c2e38',L:'#050608',U:'#121318',J:'#d2202e'},aura:'ombre'}},
-  invocateur:{azur:{nom:'Démon d\'azur',prix:500,tpl:'demon',pal:{H:'#0e2a5a',S:'#3a7ad8',E:'#eaffff',T:'#dfe8ff',A:'#0e1630',Y:'#3ff0ff',L:'#0a1020'},aura:'givre',dem:{X:'#2a5ab8',D:'#16306a',pb:'#3fa8ff',G:'#16244a',GD:'#3ff0ff',GW:'#eaffff',halo:'#3fa8ff'}}}
+  guerrier:{nord:{nom:'Seigneur du Nord',prix:500,tpl:'base',pal:{H:'#8a93a3',A:'#3f6a9a',Y:'#dfe8ff',L:'#3a2a20'},aura:'givre'},or:{nom:'Champion des flammes',prix:500,tpl:'casque',pal:{H:'#f2c14e',A:'#e8a82a',Y:'#fff1a0',L:'#8a5a1a'},aura:'flammes'}},
+  mage:{feu:{nom:'Pyromancien',prix:500,tpl:'base',pal:{H:'#b3363a',A:'#5a1a14',Y:'#ff9a3c',L:'#2a1410'},aura:'flammes'},mort:{nom:'Seigneur de la mort',prix:500,tpl:'capuche',pal:{H:'#1a1216',A:'#2a1418',Y:'#d23c3c',L:'#120a0c',E:'#ff3b4a'},aura:'mort'}},
+  archer:{neige:{nom:'Traqueur des neiges',prix:500,tpl:'base',pal:{H:'#e9eef2',A:'#5a7a9a',Y:'#bfe8ff',L:'#3a4a5a'},aura:'givre'},foret:{nom:'Rôdeur sylvestre',prix:500,tpl:'capuche',pal:{H:'#2f5a2d',A:'#3f6a2a',Y:'#9fd06a',L:'#2a3a1a'},aura:'foret'}},
+  pretre:{jade:{nom:'Oracle de jade',prix:500,tpl:'base',pal:{H:'#2a8a7a',A:'#1f5f5a',Y:'#7df0e0',L:'#143a38'},aura:'foret'},halo:{nom:'Haut prêtre',prix:500,tpl:'robe',pal:{H:'#f4f1e8',A:'#f4f1e8',Y:'#e8b04a',L:'#f4f1e8'},aura:'halo'}},
+  trickster:{arlequin:{nom:'Arlequin écarlate',prix:500,tpl:'bouffon',pal:{H:'#c8102e',A:'#16161e',Y:'#f4f1e8',L:'#0b0a12'},aura:'prisme'},illusion:{nom:'Illusionniste',prix:500,tpl:'bouffon',pal:{H:'#ff4fd8',A:'#2a1a4a',Y:'#3ff0ff',L:'#1a1030'},aura:'prisme'}},
+  assassin:{sable:{nom:'Vipère des sables',prix:500,tpl:'masque',pal:{H:'#c8a878',A:'#8a6a48',Y:'#7ed957',L:'#4a3a28',E:'#1f4f2a'},aura:'foret'},ombre:{nom:'Lame du Néant',prix:500,tpl:'masque',pal:{H:'#2a2638',A:'#1e1828',Y:'#ff3b4a',L:'#14121c',E:'#ff3b4a'},aura:'ombre'}},
+  bouclier:{ivoire:{nom:'Paladin d\'ivoire',prix:500,tpl:'heaume',pal:{H:'#d8d4c4',C:'#fffdf4',M:'#8a8470',A:'#e8e0c8',Y:'#ffd23f',L:'#8a6a2a',U:'#f4f1e8',J:'#ffd23f'},aura:'halo'},noir:{nom:'Chevalier noir',prix:500,tpl:'heaume',pal:{H:'#2c2e3a',C:'#434656',M:'#08090c',A:'#1e2029',Y:'#434656',L:'#101116',U:'#1c1d26',J:'#d2202e'},aura:'ombre'}},
+  invocateur:{cendre:{nom:'Démon de cendre',prix:500,tpl:'demon',pal:{H:'#2a2a30',S:'#8a8794',E:'#ff7a2a',T:'#3a3440',A:'#1a1418',Y:'#ff7a2a',L:'#0b0a12'},aura:'flammes',dem:{X:'#6a6470',D:'#2a2630',pb:'#ff9a3c',G:'#2a1a14',GD:'#ff7a2a',GW:'#fff1a0',halo:'#ff7a2a'}},azur:{nom:'Démon d\'azur',prix:500,tpl:'demon',pal:{H:'#0e2a5a',S:'#3a7ad8',E:'#eaffff',T:'#dfe8ff',A:'#0e1630',Y:'#3ff0ff',L:'#0a1020'},aura:'givre',dem:{X:'#2a5ab8',D:'#16306a',pb:'#3fa8ff',G:'#16244a',GD:'#3ff0ff',GW:'#eaffff',halo:'#3fa8ff'}}}
 };
 // Offre du jour chez le marchand : un skin tiré au hasard, le même pour tous les joueurs, -20 %
 function dayKey(){const d=new Date();return d.getFullYear()*372+d.getMonth()*31+d.getDate();}
 function dailySkin(){const all=[];for(const c in SKINS)for(const k in SKINS[c])all.push([c,k]);return all[Math.floor(h2(dayKey(),917)*all.length)];}
 function skinPrice(c,k){const d=SKINS[c][k],ds=dailySkin();return ds[0]===c&&ds[1]===k?Math.round(d.prix*0.5):d.prix;}
+// ---------- héros redessinés en double résolution : 16 × 14 pour la tête et le buste, puis deux lignes de jambes selon l'image (repos, pas A, pas B) ----------
+const HERO_HD={"guerrier": {r: ["......RRRR......", ".....RRRRR......", "...PHHHHHHHHP...", "..PHIIHHHHHHHP..", "..PHHHHHHHHHHP..", "..PHSSSSSSSSHP..", "..PHSESSSSESHP..", "...PSSSSSSSSP...", "..IIAAAYYAAAII..", ".IHHAAAYYAAAHHI.", "SS.ZAAAAAAAAZ.SS", "SS.ZAYYYYYYAZ.SS", "...YYYYOOYYYY...", "...AAZAAAAZAA..."]}, "guerrier:nord": {r: [".Q............Q.", ".QQ..........QQ.", "..QPHHHHHHHHPQ..", "..PHIIHHHHHHHP..", "..PHHHHHHHHHHP..", "..PHSSSSSSSSHP..", "..PHSESSSSESHP..", "...BBSSSSSSBB...", ".QQQQQBBBBQQQQQ.", ".QQHAAAAAAAAHQQ.", "SS.ZAAYAAYAAZ.SS", "SS.ZAAAYYAAAZ.SS", "...BBBBYYBBBB...", "...AAZAAAAZAA..."]}, "mage": {r: [".......HH.......", "......HHHH......", ".....HHIHHH.....", "....HHHHHHHH....", "..YYYYYYYYYYYY..", "...PSSSSSSSSP...", "...PSESSSSESP...", "....SSSSSSSS....", "...AAAAYYAAAA...", "..AAAAAYYAAAAA..", "SSAAZAAOOAAZAASS", "SSAAZAAAAAAZAASS", "..AAAYYYYYYAAA..", "..AAAAAAAAAAAA.."], robe: 1}, "mage:feu": {r: [".......OF.......", "......FHHF......", ".....HHIHHH.....", "....HHHHHHHH....", "..YYYYYYYYYYYY..", "...PSSSSSSSSP...", "...PSFSSSSFSP...", "....SSSSSSSS....", "...AAAAFFAAAA...", "..AAAAFOOFAAAA..", "SSAAZAAFFAAZAASS", "SSAAZAAAAAAZAASS", "..AAAYYYYYYAAA..", "..AAFAAFFAAFAA.."], robe: 1}, "archer": {r: ["......HHHH......", "....HHHHHHHH....", "...HHIIHHHHHH...", "..HHHHHHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "..HHSSSSSSSSHH..", "...HHSSSSSSHH...", "..HHHAABAAAHHH..", ".HHAAAABAAAAAHH.", "SS.AAAAABAAAA.SS", "SS.AAYAAABAAA.SS", "...BBBBYYBBBB...", "...AAZAAAAZAA..."]}, "archer:neige": {r: ["......HHHH......", "....HHHHHHHH....", "...HHIIHHHHHH...", "..QQQQQQQQQQQQ..", "..QHSSSSSSSSHQ..", "..HHSESSSSESHH..", "..HHSSSSSSSSHH..", "...HHSSSSSSHH...", "..QQQAABAAAQQQ..", ".QQAAAABAAAAAQQ.", "SS.AAAAABAAAA.SS", "SS.AAYAAABAAA.SS", "...BBBBYYBBBB...", "...AAZAAAAZAA..."]}, "pretre": {r: ["......YYYY......", "....HHHHHHHH....", "...HHIIHHHHHH...", "..HHHHHHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "...HSSSSSSSSH...", "....SSSSSSSS....", "...AAYAAAAYAA...", "..AAAYAAAAYAAA..", "SSAAAYAOOAYAAASS", "SSAAAYAOOAYAAASS", "..AAAYAAAAYAAA..", "..AAAYAAAAYAAA.."], robe: 1}, "pretre:jade": {r: [".....OOOOOO.....", "....HHHHHHHH....", "...HHIIHHHHHH...", "..HHHHHHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "..HHSSSSSSSSHH..", "...HHSSSSSSHH...", "...AAYAAAAYAA...", "..AAAYAOOAYAAA..", "SSAAAYOOOOYAAASS", "SSAAAYAOOAYAAASS", "..AAAYAAAAYAAA..", "..AAAYAAAAYAAA.."], robe: 1}, "trickster": {r: [".O............O.", ".HH..........HH.", ".HHH........HHH.", "..HHHH....HHHH..", "...HHHHHHHHHH...", "...HSSSSSSSSH...", "...HSESSSSESH...", "....SSSSSSSS....", "..YYAAYAAYAAYY..", "..HAAAAYYAAAAH..", "SS.AHAAAAAAHA.SS", "SS.AAHAYYAHAA.SS", "...YYYYYYYYYY...", "...HHHAAAAHHH..."]}, "trickster:arlequin": {r: [".O............O.", ".HH..........HH.", ".HHH........HHH.", "..HHHH....HHHH..", "...HHHHHHHHHH...", "...HKKSSSSKKH...", "...HKEKSSKEKH...", "....SSSSSSSS....", "..YYAAYAAYAAYY..", "..HAHAHYYAHAHH..", "SS.HAHAAAAHAH.SS", "SS.AHAHYYHAHA.SS", "...YYYYYYYYYY...", "...HHHAAAAHHH..."]}, "assassin": {r: ["......HHHH......", "....HHHHHHHH....", "...HHHHHHHHHH...", "..HHHPPPPPPHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "..HHKKKKKKKKHH..", "...HKKKKKKKKH...", "..YYYYAAAAAHHH..", ".HAYYAAAAAAAAAH.", "SS.YAAAKKAAAA.SS", "SS.YAAAAAAAAA.SS", "...KKKKYYKKKK...", "...AAZAAAAZAA..."]}, "assassin:sable": {r: ["......HHHH......", "....HHHHHHHH....", "...HHIHHHHIHH...", "..HHHHHHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "..HHHHHHHHHHHH..", "...HHIHHHHIHH...", "..YYYYAAAAAHHH..", ".HAYYAAAAAAAAAH.", "SS.YAAABBAAAA.SS", "SS.YAAAAAAAAA.SS", "...BBBBYYBBBB...", "...AAZAAAAZAA..."]}, "bouclier": {r: ["......UUUU......", "...HHHHHHHHHH...", "..HHCCCCCCCCHH..", "..HCCCCCCCCCCH..", "..HCKKKKKKKKCH..", "..HCCCCKKCCCCH..", "..HHCCCKKCCCHH..", "...HHHHHHHHHH...", "KKKKKKKKKAAAYYH.", "KUUUUUUUKAAAAHH.", "KUUUJUUUKAAAA.SS", "KUUJJJUUKYYAA.SS", "KUUUJUUUKAAAA...", ".KUUUUUK.AAZA..."]}, "invocateur": {r: ["T..............T", "TT............TT", ".TT.HHHHHHHH.TT.", "..TTHHHHHHHHTT..", "...HSSSSSSSSH...", "...SSESSSSESS...", "...SSSSKKSSSS...", "....SSQSSQSS....", "..AAAAYYYYAAAA..", ".AAAAAAYYAAAAAA.", "SS.AAYAAAAYAA.SS", "SS.AAAYAAYAAA.SS", "...YYYYOOYYYY...", "...AAZAAAAZAA..."]}};
+HERO_HD["mage"]={"r": [".........HHH....", ".......HHHHP....", ".....HHOHHHH....", "....YYYYYYYY....", ".PHHHHHHHHHHHHP.", "...PSSSSSSSSP...", "...PSESSSSESP...", "....SSSSSSSS....", "..AAAYYYYYYAAA..", ".AAAAAAOOAAAAAA.", "SSAZAAAOOAAAZASS", "SSAZAAAAAAAAZASS", "..AAYYYYYYYYAA..", "..AAAAAAAAAAAA.."], "robe": 1};HERO_HD["mage:feu"]={"r": [".......FO.......", "......FOOF......", "....HHRFFRHH....", "...HHIHHHHHHH...", "..HHHHHHHHHHHH..", "..HHPKKKKKKPHH..", "..HHKFOKKOFKHH..", "...HHKKKKKKHH...", "..YYAAHHHHAAYY..", ".YYAAAAOOAAAAYY.", "SSAAZAFOOFAZAASS", "SSAAZAAFFAAZAASS", "..AAAYYYYYYAAA..", "..AFAAFRRFAAFA.."], "robe": 1};HERO_HD["mage:mort"]={"r": ["......HHHH......", "....HHHHHHHH....", "...HHIHHHHHHH...", "..HHHHHHHHHHHH..", "..HHQQQQQQQQHH..", "..HHQEEQQEEQHH..", "..HHQQQKKQQQHH..", "...HHQKQQKQHH...", "..VAAAHHHHAAAV..", ".VAAAAQQQQAAAAV.", "SSAAZAQKKQAZAASS", "SSAAZAAQQAAZAASS", "..AAAVVVVVVAAA..", "..AVAAAVVAAAVA.."], "robe": 1};HERO_HD["guerrier:or"]={"r": ["......FOF.......", ".....RFOFR......", "...PHHHHHHHHP...", "..PHIIHHHHHHHP..", "..PHHRRRRRRHHP..", "..PHSSSSSSSSHP..", "..PHSESSSSESHP..", "...PSSSSSSSSP...", ".OIIAAAFFAAAIIO.", ".IHHAAFOOFAAHHI.", "SS.ZAARFFRAAZ.SS", "SS.ZAYYYYYYAZ.SS", "...YYYYRRYYYY...", "...AAZAAAAZAA..."]};HERO_HD["archer:foret"]={"r": ["....N.HHHH.N....", "...NHHHHHHHHN...", "...HHIIHHHHHH...", "..HHHHHHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "..HHSSSSSSSSHH..", "...HHSSSSSSHH...", ".NNHHAABAAAHHNN.", ".HNAAAABAAAAANH.", "SS.AAANABAAAA.SS", "SS.AAYAAABAAA.SS", "...BBBBOOBBBB...", "...AAZAAAAZAA..."]};HERO_HD["pretre:halo"]={"r": ["...OOOOOOOOOO...", "......HHHH......", ".....HHYYHH.....", "....HHYYYYHH....", "...HHHHYYHHHH...", "...YYYYYYYYYY...", "...PSESSSSESP...", "....SSSSSSSS....", "..YYAAOAAOAAYY..", "..AAAOOAAOOAAA..", "SSAAAAOOOOAAAASS", "SSAAAAAOOAAAAASS", "..AYAAAOOAAAYA..", "..AYAAAOOAAAYA.."], "robe": 1};HERO_HD["trickster"]={"r": ["..H..........H..", ".HHH........HHH.", ".HQHH......HHQH.", ".HQQHHHHHHHHQQH.", "..HHHIIHHHHHHH..", "..HHSSSSSSSSHH..", "..HHSESSSSESHH..", "...HSSSSSSSSH...", "..YYAAYAAYAAYY..", "..HAAAAYYAAAAH..", "SS.AHAAAAAAHA.SS", "SS.AAHAYYAHAA.SS", "...YYYYYYYYYY...", "...HHHAAAAHHH..."]};HERO_HD["trickster:arlequin"]={"r": ["..H..........H..", ".HHH........HHH.", ".HKHH......HHKH.", ".HKKHHHHHHHHKKH.", "..HHHIIHHHHHHH..", "..HHSSSSSSSSHH..", "..HKKQKKKKQKKH..", "...HSSSSSSSSH...", "..YYAAYAAYAAYY..", "..HAHAHYYAHAHH..", "SS.HAHAAAAHAH.SS", "SS.AHAHYYHAHA.SS", "...YYYYYYYYYY...", "...HHHAAAAHHH..."]};HERO_HD["trickster:illusion"]={"r": ["..H..........H..", ".HHH........HHH.", ".HYHH......HHYH.", ".HYYHHHHHHHHYYH.", "..HHHIIHHOHHHH..", "..HHSSSSSSSSHH..", "..HYYKYYYYKYYH..", "...HSSSSSSSSH...", "..YYAAOAAOAAYY..", "..HAAAAYYAAAAH..", "SS.AYAAHHAAYA.SS", "SS.AAOAHHAOAA.SS", "...HHHHYYHHHH...", "...YYYAAAAYYY..."]};HERO_HD["assassin:ombre"]={"r": ["......HHHH......", "....HHHHHHHH....", "...HHIIHHHHHH...", "..HHIHHHHHHHHH..", "..HHKKKKKKKKHH..", "..HHKEEKKEEKHH..", "..HHKKKKKKKKHH..", "...HIKKKKKKIH...", "YYYYYYAAAAAIII..", ".YVYYAAAAAAAAAI.", "SS.YAAAYYAAAA.SS", "SS.VAAYAAYAAA.SS", "...IIIIYYIIII...", "...AAZAAAAZAA..."]};HERO_HD["bouclier:noir"]={"r": [".H....RRRR....H.", ".HHHHHHHHHHHHHH.", "..HHCCCCCCCCHH..", "..HCCCCCCCCCCH..", "..HCRRVKKVRRCH..", "..HCCCCKKCCCCH..", "..HHCCCKKCCCHH..", "...HHHHHHHHHH...", "KKKKKKKKKAAAYYH.", "KUUUUUUUKAAAAHH.", "KUJUUUJUKAAAA.SS", "KUUJJJUUKYYAA.SS", "KUUJUJUUKAAAA...", ".KUUUUUK.AAZA..."]};HERO_HD["bouclier:ivoire"]={"r": ["Q.....YYYY.....Q", "QQ.HHHHHHHHHH.QQ", ".QHHCCCCCCCCHHQ.", "..HCCCCCCCCCCH..", "..HCKKKKKKKKCH..", "..HCCCCKKCCCCH..", "..HHCCCKKCCCHH..", "...HHHYYYYHHH...", "KKKKKKKKKAAAYYH.", "KUUUJUUUKAAAAHH.", "KUJJJJJUKAAAA.SS", "KUUUJUUUKYYAA.SS", "KUUUJUUUKAAAA...", ".KUUUUUK.AAZA..."]};HERO_HD["invocateur:azur"]={"r": ["..T..........T..", ".TT..........TT.", ".TTT.HHHHHH.TTT.", "..TTHHHYYHHHTT..", "...HSSSSSSSSH...", "...SSESSSSESS...", "...SSSSKKSSSS...", "....SSQSSQSS....", ".YYAAAYYYYAAAYY.", ".YAAAAAYYAAAAAY.", "SS.AAYAQQAYAA.SS", "SS.AAAYQQYAAA.SS", "...YYYYQQYYYY...", "...AAZAAAAZAA..."]};HERO_HD["invocateur:cendre"]={"r": ["T...............", "TT............T.", ".TT.HHHHHHHH.TT.", "..TTHHHFHHHHTT..", "...HSSFSSSSSH...", "...SSESSSSESS...", "...SSSSKKSSFS...", "....SSQSSQSS....", "..AAAAYYYYAAAA..", ".AAFAAAYYAAAFAA.", "SS.AAFAAAAFAA.SS", "SS.AAAFAAFAAA.SS", "...YYYYOOYYYY...", "...AAZAAAAZAA..."]};
+const HERO_JAMBES={base:{idle:['....LLL..LLL....','...LLLL..LLLL...'],wa:['..LLL......LLL..','.LLLL......LLLL.'],wb:['......LLLL......','.....LLLLLL.....']},robe:{idle:['..AAAAAAAAAAAA..','.YYYYYYYYYYYYYY.'],wa:['.AAAAAAAAAAAA...','YYYYYYYYYYYYYY..'],wb:['...AAAAAAAAAAAA.','..YYYYYYYYYYYYYY']}};
 const heroCache={};
 const pts=(c,list)=>list.map(([x,y])=>[x,y,c]);
-const SKIN_DETAIL={
-  'bouclier:noir':()=>[...pts('R',[[4,5],[5,5],[10,5],[11,5]]),...pts('V',[[6,5],[9,5]])],
-  // Champion des flammes : panache, épaulières ciselées, emblème de flamme sur le torse, liseré sur les bottes
-  'guerrier:or':()=>[...pts('R',[[7,0],[8,0],[8,1],[9,1],[7,1]]),...pts('F',[[8,-1+1]]),...pts('O',[[2,10],[3,10],[12,10],[13,10],[4,11],[11,11]]),...pts('F',[[7,10],[8,10]]),...pts('R',[[7,11],[8,11]]),...pts('O',[[6,12],[9,12]]),...pts('F',[[4,17],[11,17]])],
-  // Seigneur de la mort : crâne sur la poitrine, runes rouges, ourlet déchiré
-  'mage:mort':()=>[...pts('Q',[[7,10],[8,10],[6,11],[9,11],[7,12],[8,12]]),...pts('K',[[7,11],[8,11]]),...pts('V',[[3,12],[12,12],[5,14],[10,14],[6,15],[9,15]]),...pts('R',[[2,10],[13,10]])],
-  // Rôdeur sylvestre : feuilles sur les épaules, ceinture de cuir, broche verte
-  'archer:foret':()=>[...pts('N',[[2,10],[3,9],[12,10],[13,9],[3,11],[12,11]]),...pts('B',[[4,13],[5,13],[10,13],[11,13]]),...pts('N',[[7,10],[8,10]]),...pts('O',[[7,11]])],
-  // Haut prêtre : croix dorée, galons dorés sur toute la robe
-  'pretre:halo':()=>[...pts('O',[[7,10],[8,10],[6,11],[7,11],[8,11],[9,11],[7,12],[8,12],[7,13],[8,13]]),...pts('O',[[1,17],[3,17],[5,17],[10,17],[12,17],[14,17],[0,16],[15,16]]),...pts('Y',[[4,5],[11,5]])]
-};
+const SKIN_DETAIL={}; // les skins premium sont maintenant dessinés en entier dans HERO_HD
 // heaume du Porte-bouclier, pixel par pixel (16 × 8) : seau d'acier, plaque claire, visière en T
 const CLASS_DETAIL={bouclier:[[2,['.HHHHHHHHHHHHHH.','HHHHHHHHHHHHHHHH','HHCCCCCCCCCCCCHH','HHCKKKKKKKKKKCHH','HHCCCCCKKCCCCCHH','HHCCCCCKKCCCCCHH','HHHCCCCKKCCCCHHH','.HHHHHHHHHHHHHH.']],
   [10,['KKKKKKKKK','KUUUUUUUK','KUUUJUUUK','KUUJJJUUK','KUUUJUUUK','KUUUUUUUK','.KUUUUUK.','..KKKKK..']]]};
@@ -7244,8 +7249,12 @@ function heroSprite(cls,skin,wk,tier,frame){
   const col=wk&&KINDS[wk]&&KINDS[wk].alt?ALT_COL:wk&&KINDS[wk]&&KINDS[wk].t7?'#5c5c68':TIER_COL[clamp(tier|0,0,7)],rel=tier>=7;
   const pal=Object.assign({S:'#f0c8a0',E:'#1a1420',L:'#3a2a20'},CLASSES[cls].pal,sk?sk.pal:{},{X:col,D:shade(col,0.6),W:rel?'#ff4fd8':'#ffffff',G:rel?'#ff4fd8':'#6a4424'});
   let hd=scale2x(g.map(r=>r.join(''))).map(r=>r.split(''));
-  if((!sk||sk.tpl===CLASSES[cls].tpl)&&CLASS_DETAIL[cls])for(const [y0,rows] of CLASS_DETAIL[cls])rows.forEach((r,y)=>{for(let x=0;x<r.length;x++)if(r[x]!=='.'&&hd[y+y0])hd[y+y0][x]=r[x];}); // tête redessinée en double résolution (visière nette)
+  const HD=(sk&&HERO_HD[cls+':'+skin])||((!sk||sk.tpl===(CLASSES[cls].tpl||'base'))&&HERO_HD[cls]);
+  if(HD){const rows=HD.r.concat(HERO_JAMBES[HD.robe?'robe':'base'][frame==='wa'?'wa':frame==='wb'?'wb':'idle']);
+    rows.forEach((r,y)=>{const L=hd[y+2];if(!L)return;for(let x=0;x<16;x++){const c=r[x];if(c!=='.')L[x]=c;else if(!'XDWGRQV'.includes(L[x]))L[x]='.';}}); // on garde l'arme, on remplace tout le reste
+    if(atk)for(const y of [12,13]){hd[y][14]=hd[y][15]='A';}}
   if(sk&&SKIN_DETAIL[cls+':'+skin]){for(const [x,y,c] of SKIN_DETAIL[cls+':'+skin](frame))if(y>=0&&y<hd.length&&x>=0&&x<hd[0].length)hd[y][x]=c;}
+  pal.I=pal.I||mixHex(pal.H,'#ffffff',0.4);pal.P=pal.P||shade(pal.H,0.65);pal.Z=pal.Z||shade(pal.A,0.65);
   Object.assign(pal,{F:'#ff9a3c',R:'#e8382a',Q:'#f4f1e8',N:'#b8ff8a',O:'#fff1a0',K:'#0b0a12',B:'#5a3a22',V:'#8a1a2a'});
   return heroCache[key]=makeSprite(hd.map(r=>r.join('')),pal,3);
 }
