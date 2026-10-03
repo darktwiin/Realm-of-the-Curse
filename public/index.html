@@ -448,7 +448,7 @@ body.ton #opts{position:fixed;z-index:120}
       </div>
     </div>
     <div class="hudtl" id="hudTL">
-      <div class="brand" title="ver.0.0.45"><h1>The Curse</h1></div>
+      <div class="brand" title="ver.0.0.46"><h1>The Curse</h1></div>
       <canvas id="mini" width="120" height="120"></canvas>
       <div id="zone">Village</div>
       <div id="zoneLvl">Zone sûre</div>
@@ -464,7 +464,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="bar xp"><i id="xpF"></i><span><em>XP</em><b id="xpT">0/0</b></span></div>
       </div>
     </div>
-    <div class="verTag" id="verTag">ver.0.0.45</div>
+    <div class="verTag" id="verTag">ver.0.0.46</div>
     <button type="button" class="sidetog" id="sideTog" aria-label="Replier le menu" title="Replier / déplier le menu">▶</button>
     <button type="button" class="gear" id="gear" aria-label="Options (touche O)" title="Options (O)"><img id="gearImg" alt=""></button>
     <button type="button" class="gear dailyb" id="dailyBtn" hidden aria-label="Récompenses de connexion" title="Récompenses de connexion"><img id="dailyImg" alt=""><i class="dot" id="dailyDot" hidden></i></button>
@@ -627,7 +627,7 @@ body.ton #opts{position:fixed;z-index:120}
         <div class="opt"><label>Touches</label><div class="curnow"><button type="button" class="act main" id="kbOpen">⌨ Touches et souris…</button></div><span></span></div>
         <div class="opt"><label for="titleSel">Titre</label><select id="titleSel"></select><span></span></div>
         <div class="opt"><label>Compte</label><button type="button" class="act" id="logoutBtn">Se déconnecter</button><span id="acctName"></span></div>
-        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.45</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
+        <div class="shop-foot"><span class="hint">Touche O pour ouvrir ce menu · ver.0.0.46</span><button type="button" class="act" id="optClose">Fermer · Échap</button></div>
       </div>
     </div>
     <div class="overlay" id="kbWin" hidden>
@@ -669,7 +669,7 @@ body.ton #opts{position:fixed;z-index:120}
     <div class="overlay" id="select" hidden>
       <div class="sel-inner">
         <h2>Choisis ton héros</h2>
-        <p class="hint" style="color:#7ed957">ver.0.0.45</p>
+        <p class="hint" style="color:#7ed957">ver.0.0.46</p>
         <p>Chaque classe garde son propre niveau, son équipement et son sac. Tu peux en changer à l'autel du Village.</p>
         <div class="pseudo"><label for="pseudoIn">Ton pseudo</label><input id="pseudoIn" maxlength="16" placeholder="Héros"><span class="hint" id="pseudoHint"></span></div>
         <div class="cards" id="cards"></div>
@@ -3017,7 +3017,7 @@ let TU={},tutoMap=null;
 let openChest=null,unlockArm=-1,unlockT=0;
 
 /* ================= réseau ================= */
-const NETV=2,BUILD=2600000045;let newerWarned=false;
+const NETV=2,BUILD=2600000046;let newerWarned=false;
 let room=null,netOn=false,myPeer=null,amHost=true,sceneT=0,monId=0;
 const remotes=new Map();
 const applied=new Map();
@@ -3899,7 +3899,7 @@ parrEl.addEventListener('click',e=>{if(e.target.closest('#parrGo')){const n=docu
 document.getElementById('parrClose').addEventListener('click',closeParr);document.getElementById('parrBtn').addEventListener('click',openParr);
 /* ================= hôtel des ventes ================= */
 const HVNPC={x:33.5,y:13.4},AUCTIONEER=makeSprite(['..RRRR..','.RRRRRR.','.HSESEH.','..SSSS..','.NNWWNN.','S.NYYN.S','..NNNN..','..L..L..'],{R:'#8a1f2e',H:'#5a3a20',S:'#f0c8a0',E:'#1a1420',N:'#2a2a4a',W:'#f4f1e8',Y:'#ffd23f',L:'#1a1420'},6);
-const hvEl=document.getElementById('hvWin');let HVD={l:[],taxe:0.05,max:10},hvTab='achat',hvSel=-1,hvTri='recent',hvFil='',hvAtt=0;
+const hvEl=document.getElementById('hvWin');let HVD={l:[],taxe:0.05,frais:0.15,max:10},hvTab='achat',hvSel=-1,hvTri='recent',hvFil='',hvAtt=0;
 function openHV(){if(!save.current)return;if(!AUTH.ok||typeof room==='undefined'||!room||!room.raw){note('Connecte-toi à ton compte pour utiliser l\'hôtel des ventes');sfx('deny');return;}
   hvEl.hidden=false;paused=true;keys.clear();mouse.down=false;hvSel=-1;pushSave(true);room.raw({t:'hv',a:'liste'});renderHV();sfx('coin');}
 function closeHV(){hvEl.hidden=true;paused=false;hideItTip();cv.focus();}
@@ -3916,20 +3916,20 @@ function renderHV(){if(hvEl.hidden)return;document.getElementById('hvGold').text
     if(hvTri==='prix')l.sort((a,b)=>a.prix-b.prix);else if(hvTri==='cher')l.sort((a,b)=>b.prix-a.prix);else if(hvTri==='tier')l.sort((a,b)=>b.it.tier-a.it.tier||a.prix-b.prix);
     box.innerHTML=l.map(v=>'<div class="hvrow" data-hvid="'+v.id+'"><img src="'+icon(v.it)+'" alt=""><div><b style="color:'+itemCol(v.it)+'">'+hvEsc(v.it.name)+(v.it.up?' +'+v.it.up:'')+'</b><span>'+TIER_NOM[v.it.tier]+' · vendu par '+hvEsc(v.n)+' · encore '+v.j+' j</span></div><div><div class="price"><i class="coin"></i>'+hvPrix(v.prix)+'</div><button type="button" class="act main" data-hvbuy="'+v.id+'" '+(save.gold<v.prix?'disabled':'')+'>'+(save.gold<v.prix?'Pas assez':'Acheter')+'</button></div></div>').join('')||'<i class="hint">Rien à vendre pour l\'instant. Sois le premier à déposer un objet !</i>';
     foot.textContent=l.length+' objet'+(l.length>1?'s':'')+' en vente';}
-  else if(hvTab==='vente'){intro.textContent='Choisis un objet de ton sac, fixe ton prix, et il part en vente pour 7 jours. Tu touches les pièces à la vente, moins '+tx+' % de taxe. Invendu, il te revient.';
+  else if(hvTab==='vente'){intro.textContent='Choisis un objet de ton sac, fixe ton prix, et il part en vente pour 7 jours. La mise en vente coûte '+Math.round(HVD.frais*100)+' % du prix, payés tout de suite et jamais rendus. À la vente tu touches le prix, moins '+tx+' % de taxe. Invendu, l\'objet te revient.';
     const ch=C();let g='';ch.inv.forEach((it,i)=>{if(!it)return;const can=it.slot!=='conso';g+='<button type="button" class="tslot '+(can?'':'empty')+(hvSel===i?' sel':'')+'" '+(can?'data-hvpick="'+i+'"':'')+'><img src="'+icon(it)+'" alt=""></button>';});
     const it=hvSel>=0?ch.inv[hvSel]:null,plein=mes.length>=HVD.max;
     bar.innerHTML=it?'<b style="color:'+itemCol(it)+'">'+hvEsc(it.name)+(it.up?' +'+it.up:'')+'</b> <input type="number" id="hvPrixIn" min="1" max="10000000" step="1" placeholder="Prix en pièces"> <button type="button" class="act main" id="hvVendre" '+(plein?'disabled':'')+'>Mettre en vente</button> <span class="hint" id="hvNet"></span>':'<span class="hint">'+(plein?'Tu as déjà '+HVD.max+' ventes en cours.':'Clique sur un objet de ton sac.')+'</span>';
     box.innerHTML='<div class="sellgrid">'+(g||'<i class="hint">Ton sac est vide.</i>')+'</div>';
     foot.textContent=mes.length+' / '+HVD.max+' ventes en cours';
-    const inp=document.getElementById('hvPrixIn');if(inp){inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')document.getElementById('hvVendre').click();if(e.key==='Escape')closeHV();});inp.addEventListener('input',()=>{const p=Math.floor(+inp.value)||0;document.getElementById('hvNet').textContent=p>0?'Tu recevras '+hvPrix(Math.max(1,Math.floor(p*(1-HVD.taxe))))+' pièce'+(p>1?'s':''):'';});inp.focus();}}
+    const inp=document.getElementById('hvPrixIn');if(inp){inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')document.getElementById('hvVendre').click();if(e.key==='Escape')closeHV();});inp.addEventListener('input',()=>{const p=Math.floor(+inp.value)||0;const fr=Math.max(1,Math.ceil(p*HVD.frais));document.getElementById('hvNet').innerHTML=p>0?'Frais : <b style="color:'+(save.gold<fr?'#ff5a6a':'#ffd96a')+'">'+hvPrix(fr)+'</b> maintenant · tu recevras '+hvPrix(Math.max(1,Math.floor(p*(1-HVD.taxe))))+' à la vente':'';});inp.focus();}}
   else{intro.textContent='Tes objets en vente. Tu peux les retirer à tout moment : ils reviennent dans ton sac.';bar.innerHTML='';
     box.innerHTML=mes.map(v=>'<div class="hvrow" data-hvid="'+v.id+'"><img src="'+icon(v.it)+'" alt=""><div><b style="color:'+itemCol(v.it)+'">'+hvEsc(v.it.name)+(v.it.up?' +'+v.it.up:'')+'</b><span>'+TIER_NOM[v.it.tier]+' · encore '+v.j+' j</span></div><div><div class="price"><i class="coin"></i>'+hvPrix(v.prix)+'</div><button type="button" class="act" data-hvdel="'+v.id+'">Retirer</button></div></div>').join('')||'<i class="hint">Tu n\'as rien en vente.</i>';
     foot.textContent=mes.length+' / '+HVD.max+' ventes en cours';}
 }
 function onHV(m){
-  if(m.a==='liste'){HVD={l:Array.isArray(m.l)?m.l.filter(v=>v&&v.it&&KINDS[v.it.kind]):[],taxe:+m.taxe||0.05,max:m.max|0||10};renderHV();return;}
-  if(m.a==='depot'){hvAtt=0;if(!m.ok){note(m.msg||'Vente refusée');sfx('deny');return;}const ch=C(),it=ch.inv[m.i|0];if(it){ch.inv[m.i|0]=null;invDirty=true;persist();pushSave(true);note(it.name+' mis en vente');sfx('coin');}hvSel=-1;renderHV();return;}
+  if(m.a==='liste'){HVD={l:Array.isArray(m.l)?m.l.filter(v=>v&&v.it&&KINDS[v.it.kind]):[],taxe:+m.taxe||0.05,frais:m.frais==null?0.15:+m.frais,max:m.max|0||10};renderHV();return;}
+  if(m.a==='depot'){hvAtt=0;if(!m.ok){note(m.msg||'Vente refusée');sfx('deny');return;}const ch=C(),it=ch.inv[m.i|0];if(it){ch.inv[m.i|0]=null;save.gold=Math.max(0,save.gold-(m.frais|0));invDirty=true;persist();pushSave(true);note(it.name+' mis en vente'+(m.frais?' · frais : '+hvPrix(m.frais|0)+' pièces':''));sfx('coin');}hvSel=-1;renderHV();return;}
   if(m.a==='achat'){hvAtt=0;if(!m.ok){note(m.msg||'Achat refusé');sfx('deny');renderHV();return;}save.gold=Math.max(0,save.gold-(m.prix|0));giveItem(m.it);pushSave(true);note(m.it.name+' acheté pour '+hvPrix(m.prix)+' pièces');sfx('buy');renderHV();return;}
   if(m.a==='retour'){if(m.ok===0){note(m.msg||'Impossible');sfx('deny');return;}giveItem(m.it);pushSave(true);note(m.it.name+' : objet revenu de l\'hôtel des ventes');sfx('item');renderHV();return;}
   if(m.a==='paye'){save.gold+=m.or|0;persist();pushSave(true);invDirty=true;note((m.nom?m.nom+' vendu':(m.n>1?m.n+' objets vendus':'Objet vendu'))+' à l\'hôtel des ventes : +'+hvPrix(m.or|0)+' pièces');sfx('coin');if(!hvEl.hidden)room.raw({t:'hv',a:'liste'});return;}
@@ -3939,7 +3939,7 @@ hvEl.addEventListener('click',e=>{const t=e.target.closest('[data-hvtab]');if(t)
   if(Date.now()-hvAtt<1500&&e.target.closest('[data-hvbuy],[data-hvdel],#hvVendre'))return;
   const b=e.target.closest('[data-hvbuy]');if(b){const v=HVD.l.find(x=>x.id===+b.dataset.hvbuy);if(!v||save.gold<v.prix){sfx('deny');return;}if(freeInv()<0){note('Ton sac est plein');sfx('deny');return;}hvAtt=Date.now();pushSave(true);setTimeout(()=>room.raw({t:'hv',a:'acheter',id:v.id}),450);return;}
   const d=e.target.closest('[data-hvdel]');if(d){if(freeInv()<0){note('Ton sac est plein');sfx('deny');return;}hvAtt=Date.now();room.raw({t:'hv',a:'retirer',id:+d.dataset.hvdel});return;}
-  if(e.target.closest('#hvVendre')){const it=C().inv[hvSel],p=Math.floor(+document.getElementById('hvPrixIn').value);if(!it)return;if(!(p>=1&&p<=10000000)){note('Indique un prix entre 1 et 10 000 000 pièces');sfx('deny');return;}hvAtt=Date.now();room.raw({t:'hv',a:'vendre',it:{kind:it.kind,tier:it.tier,up:it.up|0,stats:it.stats},prix:p,i:hvSel});return;}});
+  if(e.target.closest('#hvVendre')){const it=C().inv[hvSel],p=Math.floor(+document.getElementById('hvPrixIn').value);if(!it)return;if(!(p>=1&&p<=10000000)){note('Indique un prix entre 1 et 10 000 000 pièces');sfx('deny');return;}{const fr=Math.max(1,Math.ceil(p*HVD.frais));if(save.gold<fr){note('Il te faut '+hvPrix(fr)+' pièces pour les frais de mise en vente');sfx('deny');return;}}pushSave(true);hvAtt=Date.now();room.raw({t:'hv',a:'vendre',it:{kind:it.kind,tier:it.tier,up:it.up|0,stats:it.stats},prix:p,i:hvSel});return;}});
 hvEl.addEventListener('change',e=>{if(e.target.id==='hvFilS'){hvFil=e.target.value;renderHV();}if(e.target.id==='hvTriS'){hvTri=e.target.value;renderHV();}});
 hvEl.addEventListener('mouseover',e=>{const r=e.target.closest('[data-hvid]');if(r){const v=HVD.l.find(x=>x.id===+r.dataset.hvid);if(v)showItTip(v.it,r);return;}const pk=e.target.closest('[data-hvpick]');if(pk){const it=C().inv[+pk.dataset.hvpick];if(it)showItTip(it,pk);}});
 hvEl.addEventListener('mouseout',e=>{if(e.target.closest('[data-hvid],[data-hvpick]'))hideItTip();});
@@ -4340,7 +4340,11 @@ function gainXP(n,x,y){
   if(ch.lvl>=maxLvl())ch.xp=0;
   statsDirty=true;persist();
 }
-function prestigeGain(ch){const sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];return Math.max(1,ch.lvl+Math.floor((ch.kills||0)/25)+2*spT+3*(ch.bosses||0)+GLORY_PRES*(ch.gp||0));}
+function prestigeBase(ch){const sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];return Math.max(1,ch.lvl+Math.floor((ch.kills||0)/25)+2*spT+3*(ch.bosses||0)+GLORY_PRES*(ch.gp||0));}
+// bonus de prestige de l'équipement porté à la mort définitive : T2 1 %, T3 2 %, T4 3 %, T5 4 %, T6 5 %, Tier 7 6 %, relique 10 %, +1 % par niveau de forge
+function presObjet(it){if(!it||!KINDS[it.kind]||it.slot==='conso'||it.slot==='meuble')return 0;const K=KINDS[it.kind];return (K.alt||it.tier>=7?10:K.t7?6:Math.max(0,it.tier-1))+Math.max(0,Math.min(2,it.up|0));}
+function presEquip(ch){let p=0;for(const it of (ch.equip||[]))p+=presObjet(it);return p;}
+function prestigeGain(ch){return Math.max(1,Math.round(prestigeBase(ch)*(1+presEquip(ch)/100)));}
 const deathEl=$('#death');let permaArm=0;
 const steamOn=g=>Math.floor(time/2+(g===2?1:0))%2===0;
 function themeTick(dt,st,T,mv){
@@ -4360,10 +4364,10 @@ function die(src){
   if(scene!=='tuto'&&scene!=='arena')myEv=(++evSeq)+'|d|'+Math.round(P.x*10)+'|'+Math.round(P.y*10)+'|'+sceneKey(); // une tombe apparaît chez les autres joueurs de la scène
   if(scene==='raid'){raidDeath(src);return;}
   enterNexus();const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;P.berserk=0;paused=true;keys.clear();mouse.down=false;
-  const ch=C(),g=prestigeGain(ch),sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];
+  const ch=C(),g=prestigeGain(ch),sp=ch.sp||{};let spT=0;for(const k in sp)spT+=sp[k];pushSave(true); // l'équipement porté compte pour le prestige : le serveur doit le connaître
   $('#deathWhy').textContent='Tué par '+src+' · '+CLASSES[save.current].nom+' niveau '+ch.lvl;
   {const nl=deathLvl(ch.lvl);$('#dContTxt').textContent=(nl<ch.lvl?'Ton héros perd 20 % de ses niveaux : niveau '+ch.lvl+' → niveau '+nl+'. ':'Ton héros reste au niveau '+ch.lvl+'. ')}$('#dContTxt').textContent+=''+'Tu gardes ton équipement, tes sacs et tes potions de caractéristiques.';
-  $('#dPermaTxt').textContent='Ce héros repart de zéro. Tu gagnes '+g+' prestige (niveau '+ch.lvl+' + '+Math.floor((ch.kills||0)/25)+' pour les monstres + '+2*spT+' pour les potions + '+3*(ch.bosses||0)+' pour les boss'+(ch.gp?' + '+GLORY_PRES*ch.gp+' pour '+ch.gp+' point'+(ch.gp>1?'s':'')+' de gloire':'')+').';
+  $('#dPermaTxt').textContent='Ce héros repart de zéro. Tu gagnes '+g+' prestige (niveau '+ch.lvl+' + '+Math.floor((ch.kills||0)/25)+' pour les monstres + '+2*spT+' pour les potions + '+3*(ch.bosses||0)+' pour les boss'+(ch.gp?' + '+GLORY_PRES*ch.gp+' pour '+ch.gp+' point'+(ch.gp>1?'s':'')+' de gloire':'')+(presEquip(ch)?', le tout +'+presEquip(ch)+' % grâce à l\'équipement porté, qui sera perdu':'')+').';
   permaArm=0;$('#dPerma').classList.remove('arm');deathEl.hidden=false;sfx('boss');
 }
 $('#dContinue').addEventListener('click',()=>{const ch=C(),old=ch.lvl;ch.lvl=deathLvl(old);ch.xp=0;ch.gxp=0;persist();statsDirty=true;invDirty=true;const st=S();P.hp=st.tot.vie;P.mp=st.tot.mana;deathEl.hidden=true;paused=false;showBanner('Retour au Village',ch.lvl<old?'Niveau '+old+' → niveau '+ch.lvl+' · équipement et potions conservés':'Équipement et potions conservés','#ff5a6a');cv.focus();});

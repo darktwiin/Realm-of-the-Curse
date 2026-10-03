@@ -57,7 +57,11 @@ const estNombre = (v, lo, hi) => typeof v === 'number' && isFinite(v) && v >= lo
 const memeStats = (a, b) => { const ka = Object.keys(a || {}).filter(k => a[k]), kb = Object.keys(b || {}).filter(k => b[k]); if (ka.length !== kb.length) return false; for (const k of ka) if (Math.abs((a[k] || 0) - (b[k] || 0)) > 0.051) return false; return true; };
 // le niveau de forge (+1, +2) fait partie de la signature : un objet amélioré n'est pas le même objet
 const signature = it => it.kind + '|' + it.tier + '|' + JSON.stringify(Object.keys(it.stats || {}).sort().map(k => [k, it.stats[k]])) + (it.up ? '|+' + (it.up | 0) : '');
-const prestigeGain = ch => { const spT = Object.values(ch.sp || {}).reduce((a, v) => a + (v | 0), 0); return (ch.lvl | 0) + Math.floor((ch.kills | 0) / 25) + 2 * spT + 3 * (ch.bosses | 0) + 2 * (ch.gp | 0); };
+// bonus de prestige de l'équipement porté à la mort définitive : T2 1 %, T3 2 %, T4 3 %, T5 4 %, T6 5 %, Tier 7 6 %, relique 10 %, +1 % par niveau de forge
+const presObjet = it => { if (!it || !R || !R.KINDS[it.kind] || R.KINDS[it.kind].slot === 'conso' || R.KINDS[it.kind].slot === 'meuble') return 0; const K = R.KINDS[it.kind], t = it.tier | 0; return (K.alt || t >= 7 ? 10 : K.t7 ? 6 : Math.max(0, t - 1)) + Math.max(0, Math.min(2, it.up | 0)); };
+// le héros a pu changer d'équipement depuis la dernière sauvegarde : on prend le meilleur objet de chaque emplacement parmi ce qu'il portait ou avait dans son sac
+const presEquip = ch => { const best = {}; for (const it of [...(ch.equip || []), ...(ch.inv || [])]) if (it && ['arme', 'capa', 'armure', 'anneau'].includes(it.slot)) best[it.slot] = Math.max(best[it.slot] || 0, presObjet(it)); return Object.values(best).reduce((a, v) => a + v, 0); };
+const prestigeGain = ch => { const spT = Object.values(ch.sp || {}).reduce((a, v) => a + (v | 0), 0); return Math.round(((ch.lvl | 0) + Math.floor((ch.kills | 0) / 25) + 2 * spT + 3 * (ch.bosses | 0) + 2 * (ch.gp | 0)) * (1 + presEquip(ch) / 100)); };
 
 // objet valide ? (comparé à ce que le jeu fabrique pour le même type et le même tier)
 function objetValide(it) {

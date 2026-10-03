@@ -1,5 +1,9 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.46 (server.js et arbitre.js modifiés ; wiki.html régénéré)
+- **Prestige et équipement** : à la mort définitive, chaque objet porté augmente le prestige gagné. Tier 2 : +1 %, Tier 3 : +2 %, Tier 4 : +3 %, Tier 5 : +4 %, Tier 6 : +5 %, Tier 7 : +6 %, Relique : +10 %, et +1 % par niveau de forge. Les pourcentages des quatre objets s'additionnent (quatre Reliques +2 : +48 %). L'écran de mort affiche le bonus.
+- **Hôtel des ventes** : la mise en vente coûte 15 % du prix demandé, payés tout de suite et jamais rendus (objet vendu, retiré ou invendu). La taxe de 5 % à la vente reste en place.
+
 ## ver.0.0.45 (arbitre.js modifié ; server.js inchangé depuis la 0.0.44 ; wiki.html régénéré)
 - **Anti-triche, faux positif corrigé** : une potion de caractéristique donnée par un boss et bue aussitôt (avant la sauvegarde suivante) était jugée « bue sans potion », ce qui refusait la sauvegarde. Elle est maintenant reconnue.
 - Les objets **Tier 7** se vendent 15 pièces au marchand (10 avant).

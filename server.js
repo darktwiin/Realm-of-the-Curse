@@ -217,7 +217,7 @@ function sauverCompte(moi, m) {
     const D = cpt.dons, r = v.reste || DONS0();
     D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {}; D.sol = r.sol || []; D.res = r.res || {};
     cpt.aPerdre = cpt.aPerdre.filter(e => Date.now() - e.t < 3000); // les plus récents seront vérifiés à la sauvegarde suivante
-    if (cpt.achats) cpt.achats = cpt.achats.filter(a => !a.vu);                // achats de l'hôtel des ventes payés
+    if (cpt.achats) cpt.achats = cpt.achats.filter(a => !a.vu); if (cpt.frais) cpt.frais = cpt.frais.filter(f => !f.vu && Date.now() - f.t < 600000);                // achats de l'hôtel des ventes payés
   } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
   cpt.boost = +m.data.boostXP || 0;
@@ -745,12 +745,12 @@ function dessiner(moi, m) {
 // Le serveur garde l'objet en dépôt (il doit disparaître du sac du vendeur), le donne à l'acheteur (qui doit payer), puis verse l'or au vendeur, moins la taxe.
 db.exec(`CREATE TABLE IF NOT EXISTS ventes (id INTEGER PRIMARY KEY AUTOINCREMENT, vendeur INTEGER NOT NULL, nom TEXT NOT NULL, objet TEXT NOT NULL, prix INTEGER NOT NULL, quand INTEGER NOT NULL)`);
 db.exec(`CREATE TABLE IF NOT EXISTS ventes_dus (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER NOT NULL, ors INTEGER NOT NULL DEFAULT 0, objet TEXT, quand INTEGER NOT NULL)`);
-const HV = { TAXE: 0.05, MAX: 10, DUREE: 7 * 86400000,
+const HV = { TAXE: 0.05, FRAIS: 0.15, MAX: 10, DUREE: 7 * 86400000,
   liste: db.prepare('SELECT id, vendeur, nom, objet, prix, quand FROM ventes ORDER BY id DESC LIMIT 300'), une: db.prepare('SELECT * FROM ventes WHERE id = ?'), de: db.prepare('SELECT * FROM ventes WHERE vendeur = ?'),
   ins: db.prepare('INSERT INTO ventes (vendeur, nom, objet, prix, quand) VALUES (?, ?, ?, ?, ?)'), del: db.prepare('DELETE FROM ventes WHERE id = ?'),
   duIns: db.prepare('INSERT INTO ventes_dus (compte, ors, objet, quand) VALUES (?, ?, ?, ?)'), duDe: db.prepare('SELECT * FROM ventes_dus WHERE compte = ?'), duDel: db.prepare('DELETE FROM ventes_dus WHERE id = ?') };
 function hvListe(moi) { const l = HV.liste.all().map(v => { let it = null; try { it = JSON.parse(v.objet); } catch {} return it ? { id: v.id, n: v.nom, it, prix: v.prix, moi: v.vendeur === moi.compte.id ? 1 : 0, j: Math.max(0, Math.ceil((v.quand + HV.DUREE - Date.now()) / 86400000)) } : null; }).filter(Boolean);
-  return { t: 'hv', a: 'liste', l, taxe: HV.TAXE, max: HV.MAX }; }
+  return { t: 'hv', a: 'liste', l, taxe: HV.TAXE, frais: HV.FRAIS, max: HV.MAX }; }
 function hvRendre(moi, it) { const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); butin.noter(cpt.dons, it); envoyer(moi.ws, { t: 'hv', a: 'retour', it }); }
 // à la connexion : or des ventes conclues pendant l'absence, objets invendus depuis 7 jours
 function hvConnexion(moi) {
@@ -775,17 +775,21 @@ function hotelDesVentes(moi, m) {
       if (prep[0].recu.slot === 'conso') return rep({ a: 'depot', ok: 0, msg: 'Les potions ne se vendent pas ici' });
       const { recu, sigDonneur } = prep[0], e = cpt.aPerdre.find(x => x.sig === sigDonneur), dispo = e ? e.max : butin.compterSig(sv, sigDonneur);
       if (dispo < 1) return rep({ a: 'depot', ok: 0, msg: 'Objet pas encore enregistré : réessaie dans deux secondes' });
+      // frais de mise en vente : 15 % du prix, payés tout de suite et jamais rendus
+      const frais = Math.max(1, Math.ceil(prix * HV.FRAIS)), dejaDu = (cpt.achats || []).reduce((a, x) => a + x.prix, 0) + (cpt.frais || []).reduce((a, x) => a + x.prix, 0);
+      if ((sv.gold | 0) - dejaDu < frais) return rep({ a: 'depot', ok: 0, msg: 'Il te faut ' + frais + ' pièces pour les frais de mise en vente (15 % du prix)' });
+      (cpt.frais || (cpt.frais = [])).push({ sig: sigDonneur, prix: frais, t: Date.now() });
       if (e) { e.max = dispo - 1; e.t = Date.now(); } else cpt.aPerdre.push({ sig: sigDonneur, max: dispo - 1, t: Date.now() });
       HV.ins.run(moi.compte.id, String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 16), JSON.stringify(recu), prix, Date.now());
       console.log(`[ventes] ${moi.compte.nom} met en vente ${recu.kind} T${recu.tier} pour ${prix}`);
-      rep({ a: 'depot', ok: 1, i: m.i | 0 }); return envoyer(moi.ws, hvListe(moi));
+      rep({ a: 'depot', ok: 1, i: m.i | 0, frais }); return envoyer(moi.ws, hvListe(moi));
     }
     if (m.a === 'retirer') { const v = HV.une.get(m.id | 0); if (!v || v.vendeur !== moi.compte.id) return rep({ a: 'retour', ok: 0, msg: 'Vente introuvable' }); HV.del.run(v.id); hvRendre(moi, JSON.parse(v.objet)); return envoyer(moi.ws, hvListe(moi)); }
     if (m.a === 'acheter') {
       const v = HV.une.get(m.id | 0); if (!v) { rep({ a: 'achat', ok: 0, msg: 'Trop tard : cet objet vient d\'être vendu' }); return envoyer(moi.ws, hvListe(moi)); }
       if (v.vendeur === moi.compte.id) return rep({ a: 'achat', ok: 0, msg: 'C\'est ta propre vente' });
       let sv = null; try { const row = sql.parId.get(moi.compte.id); sv = row && row.save ? JSON.parse(row.save) : null; } catch {}
-      const du = (cpt.achats || []).reduce((a, x) => a + x.prix, 0); if (!sv || (sv.gold | 0) - du < v.prix) return rep({ a: 'achat', ok: 0, msg: 'Pas assez de pièces' });
+      const du = (cpt.achats || []).reduce((a, x) => a + x.prix, 0) + (cpt.frais || []).reduce((a, x) => a + x.prix, 0); if (!sv || (sv.gold | 0) - du < v.prix) return rep({ a: 'achat', ok: 0, msg: 'Pas assez de pièces' });
       const it = JSON.parse(v.objet); HV.del.run(v.id);
       butin.noter(cpt.dons, it); (cpt.achats || (cpt.achats = [])).push({ sig: butin.signature(it), prix: v.prix, t: Date.now() });
       rep({ a: 'achat', ok: 1, it, prix: v.prix });
@@ -797,7 +801,9 @@ function hotelDesVentes(moi, m) {
   } catch (e) { console.error('[ventes]', e.message); }
 }
 // à chaque sauvegarde : un objet acheté qui apparaît doit avoir été payé
-function hvAPayer(cpt, ancien, nouveau) { let tot = 0; for (const a of (cpt.achats || [])) { a.vu = butin.compterSig(nouveau, a.sig) > butin.compterSig(ancien, a.sig); if (a.vu) tot += a.prix; } return tot; }
+function hvAPayer(cpt, ancien, nouveau) { let tot = 0;
+  // frais de mise en vente : dus dans la sauvegarde où l'objet déposé quitte le sac (le jeu retire l'objet et les pièces en même temps)
+  { const vus = {}; for (const f of (cpt.frais || [])) { const moins = butin.compterSig(ancien, f.sig) - butin.compterSig(nouveau, f.sig) - (vus[f.sig] || 0); f.vu = moins > 0; if (f.vu) { vus[f.sig] = (vus[f.sig] || 0) + 1; tot += f.prix; } } } for (const a of (cpt.achats || [])) { a.vu = butin.compterSig(nouveau, a.sig) > butin.compterSig(ancien, a.sig); if (a.vu) tot += a.prix; } return tot; }
 
 // ---------- parrainage : un nouveau joueur désigne son parrain, les deux sont récompensés quand le filleul progresse ----------
 db.exec(`CREATE TABLE IF NOT EXISTS parrainage (filleul INTEGER PRIMARY KEY, parrain INTEGER NOT NULL, quand INTEGER NOT NULL, palier INTEGER NOT NULL DEFAULT 0)`);
