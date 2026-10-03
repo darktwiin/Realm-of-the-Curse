@@ -33,6 +33,7 @@ function objetT7(R, cls) {
   else k = 'anneau';
   return R.KINDS[k + '7'] ? R.mkItem(k + '7', 6) : null;
 }
+const TAUX_RESSOURCE = 0.2; // ressource de talisman sur un boss de donjon
 const DONJONS_T7 = 'ah', TAUX_T7 = 0.05; // Observatoire Céleste et Horloge Brisée : 5 % par monstre tué
 function potionsCarac(R, key, d, scene) {
   if (d.tuto) return [];
@@ -60,6 +61,8 @@ function tirer(R, key, cls, scene, sc) {
   // Chronos : une Relique de Chronos à chaque fois (une chance sur deux qu'elle soit pour la classe du joueur)
   if (key === 'chronos') { const tous = Object.keys(R.KINDS).filter(k => R.KINDS[k].alt), miens = tous.filter(k => (R.KINDS[k].cls || []).includes(cls));
     if (tous.length) out.it.push(R.mkItem(pick(miens.length && Math.random() < 0.5 ? miens : tous), 7)); }
+  // ressource de boss (talismans) : 20 % sur le boss du donjon où l'on se trouve
+  if (d.boss && typeof sc === 'string' && sc[0] === 'd' && R.TALIS && R.TALIS[sc[1]]) { const T = R.DTYPES[sc[1]]; if (T && (T.bk === key || T.bk2 === key) && Math.random() < TAUX_RESSOURCE) out.res = sc[1]; }
   if (d.midBoss || GARANTIS.includes(key)) out.spg.push(R.mkItem('sp_' + pick(R.SK), 0));
   out.sp = potionsCarac(R, key, d, scene).map(k => R.mkItem('sp_' + k, 0));
   if (d.or && Math.random() < d.or[0]) out.or = Math.max(1, Math.round(ri(d.or[1], d.or[2]) * 1.3)); // pièces +30 %
@@ -149,9 +152,11 @@ function reclamer(moi, m, ctx) {
   const cls = R.CLASSES[m.c] ? String(m.c) : String((moi.etat && moi.etat.c) || '');
   const r = tirer(R, key, cls, s === 'r' ? 'realm' : 'dungeon', s);
   if (ctx.boost && Date.now() < ctx.boost) r.xp = Math.round(r.xp * 1.3); // boost d'expérience (Cursite)
+  if (ctx.boostServeur > 1) r.xp = Math.round(r.xp * ctx.boostServeur);     // objectif commun de la semaine atteint
   const dons = ctx.dons; nettoyer(dons);
   dons.xp += r.xp; dons.kills += 1; dons.boss += r.b; dons.or += r.or;
   for (const it of [...r.it, ...r.spg, ...r.sp]) noter(dons, it);
+  if (r.res) { dons.res = dons.res || {}; dons.res[r.res] = (dons.res[r.res] || 0) + 1; }
   const x = Math.round((Number(m.x) || 0) * 10) / 10, y = Math.round((Number(m.y) || 0) * 10) / 10;
   ctx.envoyer(moi.ws, Object.assign({ t: 'butin', id, k: key, x, y }, r));
   if (ctx.onTue) try { ctx.onTue(key, s); } catch (e) { console.error('[butin] onTue', e.message); }

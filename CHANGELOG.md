@@ -1,5 +1,38 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.41 (server.js, butin.js et arbitre.js modifiés ; wiki.html régénéré ; nouvelle image outils/guide/14-maison.jpg)
+- **Hôtel des ventes** : un nouveau personnage dans l'échoppe (à gauche du comptoir). Onglet « Vendre » : choisis un objet de ton sac, fixe ton prix, il reste en vente 7 jours (10 ventes à la fois, les potions ne se vendent pas). Onglet « Acheter » : tous les objets des autres joueurs, avec filtre par type et tri par prix ou par tier. Le vendeur touche le prix moins 5 % de taxe, même s'il est déconnecté au moment de la vente (il reçoit ses pièces à son retour). Un objet invendu ou retiré revient dans le sac.
+- **Maison à décorer** : 25 meubles à acheter avec des pièces (de la chaise à 8 pièces au Cristal de Cursite à 1 200), à poser où tu veux dans ta maison. Pupitre « Décoration » → onglet « Meubles » → « Poser » : un clic sur une case pose le meuble, un clic sur un meuble le reprend, Échap termine. Un meuble ne peut jamais enfermer une partie de la pièce. 80 meubles au maximum.
+- **Visites** : clic sur un joueur → « Visiter sa maison », ou onglet « Visiter » du pupitre (nom de compte, ou liste des maisons les plus aimées). On y voit ses meubles, son style, ses coffres et ses familiers, on croise le propriétaire et les autres visiteurs, et on peut laisser **un cœur** par maison au livre d'or.
+- **Parrainage** : nouveau bouton sous la carte. Un nouveau joueur indique le nom de compte de son parrain pendant ses 7 premiers jours. Quand le filleul atteint le niveau 10 puis le niveau 20, parrain et filleul gagnent chacun 25 puis 75 Cursite. 10 filleuls au maximum par parrain.
+- **Objectif commun de la semaine** : tous les monstres tués par tous les joueurs du serveur s'additionnent (15 000 par semaine). Une fois l'objectif atteint, tout le monde gagne +25 % d'expérience jusqu'au dimanche soir. La progression s'affiche dans les Évènements.
+- **Tournoi de pêche du dimanche** : chaque dimanche (heure de Paris), la plus grosse prise de chaque joueur est classée en direct. Le vainqueur porte le titre « Roi de la pêche » toute la semaine suivante.
+- Wiki : nouvelle étape 14 dans « Bien débuter » (maison, hôtel des ventes, parrainage, objectif, tournoi).
+
+## ver.0.0.40 (server.js, gardien.js, butin.js et arbitre.js modifiés ; wiki.html régénéré)
+Cette version regroupe les 0.0.37 à 0.0.40.
+- **Tous les monstres sont redessinés** en 32 pixels : les 61 qui restaient rejoignent les 22 premiers (slime, gobelins, crabe, squelettes, loups, champignon, feu follet, luciole, noyé, sangsue, ogre, spectres, sylvain, harpie, bandit, salamandre, cendreux, démon, sentinelle, chimère, acolyte, gargouille, ombre, fantôme, chauves-souris, momie, scarabées, djinn, requin, calmar, orbe, griffon, diable cornu, flammèches, yéti, mannequin, hibou, poissons de la Vengeance, pendule, sablier, coucou…). Chacun a deux images de repos et une image d'attaque dessinées à la main.
+- Le **Scorpion des sables** est maintenant de profil. Toutes les créatures de profil se retournent pour regarder le joueur.
+- **Talismans** : chaque boss de donjon a 20 % de chance de lâcher sa ressource (14 ressources, une par donjon). Elles ne prennent pas de place dans le sac : bouton « Ressources et talismans » sous l'inventaire. Avec 10 ressources d'un même boss, la **table enchantée** au fond de la forge fabrique son talisman. Un seul talisman porté à la fois ; son bonus (vie, mana, armure, vitesse, puissance… selon la difficulté du donjon) profite à tous les héros. Le serveur vérifie les ressources et les talismans.
+- **Familiers** : tri par type, rareté ou nombre ; bouton « Choisir » sur chaque familier pour en **relancer 3** contre 1 nouveau familier commun, ou pour les **vendre** (40, 150, 600 ou 2 500 pièces selon le rang).
+- **Bots** : ils parlent maintenant des évènements en cours (concours, raid du dragon) et du jeu, quand un vrai joueur est près d'eux.
+- **Wiki** : nouvelle rubrique « Bien débuter » (13 étapes avec captures, du premier héros à Chronos) ; au survol d'un monstre, la liste de tout ce qu'il peut donner avec les pourcentages ; nouvelle rubrique « Héros joués » (niveaux cumulés de chaque héros sur tous les comptes, en direct).
+
+## ver.0.0.36 (server.js inchangé depuis la 0.0.35 ; wiki.html régénéré)
+- **22 monstres redessinés**, deux fois plus détaillés (32 pixels au lieu de 16) : Mouette vorace, Crapaud géant, Araignée tisseuse, Scorpion des sables, Golem de rouille, Diablotin, Wyrm de lave, Armure hantée, Poisson-lanterne, Ange gardien, Cerbère, Rat géant, Guêpe géante, Golem de pierre, Automate rouillé, Golem de glace, Chevalier comète, Méduse du vide, Rouage vivant, et les boss Roi Bouffon (arlequin couronné, 64 pixels), Carpe koï d'or maudite (une vraie carpe koï) et Dévoreur d'Étoiles.
+- **100 attaques dessinées en pixels** à la place des boules : chaque monstre tire un projectile qui lui ressemble (pince du crabe, plume de la mouette, toile de l'araignée, dard du scorpion, boule de feu, carte à jouer du Roi Bouffon, aiguille d'horloge de Chronos…). Les projectiles pointent dans le sens du tir ou tournent sur eux-mêmes selon leur forme. Plusieurs boss alternent deux ou trois attaques. Les zones de dégâts ne changent pas.
+- **Tous les monstres sont animés** : deux images au repos (marche, vol, flottement, respiration ou pulsation selon la créature) et une image d'attaque au moment du tir. Seuls le Dragon de guilde et Chronos gardent leur animation propre.
+- Wiki : les monstres sont animés comme en jeu, et chaque fiche montre les projectiles du monstre.
+
+## ver.0.0.35 (server.js modifié ; wiki.html régénéré)
+- Wiki : les monstres n'apparaissent plus en double dans les donjons. Nouvelle rubrique **Classement**, avec les mêmes catégories qu'en jeu, lue en direct sur le serveur.
+- Classement : nouvelle catégorie **Top Précision** (en jeu et sur le wiki), 300 tirs minimum pour être classé.
+- Raccourcis : **B** ouvre le wiki, **N** les succès, **M** la grande carte (modifiables dans les Options).
+- Nouveau bouton **Carte** : la mini-carte s'affiche en grand au milieu de l'écran, sans mettre le jeu en pause.
+- Écran titre : des éclairs frappent l'horloge, et la grande aiguille se détraque régulièrement (elle tremble, saute, laisse une image fantôme).
+- Démoniste, parchemins de pacte : 1 démon aux T0 et T1, 2 du T2 au T4, 3 aux T5 et T6, 4 au Tier 7 d'obsidienne. Coût en mana +50 %. La forge compte maintenant : +10 % de dégâts et de durée des démons par niveau, et +20 mana max par niveau.
+- Plaines Sauvages : 15 % de monstres en plus.
+
 ## ver.0.0.34 (server.js et gardien.js modifiés ; nouveau fichier public/wiki.html)
 - **Écran titre** au lancement : l'Horloge Brisée, violette, tourne à l'envers au milieu d'un tourbillon d'étoiles, d'engrenages et de ruines. Menu « Jouer », « Options », « Wiki du jeu » ; touche Entrée pour jouer. L'écran a sa propre musique (lente, en mineur, avec le tic-tac de l'horloge), qui démarre au premier clic.
 - **Wiki** : nouvelle page `/wiki` (bouton sur l'écran titre et dans le panneau de droite). Objets avec leurs caractéristiques au survol, monstres et boss avec vie, dégâts, expérience et butin, zones, donjons et comment y entrer, taux de butin, héros, poissons. La page est fabriquée à partir du jeu lui-même par `outils/generer-wiki.js` : les chiffres sont ceux du serveur.

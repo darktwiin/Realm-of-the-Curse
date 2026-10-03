@@ -60,6 +60,14 @@ setInterval(() => {
   fs.writeFile(FICHIER_SCORES, JSON.stringify(scores), () => {});
 }, 30000);
 
+let popCache = null, popT = 0;
+function popularite() {
+  if (popCache && Date.now() - popT < 300000) return popCache;
+  const niv = {}, heros = {}; let comptes = 0;
+  try { for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { let sv; try { sv = JSON.parse(r.save); } catch { continue; } if (!sv || !sv.chars) continue; comptes++;
+      for (const [c, ch] of Object.entries(sv.chars)) { if (!CLASSES_OK.includes(c) || !ch) continue; const l = Math.max(1, Math.min(25, ch.lvl | 0)); niv[c] = (niv[c] || 0) + l; heros[c] = (heros[c] || 0) + 1; } } } catch (e) { console.error('[classes]', e.message); }
+  popT = Date.now(); return (popCache = { t: popT, comptes, niv, heros });
+}
 const server = http.createServer((req, res) => {
   const url = req.url.split('?')[0];
   if (url === '/' || url === '/index.html') {
@@ -73,6 +81,14 @@ const server = http.createServer((req, res) => {
     // wiki du jeu : page générée par outils/generer-wiki.js
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(WIKI);
+  } else if (url === '/classes') {
+    // popularité des héros pour le wiki : somme des niveaux de chaque héros sur tous les comptes (recalculée au plus toutes les 5 minutes)
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify(popularite()));
+  } else if (url === '/top') {
+    // classement, lu par le wiki
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify(top('')));
   } else if (url === '/__annonce' && req.method === 'POST') {
     // appelé par deploy/annoncer.js juste avant un redémarrage : compte à rebours chez tous les joueurs
     const q = new URL(req.url, 'http://local').searchParams;
@@ -123,7 +139,7 @@ sql.cguDernier = db.prepare('SELECT version FROM consentements WHERE compte = ? 
 sql.anoIns = db.prepare('INSERT INTO anomalies (compte, nom, quand, raisons) VALUES (?, ?, ?, ?)');
 sql.anoListe = db.prepare('SELECT nom, quand, raisons FROM anomalies ORDER BY id DESC LIMIT 60');
 for (const r of db.prepare('SELECT save FROM comptes WHERE save IS NOT NULL').all()) { try { arbitre.apprendre(JSON.parse(r.save)); } catch {} }
-const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0, xp: 0, kills: 0, boss: 0, liste: {}, sol: [] });
+const DONS0 = () => ({ cursite: 0, or: 0, prestige: 0, objets: 0, xp: 0, kills: 0, boss: 0, liste: {}, sol: [], res: {} });
 // état anti-triche par compte (survit aux reconnexions tant que le serveur tourne)
 const etatsComptes = new Map();
 function etatCompte(id) { let e = etatsComptes.get(id); if (!e) { e = { dons: DONS0(), seaux: arbitre.nouveauxSeaux(), rythme: {}, aPerdre: [] }; etatsComptes.set(id, e); } return e; }
@@ -146,9 +162,10 @@ function connecter(moi, c, ws) {
   const token = crypto.randomBytes(24).toString('hex'); sql.sessIns.run(token, c.id, Date.now());
   let save = null; try { save = c.save ? JSON.parse(c.save) : null; } catch { save = null; }
   let cgu = null; try { const r = sql.cguDernier.get(c.id); cgu = r ? r.version : null; } catch {}
-  envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, admin: moi.compte.admin, save, cgu });
+  envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, id: c.id, admin: moi.compte.admin, save, cgu });
   if (save) { envoyerCapGardien(moi, save); moi.cpt.boost = +save.boostXP || 0; }
   if (concoursVisible()) envoyer(ws, etatConcours());
+  envoyer(ws, etatObjectif()); tournoiCloture(); envoyer(ws, etatTournoi(moi));
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
 }
 function actionCompte(moi, ws, m) {
@@ -179,7 +196,7 @@ function sauverCompte(moi, m) {
   // les admins ne sont pas contrôlés (outils de test)
   const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); moi.dons = cpt.dons; moi.seaux = cpt.seaux;
   if (!moi.compte.admin) {
-    let v; try { v = arbitre.verifier(ancien, m.data, { seaux: cpt.seaux, dons: cpt.dons, aPerdre: cpt.aPerdre }); } catch (e) { console.error('[arbitre] erreur', e); v = { ok: true }; }
+    let v; try { v = arbitre.verifier(ancien, m.data, { seaux: cpt.seaux, dons: cpt.dons, aPerdre: cpt.aPerdre, aPayer: hvAPayer(cpt, ancien, m.data) }); } catch (e) { console.error('[arbitre] erreur', e); v = { ok: true }; }
     if (!v.ok) {
       moi.refus = (moi.refus || 0) + 1;
       sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(v.raisons));
@@ -196,13 +213,14 @@ function sauverCompte(moi, m) {
     }
     // ce qui n'a pas encore servi reste disponible (butin pas encore ramassé…), modifié sur place
     const D = cpt.dons, r = v.reste || DONS0();
-    D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {}; D.sol = r.sol || [];
+    D.or = r.or; D.cursite = r.cursite; D.prestige = r.prestige; D.objets = r.objets; D.xp = r.xp; D.kills = r.kills; D.boss = r.boss; D.liste = r.liste || {}; D.sol = r.sol || []; D.res = r.res || {};
     cpt.aPerdre = cpt.aPerdre.filter(e => Date.now() - e.t < 3000); // les plus récents seront vérifiés à la sauvegarde suivante
+    if (cpt.achats) cpt.achats = cpt.achats.filter(a => !a.vu);                // achats de l'hôtel des ventes payés
   } else { Object.assign(cpt.dons, DONS0()); cpt.aPerdre = []; }
   arbitre.apprendre(m.data);
   cpt.boost = +m.data.boostXP || 0;
   sql.save.run(txt, Date.now(), moi.compte.id);
-  envoyerCapGardien(moi, m.data);
+  envoyerCapGardien(moi, m.data); parrPaliers(moi, m.data);
 }
 // ---- échanges : à la conclusion, le serveur note ce que chacun reçoit et ce que chacun doit perdre ----
 function conclureEchange(A, B) {
@@ -427,6 +445,10 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
     if (m && m.t === 'peche') { pecher(moi, nom, m); return; }
     if (m && (m.t === 'dessin' || m.t === 'px')) { dessiner(moi, m); return; }
+    if (m && m.t === 'tournoi') { tournoiPrise(moi, m); return; }
+    if (m && m.t === 'hv') { hotelDesVentes(moi, m); return; }
+    if (m && m.t === 'parr') { parrainage(moi, m); return; }
+    if (m && m.t === 'maison') { maison(moi, m, salle); return; }
     if (m && m.t === 'cgu') { const v = String(m.v || ''); if (moi.compte && /^\d{4}-\d{2}-\d{2}$/.test(v)) { try { sql.cguIns.run(moi.compte.id, v, Date.now()); console.log(`[cgu] ${moi.compte.nom} accepte la version ${v}`); } catch (e) { console.error('[cgu]', e.message); } } return; }
     // nouveau compte : son premier héros vient d'être choisi, on souhaite la bienvenue à tout le monde (une seule fois)
     if (m && m.t === 'bienvenue') { if (moi.compte && moi.nouveau) { moi.nouveau = false; const n = filtrer(String(m.n || moi.compte.nom)).replace(/[<>]/g, '').slice(0, 16) || moi.compte.nom; console.log(`[compte] bienvenue à ${n}`); envoyer(ws, { t: 'bienvenue', n, moi: 1 }); diffuserPartout({ t: 'bienvenue', n }, moi); } return; }
@@ -545,6 +567,7 @@ wss.on('connection', (ws, req) => {
       let v = m.patch[k];
       if (k === 'ti' && v === 'admin' && !(moi.compte && moi.compte.admin)) v = null; // titre ADMIN réservé aux comptes admin
       if (k === 'gd' && !moi.gardien) v = null; // seul le vrai Gardien peut s'annoncer
+      if (k === 'ti' && v === 'roipeche' && !(moi.compte && roiPeche() && roiPeche().compte === moi.compte.nom)) v = null; // titre du vainqueur du tournoi de pêche
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
       if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
       if (v === null) delete moi.etat[k]; else moi.etat[k] = v;
@@ -714,6 +737,193 @@ function dessiner(moi, m) {
   envoyer(moi.ws, { t: 'px', x, y, c, moi: 1, att: dessinAttente(moi) });
   diffuserPartout({ t: 'px', x, y, c }, moi);
 }
+// ---------- hôtel des ventes : les joueurs vendent leurs objets entre eux, contre des pièces ----------
+// Le serveur garde l'objet en dépôt (il doit disparaître du sac du vendeur), le donne à l'acheteur (qui doit payer), puis verse l'or au vendeur, moins la taxe.
+db.exec(`CREATE TABLE IF NOT EXISTS ventes (id INTEGER PRIMARY KEY AUTOINCREMENT, vendeur INTEGER NOT NULL, nom TEXT NOT NULL, objet TEXT NOT NULL, prix INTEGER NOT NULL, quand INTEGER NOT NULL)`);
+db.exec(`CREATE TABLE IF NOT EXISTS ventes_dus (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER NOT NULL, ors INTEGER NOT NULL DEFAULT 0, objet TEXT, quand INTEGER NOT NULL)`);
+const HV = { TAXE: 0.05, MAX: 10, DUREE: 7 * 86400000,
+  liste: db.prepare('SELECT id, vendeur, nom, objet, prix, quand FROM ventes ORDER BY id DESC LIMIT 300'), une: db.prepare('SELECT * FROM ventes WHERE id = ?'), de: db.prepare('SELECT * FROM ventes WHERE vendeur = ?'),
+  ins: db.prepare('INSERT INTO ventes (vendeur, nom, objet, prix, quand) VALUES (?, ?, ?, ?, ?)'), del: db.prepare('DELETE FROM ventes WHERE id = ?'),
+  duIns: db.prepare('INSERT INTO ventes_dus (compte, ors, objet, quand) VALUES (?, ?, ?, ?)'), duDe: db.prepare('SELECT * FROM ventes_dus WHERE compte = ?'), duDel: db.prepare('DELETE FROM ventes_dus WHERE id = ?') };
+function hvListe(moi) { const l = HV.liste.all().map(v => { let it = null; try { it = JSON.parse(v.objet); } catch {} return it ? { id: v.id, n: v.nom, it, prix: v.prix, moi: v.vendeur === moi.compte.id ? 1 : 0, j: Math.max(0, Math.ceil((v.quand + HV.DUREE - Date.now()) / 86400000)) } : null; }).filter(Boolean);
+  return { t: 'hv', a: 'liste', l, taxe: HV.TAXE, max: HV.MAX }; }
+function hvRendre(moi, it) { const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); butin.noter(cpt.dons, it); envoyer(moi.ws, { t: 'hv', a: 'retour', it }); }
+// à la connexion : or des ventes conclues pendant l'absence, objets invendus depuis 7 jours
+function hvConnexion(moi) {
+  try { const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); let or = 0, n = 0;
+    for (const d of HV.duDe.all(moi.compte.id)) { HV.duDel.run(d.id); if (d.objet) { try { hvRendre(moi, JSON.parse(d.objet)); } catch {} } else { or += d.ors | 0; n++; } }
+    if (or > 0) { cpt.dons.or += or; envoyer(moi.ws, { t: 'hv', a: 'paye', or, n }); }
+    for (const v of HV.de.all(moi.compte.id)) if (Date.now() - v.quand > HV.DUREE) { HV.del.run(v.id); try { hvRendre(moi, JSON.parse(v.objet)); } catch {} }
+  } catch (e) { console.error('[ventes] connexion', e.message); } }
+function hotelDesVentes(moi, m) {
+  if (!moi.compte) return; const rep = o => envoyer(moi.ws, Object.assign({ t: 'hv' }, o)), R = arbitre.regles();
+  if (m.a === 'dus') { if (Date.now() - (moi.dusT || 0) < 3000) return; moi.dusT = Date.now(); hvConnexion(moi); return parrConnexion(moi); } // demandé par le jeu une fois le héros chargé
+  if (Date.now() - (moi.hvT || 0) < 400) return; moi.hvT = Date.now();
+  const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id));
+  try {
+    if (m.a === 'liste') return envoyer(moi.ws, hvListe(moi));
+    if (m.a === 'vendre') {
+      const prix = Math.floor(+m.prix); if (!(prix >= 1 && prix <= 10000000)) return rep({ a: 'depot', ok: 0, msg: 'Prix entre 1 et 10 000 000 pièces' });
+      if (HV.de.all(moi.compte.id).length >= HV.MAX) return rep({ a: 'depot', ok: 0, msg: HV.MAX + ' ventes au maximum à la fois' });
+      let sv = null; try { const row = sql.parId.get(moi.compte.id); sv = row && row.save ? JSON.parse(row.save) : null; } catch {}
+      if (!sv || !R) return rep({ a: 'depot', ok: 0, msg: 'Sauvegarde introuvable, réessaie' });
+      const prep = butin.preparerEchange(sv, [m.it]); if (!prep.length) return rep({ a: 'depot', ok: 0, msg: 'Objet pas encore enregistré : réessaie dans deux secondes' });
+      if (prep[0].recu.slot === 'conso') return rep({ a: 'depot', ok: 0, msg: 'Les potions ne se vendent pas ici' });
+      const { recu, sigDonneur } = prep[0], e = cpt.aPerdre.find(x => x.sig === sigDonneur), dispo = e ? e.max : butin.compterSig(sv, sigDonneur);
+      if (dispo < 1) return rep({ a: 'depot', ok: 0, msg: 'Objet pas encore enregistré : réessaie dans deux secondes' });
+      if (e) { e.max = dispo - 1; e.t = Date.now(); } else cpt.aPerdre.push({ sig: sigDonneur, max: dispo - 1, t: Date.now() });
+      HV.ins.run(moi.compte.id, String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 16), JSON.stringify(recu), prix, Date.now());
+      console.log(`[ventes] ${moi.compte.nom} met en vente ${recu.kind} T${recu.tier} pour ${prix}`);
+      rep({ a: 'depot', ok: 1, i: m.i | 0 }); return envoyer(moi.ws, hvListe(moi));
+    }
+    if (m.a === 'retirer') { const v = HV.une.get(m.id | 0); if (!v || v.vendeur !== moi.compte.id) return rep({ a: 'retour', ok: 0, msg: 'Vente introuvable' }); HV.del.run(v.id); hvRendre(moi, JSON.parse(v.objet)); return envoyer(moi.ws, hvListe(moi)); }
+    if (m.a === 'acheter') {
+      const v = HV.une.get(m.id | 0); if (!v) { rep({ a: 'achat', ok: 0, msg: 'Trop tard : cet objet vient d\'être vendu' }); return envoyer(moi.ws, hvListe(moi)); }
+      if (v.vendeur === moi.compte.id) return rep({ a: 'achat', ok: 0, msg: 'C\'est ta propre vente' });
+      let sv = null; try { const row = sql.parId.get(moi.compte.id); sv = row && row.save ? JSON.parse(row.save) : null; } catch {}
+      const du = (cpt.achats || []).reduce((a, x) => a + x.prix, 0); if (!sv || (sv.gold | 0) - du < v.prix) return rep({ a: 'achat', ok: 0, msg: 'Pas assez de pièces' });
+      const it = JSON.parse(v.objet); HV.del.run(v.id);
+      butin.noter(cpt.dons, it); (cpt.achats || (cpt.achats = [])).push({ sig: butin.signature(it), prix: v.prix, t: Date.now() });
+      rep({ a: 'achat', ok: 1, it, prix: v.prix });
+      const net = Math.max(1, Math.floor(v.prix * (1 - HV.TAXE))), vend = enLigne.get(v.vendeur);
+      if (vend && vend.ws.readyState === 1) { (vend.cpt || (vend.cpt = etatCompte(v.vendeur))).dons.or += net; envoyer(vend.ws, { t: 'hv', a: 'paye', or: net, n: 1, nom: it.name }); } else HV.duIns.run(v.vendeur, net, null, Date.now());
+      console.log(`[ventes] ${moi.compte.nom} achète ${it.kind} T${it.tier} à ${v.nom} pour ${v.prix}`);
+      return envoyer(moi.ws, hvListe(moi));
+    }
+  } catch (e) { console.error('[ventes]', e.message); }
+}
+// à chaque sauvegarde : un objet acheté qui apparaît doit avoir été payé
+function hvAPayer(cpt, ancien, nouveau) { let tot = 0; for (const a of (cpt.achats || [])) { a.vu = butin.compterSig(nouveau, a.sig) > butin.compterSig(ancien, a.sig); if (a.vu) tot += a.prix; } return tot; }
+
+// ---------- parrainage : un nouveau joueur désigne son parrain, les deux sont récompensés quand le filleul progresse ----------
+db.exec(`CREATE TABLE IF NOT EXISTS parrainage (filleul INTEGER PRIMARY KEY, parrain INTEGER NOT NULL, quand INTEGER NOT NULL, palier INTEGER NOT NULL DEFAULT 0)`);
+db.exec(`CREATE TABLE IF NOT EXISTS parrainage_dus (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER NOT NULL, cursite INTEGER NOT NULL, nom TEXT, niv INTEGER)`);
+const PARR = { PALIERS: [[10, 25], [20, 75]], MAX: 10, DELAI: 7 * 86400000,
+  get: db.prepare('SELECT * FROM parrainage WHERE filleul = ?'), de: db.prepare('SELECT p.filleul, p.palier, c.nom, c.save FROM parrainage p JOIN comptes c ON c.id = p.filleul WHERE p.parrain = ? ORDER BY p.quand'),
+  ins: db.prepare('INSERT INTO parrainage (filleul, parrain, quand) VALUES (?, ?, ?)'), maj: db.prepare('UPDATE parrainage SET palier = ? WHERE filleul = ?'),
+  duIns: db.prepare('INSERT INTO parrainage_dus (compte, cursite, nom, niv) VALUES (?, ?, ?, ?)'), duDe: db.prepare('SELECT * FROM parrainage_dus WHERE compte = ?'), duDel: db.prepare('DELETE FROM parrainage_dus WHERE id = ?') };
+const nivMax = sv => { let n = 0; try { for (const ch of Object.values((sv && sv.chars) || {})) n = Math.max(n, (ch && ch.lvl) | 0); } catch {} return Math.min(25, n); };
+function etatParrainage(moi) {
+  const c = sql.parId.get(moi.compte.id), lien = PARR.get.get(moi.compte.id), par = lien ? sql.parId.get(lien.parrain) : null;
+  const fl = PARR.de.all(moi.compte.id).map(f => { let sv = null; try { sv = f.save ? JSON.parse(f.save) : null; } catch {} return { n: f.nom, niv: nivMax(sv), p: f.palier }; });
+  return { t: 'parr', a: 'etat', parrain: par ? par.nom : null, palier: lien ? lien.palier : 0, peut: !lien && !!c && Date.now() - c.cree < PARR.DELAI ? 1 : 0, filleuls: fl, paliers: PARR.PALIERS, max: PARR.MAX };
+}
+function parrainage(moi, m) {
+  if (!moi.compte) return; if (Date.now() - (moi.parrT || 0) < 500) return; moi.parrT = Date.now();
+  try {
+    if (m.a === 'etat') return envoyer(moi.ws, etatParrainage(moi));
+    if (m.a === 'choisir') {
+      const non = msg => envoyer(moi.ws, { t: 'parr', a: 'choix', ok: 0, msg }), c = sql.parId.get(moi.compte.id), p = sql.parNom.get(String(m.nom || '').trim().slice(0, 16));
+      if (PARR.get.get(moi.compte.id)) return non('Tu as déjà un parrain');
+      if (!c || Date.now() - c.cree > PARR.DELAI) return non('Le parrain se choisit pendant les 7 premiers jours du compte');
+      if (!p) return non('Aucun compte ne porte ce nom');
+      if (p.id === c.id) return non('Tu ne peux pas te parrainer toi-même');
+      if (p.cree >= c.cree) return non('Ton parrain doit avoir un compte plus ancien que le tien');
+      if (PARR.de.all(p.id).length >= PARR.MAX) return non('Ce joueur a déjà ' + PARR.MAX + ' filleuls');
+      PARR.ins.run(c.id, p.id, Date.now()); console.log(`[parrainage] ${c.nom} choisit ${p.nom} comme parrain`);
+      envoyer(moi.ws, { t: 'parr', a: 'choix', ok: 1, nom: p.nom }); envoyer(moi.ws, etatParrainage(moi));
+      const P = enLigne.get(p.id); if (P && P.ws.readyState === 1) { envoyer(P.ws, { t: 'parr', a: 'nouveau', nom: c.nom }); envoyer(P.ws, etatParrainage(P)); }
+      let sv = null; try { sv = c.save ? JSON.parse(c.save) : null; } catch {} if (sv) parrPaliers(moi, sv);
+    }
+  } catch (e) { console.error('[parrainage]', e.message); }
+}
+// à chaque sauvegarde acceptée : le filleul a-t-il franchi un palier de niveau ?
+function parrPaliers(moi, sv) {
+  try { const lien = PARR.get.get(moi.compte.id); if (!lien || lien.palier >= PARR.PALIERS.length) return; const niv = nivMax(sv); let p = lien.palier;
+    while (p < PARR.PALIERS.length && niv >= PARR.PALIERS[p][0]) { const [seuil, cu] = PARR.PALIERS[p]; p++; PARR.maj.run(p, moi.compte.id);
+      const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); cpt.dons.cursite += cu; envoyer(moi.ws, { t: 'parr', a: 'gain', cursite: cu, niv: seuil, moi: 1 });
+      const P = enLigne.get(lien.parrain);
+      if (P && P.ws.readyState === 1) { (P.cpt || (P.cpt = etatCompte(lien.parrain))).dons.cursite += cu; envoyer(P.ws, { t: 'parr', a: 'gain', cursite: cu, niv: seuil, nom: moi.compte.nom }); envoyer(P.ws, etatParrainage(P)); }
+      else PARR.duIns.run(lien.parrain, cu, moi.compte.nom, seuil);
+      console.log(`[parrainage] ${moi.compte.nom} atteint le niveau ${seuil} : +${cu} Cursite pour lui et son parrain`); }
+  } catch (e) { console.error('[parrainage] palier', e.message); }
+}
+function parrConnexion(moi) { try { const cpt = moi.cpt || (moi.cpt = etatCompte(moi.compte.id)); for (const d of PARR.duDe.all(moi.compte.id)) { PARR.duDel.run(d.id); cpt.dons.cursite += d.cursite; envoyer(moi.ws, { t: 'parr', a: 'gain', cursite: d.cursite, niv: d.niv, nom: d.nom }); } } catch (e) { console.error('[parrainage] connexion', e.message); } }
+
+// ---------- maisons : on visite la maison meublée des autres joueurs et on y laisse un cœur ----------
+db.exec(`CREATE TABLE IF NOT EXISTS maison_coeurs (maison INTEGER NOT NULL, de INTEGER NOT NULL, quand INTEGER NOT NULL, PRIMARY KEY (maison, de))`);
+const MAISON = { nb: db.prepare('SELECT COUNT(*) AS n FROM maison_coeurs WHERE maison = ?'), a: db.prepare('SELECT 1 AS x FROM maison_coeurs WHERE maison = ? AND de = ?'), ins: db.prepare('INSERT OR IGNORE INTO maison_coeurs (maison, de, quand) VALUES (?, ?, ?)'),
+  top: db.prepare('SELECT m.maison AS id, COUNT(*) AS n, c.nom AS nom FROM maison_coeurs m JOIN comptes c ON c.id = m.maison GROUP BY m.maison ORDER BY n DESC, m.maison LIMIT 10') };
+function planMaison(c, moi) {
+  let sv = null; try { sv = c.save ? JSON.parse(c.save) : null; } catch {} sv = sv || {};
+  const h = (sv.house && typeof sv.house === 'object') ? sv.house : {}, vus = new Set(), m = [];
+  for (const e of (Array.isArray(h.m) ? h.m : []).slice(0, 80)) { if (!Array.isArray(e)) continue; const id = String(e[0] || ''), x = e[1] | 0, y = e[2] | 0; if (!/^[a-zA-Z0-9]{1,12}$/.test(id) || x < 1 || x > 25 || y < 1 || y > 16 || vus.has(x + ',' + y)) continue; vus.add(x + ',' + y); m.push([id, x, y]); }
+  const pets = (Array.isArray(sv.pets) ? sv.pets : []).filter(q => q && q.id !== sv.petEq).slice(0, 12).map(q => ({ k: String(q.k || '').slice(0, 16), t: Math.max(0, Math.min(3, q.t | 0)) }));
+  const lig = enLigne.get(c.id);
+  return { t: 'maison', a: 'plan', ok: 1, id: c.id, n: String((lig && lig.etat && lig.etat.n) || c.nom).slice(0, 16), skin: String(h.skin || 'bois').slice(0, 12), m, coffres: Math.max(1, Math.min(10, (sv.vault && sv.vault.n) | 0 || 1)), pets,
+    coeurs: MAISON.nb.get(c.id).n, aime: MAISON.a.get(c.id, moi.compte.id) ? 1 : 0, moi: c.id === moi.compte.id ? 1 : 0 };
+}
+function maison(moi, m, salle) {
+  if (!moi.compte) return; if (Date.now() - (moi.maisT || 0) < 500) return; moi.maisT = Date.now();
+  try {
+    const nomDe = j => String((j.etat && j.etat.n) || j.compte.nom).slice(0, 16);
+    if (m.a === 'top') return envoyer(moi.ws, { t: 'maison', a: 'top', l: MAISON.top.all().map(r => ({ id: r.id, n: r.nom, c: r.n })), moi: MAISON.nb.get(moi.compte.id).n });
+    if (m.a === 'voir') {
+      let c = null; if (m.peer) { const j = salle && salle.get(String(m.peer)); if (j && j.compte) c = sql.parId.get(j.compte.id); } else if (m.id) c = sql.parId.get(m.id | 0); else if (m.nom) c = sql.parNom.get(String(m.nom).trim().slice(0, 16));
+      if (!c) return envoyer(moi.ws, { t: 'maison', a: 'plan', ok: 0, msg: m.peer ? 'Ce joueur n\'a pas de compte' : 'Aucune maison à ce nom' });
+      envoyer(moi.ws, planMaison(c, moi));
+      const P = enLigne.get(c.id); if (P && P !== moi && P.ws.readyState === 1 && Date.now() - ((moi.visites || (moi.visites = {}))[c.id] || 0) > 120000) { moi.visites[c.id] = Date.now(); envoyer(P.ws, { t: 'maison', a: 'visite', n: nomDe(moi) }); }
+      return;
+    }
+    if (m.a === 'coeur') {
+      const c = sql.parId.get(m.id | 0); if (!c || c.id === moi.compte.id) return envoyer(moi.ws, { t: 'maison', a: 'coeur', ok: 0, msg: c ? 'C\'est ta propre maison' : 'Maison introuvable' });
+      const r = MAISON.ins.run(c.id, moi.compte.id, Date.now()), n = MAISON.nb.get(c.id).n;
+      if (!r.changes) return envoyer(moi.ws, { t: 'maison', a: 'coeur', ok: 0, n, msg: 'Tu as déjà laissé un cœur dans cette maison' });
+      envoyer(moi.ws, { t: 'maison', a: 'coeur', ok: 1, n, id: c.id });
+      const P = enLigne.get(c.id); if (P && P.ws.readyState === 1) envoyer(P.ws, { t: 'maison', a: 'aime', n: nomDe(moi), c: n });
+    }
+  } catch (e) { console.error('[maison]', e.message); }
+}
+
+// ---------- heure de Paris (semaine d'objectif, dimanche de pêche) ----------
+function paris() { const t = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Paris' }), [d, h] = t.split(' '), [y, m, j] = d.split('-').map(Number);
+  const jr = new Date(Date.UTC(y, m - 1, j)), js = process.env.FAUX_DIMANCHE ? 0 : jr.getUTCDay(), /* FAUX_DIMANCHE : pour les essais */ lundi = new Date(jr.getTime() - ((js + 6) % 7) * 86400000);
+  return { jour: d, js, semaine: lundi.toISOString().slice(0, 10), heure: +h.slice(0, 2) }; }
+
+// ---------- objectif commun de la semaine : tous les monstres tués sur le serveur ; une fois atteint, +25 % d'expérience pour tout le monde jusqu'à dimanche soir ----------
+const OBJECTIF = { semaine: paris().semaine, n: 0, but: Math.max(100, +process.env.OBJECTIF_SEMAINE || 15000), atteint: 0 }, OBJECTIF_BONUS = 1.25;
+const FICHIER_OBJECTIF = path.join(DATA_DIR, 'objectif.json');
+try { const o = JSON.parse(fs.readFileSync(FICHIER_OBJECTIF, 'utf8')); if (o && o.semaine === OBJECTIF.semaine) { OBJECTIF.n = o.n | 0; OBJECTIF.atteint = +o.atteint || 0; } } catch {}
+let objectifSale = false, objectifVu = -1;
+const etatObjectif = () => ({ t: 'objectif', n: OBJECTIF.n, but: OBJECTIF.but, ok: OBJECTIF.atteint ? 1 : 0, bonus: Math.round((OBJECTIF_BONUS - 1) * 100) });
+function objectifTue() {
+  const sem = paris().semaine; if (sem !== OBJECTIF.semaine) { OBJECTIF.semaine = sem; OBJECTIF.n = 0; OBJECTIF.atteint = 0; }
+  OBJECTIF.n++; objectifSale = true;
+  if (!OBJECTIF.atteint && OBJECTIF.n >= OBJECTIF.but) { OBJECTIF.atteint = Date.now(); console.log('[objectif] atteint : ' + OBJECTIF.n + ' monstres'); diffuserPartout(Object.assign(etatObjectif(), { bravo: 1 })); objectifVu = OBJECTIF.n; }
+}
+const bonusObjectif = () => OBJECTIF.atteint && paris().semaine === OBJECTIF.semaine ? OBJECTIF_BONUS : 1;
+setInterval(() => { if (objectifSale) { objectifSale = false; try { fs.writeFileSync(FICHIER_OBJECTIF, JSON.stringify({ semaine: OBJECTIF.semaine, n: OBJECTIF.n, atteint: OBJECTIF.atteint })); } catch (e) { console.error('[objectif]', e.message); } }
+  if (paris().semaine !== OBJECTIF.semaine) { OBJECTIF.semaine = paris().semaine; OBJECTIF.n = 0; OBJECTIF.atteint = 0; objectifSale = true; }
+  if (objectifVu !== OBJECTIF.n) { objectifVu = OBJECTIF.n; diffuserPartout(etatObjectif()); } }, 20000).unref();
+
+// ---------- tournoi de pêche du dimanche : le plus gros poisson de la journée ; le vainqueur porte le titre « Roi de la pêche » toute la semaine ----------
+const POISSONS = {}; { const re = /\['(lac|mer)','(\w+)','(?:[^'\\]|\\.)*',(\d),([\d.]+),([\d.]+),/g, txt = INDEX.toString('utf8'); let m; while ((m = re.exec(txt))) POISSONS[m[2]] = { r: +m[3], min: +m[4], max: +m[5] }; }
+const TOURNOI = { jour: '', best: {}, roi: null };
+const FICHIER_TOURNOI = path.join(DATA_DIR, 'peche.json');
+try { const o = JSON.parse(fs.readFileSync(FICHIER_TOURNOI, 'utf8')); if (o) { TOURNOI.jour = String(o.jour || ''); TOURNOI.best = o.best || {}; TOURNOI.roi = o.roi || null; } } catch {}
+const sauverTournoi = () => { try { fs.writeFileSync(FICHIER_TOURNOI, JSON.stringify(TOURNOI)); } catch (e) { console.error('[pêche]', e.message); } };
+const tournoiActif = () => paris().js === 0;
+function tournoiCloture() { // le dimanche est passé : on couronne le vainqueur
+  const P = paris(); if (!TOURNOI.jour || TOURNOI.jour === P.jour) return;
+  const l = Object.entries(TOURNOI.best).sort((a, b) => b[1].w - a[1].w);
+  if (l.length) { TOURNOI.roi = { compte: l[0][0], n: l[0][1].n, w: l[0][1].w, f: l[0][1].f, jour: TOURNOI.jour }; console.log(`[pêche] roi de la pêche : ${l[0][0]} (${l[0][1].w} kg)`); }
+  TOURNOI.jour = ''; TOURNOI.best = {}; sauverTournoi(); diffuserPartout(etatTournoi());
+}
+// le titre ne dure qu'une semaine : il tombe au dimanche suivant
+const roiPeche = () => TOURNOI.roi && (Date.now() - Date.parse(TOURNOI.roi.jour + 'T00:00:00Z') < 8 * 86400000) ? TOURNOI.roi : null;
+const etatTournoi = moi => { const r = roiPeche(); return { t: 'tournoi', actif: tournoiActif() ? 1 : 0, top: Object.values(TOURNOI.best).sort((a, b) => b.w - a.w).slice(0, 10).map(e => ({ n: e.n, w: e.w, f: e.f })), roi: r ? { n: r.n, w: r.w, f: r.f } : null, roiMoi: !!(moi && moi.compte && r && r.compte === moi.compte.nom) }; };
+function tournoiPrise(moi, m) {
+  if (!moi.compte) return; tournoiCloture(); if (!tournoiActif()) return;
+  const f = POISSONS[String(m.f || '')], w = Math.round((+m.w || 0) * 1000) / 1000; if (!f || !(w >= f.min && w <= f.max)) return;
+  const now = Date.now(); if (now - (moi.tournoiT || 0) < 4000 || (f.r >= 3 && now - (moi.tournoiR || 0) < 45000)) return; moi.tournoiT = now; if (f.r >= 3) moi.tournoiR = now;
+  const P = paris(); if (TOURNOI.jour !== P.jour) { TOURNOI.jour = P.jour; TOURNOI.best = {}; }
+  const cur = TOURNOI.best[moi.compte.nom]; if (cur && cur.w >= w) return;
+  const avant = Object.values(TOURNOI.best).reduce((a, e) => Math.max(a, e.w), 0);
+  TOURNOI.best[moi.compte.nom] = { n: String((moi.etat && moi.etat.n) || moi.compte.nom).slice(0, 16), w, f: String(m.f) }; sauverTournoi();
+  if (w > avant) diffuserPartout(Object.assign(etatTournoi(), { tete: TOURNOI.best[moi.compte.nom].n })); else envoyer(moi.ws, etatTournoi(moi));
+}
+setInterval(tournoiCloture, 60000).unref();
+
 function utiliserCle(moi, salle) {
   if (!moi.compte) return;
   const rep = (ok, msg, id) => envoyer(moi.ws, { t: 'cle', ok, msg, id });
@@ -754,5 +964,5 @@ function reclamerKill(moi, m, nom, salle, essai) {
   const sc = String(m.s || ''), d = donjonsGardes.get(nom + '|' + sc);
   const G = gardienDe(salle, sc || 'r');
   if (!G && d && Date.now() - d.t < 8000 && essai < 25) { setTimeout(() => { if (moi.ws.readyState === 1) reclamerKill(moi, m, nom, salle, essai + 1); }, 400); return; }
-  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc) && !moi.compte.admin, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, onTue: (key, s) => concoursTue(moi, key, s), signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
+  butin.reclamer(moi, m, { salle: nom, membres: salle, gardien: G, sansClef: sc[0] === 'd' && !ticketOk(nom, sc) && !moi.compte.admin, boost: moi.cpt.boost || 0, onRefus: r => noterSuspect(moi, 'kill', 1, 'Monstre refusé : ' + r), dons: moi.dons, rythme: moi.cpt.rythme, envoyer, boostServeur: bonusObjectif(), onTue: (key, s) => { concoursTue(moi, key, s); objectifTue(); }, signaler: r => { try { sql.anoIns.run(moi.compte.id, moi.compte.nom, Date.now(), JSON.stringify(r)); } catch {} } });
 }

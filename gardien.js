@@ -165,7 +165,19 @@ function initBot(bot) {
       if(time>B.bloque){B.bloque=time+0.8;if(Math.hypot(P.x-B.lx,P.y-B.ly)<0.5&&keys.size){B.evite=time+rnd(0.8,1.6);B.ea=(Math.random()<0.5?-1:1)*rnd(1.2,1.9);}B.lx=P.x;B.ly=P.y;}}
     function botSalue(){if(time<B.parle)return;const k=sceneKey();for(const r of remotes.values()){if(!r.p||r.p.gd||r.p.s!==k||!r.p.n||BN.includes(r.p.n))continue;if(Math.hypot(r.x-P.x,r.y-P.y)>5)continue;if((B.salue.get(r.p.n)||0)>Date.now())continue;
         B.salue.set(r.p.n,Date.now()+15*60000);B.parle=time+25;setTimeout(()=>{try{sendChat(pick(['salut','coucou','bonjour','salut !','coucou !','bonjour !','yo','cc','hello','salut '+String(r.p.n).slice(0,16)]));}catch(e){}},700+Math.random()*2200);return;}}
-    setInterval(()=>{try{paused=false;if(!deathEl.hidden)deathEl.hidden=true;mouse.down=false;if(B.mode==='village')botVillage();else botPlaines();botSalue();}catch(e){console.error('bot',e);}},120);
+    // de temps en temps, quand un vrai joueur est dans le coin, le bot parle des évènements en cours
+    function botSujets(){const l=[],now=Date.now(),j=ms=>Math.max(0,Math.ceil(ms/86400000)),h=ms=>Math.max(1,Math.round(ms/3600000));
+      if(typeof CONC!=='undefined'&&CONC&&!CONC.g){const d=CONC.debut-now;
+        if(d>0)l.push(d<3600000?'le concours commence dans moins d une heure !':d<86400000?'concours dans '+h(d)+' h, vous y serez ?':'vous faites le concours du premier donjon ?','500 cursite pour le premier qui finit le donjon du concours, ça motive','on sait toujours pas quel donjon ce sera pour le concours','je m entraine pour le concours, faut être rapide');
+        else l.push('le concours est lancé ! '+(CONC.dn?'c est '+CONC.dn:'foncez'),'quelqu un a déjà fini le donjon du concours ?','le portail du concours est au village, près de la fontaine');}
+      else if(typeof CONC!=='undefined'&&CONC&&CONC.g)l.push('gg à '+String(CONC.g.n||'').slice(0,16)+' pour le concours','500 cursite le concours, bien joué au gagnant');
+      if(typeof RAIDEV!=='undefined'&&RAIDEV){if(RAIDEV.fin&&now<RAIDEV.fin)l.push('le raid du dragon est ouvert !','qui a une guilde pour le dragon ?');else if(RAIDEV.spawn&&RAIDEV.spawn>now)l.push('raid du dragon dans '+(RAIDEV.spawn-now<86400000?h(RAIDEV.spawn-now)+' h':j(RAIDEV.spawn-now)+' jours')+', faut une guilde','quelqu un recrute pour le raid du dragon ?','3 par guilde pour le raid, qui est chaud ?');}
+      l.push('quelqu un a déjà eu une clef du temps ?','chronos est vraiment dur','vous avez vu la table à dessin au village ?','le pêcheur donne un titre si on attrape tout','pensez au cadeau de connexion du jour','j ai enfin fait évoluer mon familier','le wiki est pratique pour les taux de drop (touche B)','qui vient dans les plaines ?','un boss au centre tous les 20 monstres, à plusieurs ça passe mieux','le tier 7 tombe que dans les deux derniers donjons','faut le niveau 15 pour débloquer le héros suivant');
+      return l;}
+    function botParle(){if(time<B.sujetT||time<B.parle)return;const k=sceneKey();let vu=false;for(const r of remotes.values()){if(r.p&&!r.p.gd&&r.p.s===k&&r.p.n&&!BN.includes(r.p.n)&&Math.hypot(r.x-P.x,r.y-P.y)<12){vu=true;break;}}
+      if(!vu){B.sujetT=time+15;return;}B.sujetT=time+rnd(150,420);B.parle=time+25;const l=botSujets().filter(t=>t!==B.dernier);const t=pick(l);B.dernier=t;try{sendChat(t);}catch(e){}}
+    B.sujetT=time+rnd(40,160);
+    setInterval(()=>{try{paused=false;if(!deathEl.hidden)deathEl.hidden=true;mouse.down=false;if(B.mode==='village')botVillage();else botPlaines();botSalue();botParle();}catch(e){console.error('bot',e);}},120);
     B.until=time+rnd(30,240);
     window.__bot={etat:()=>({nom:pseudo,cls:save.current,lvl:C().lvl,mode:B.mode,scene,x:Math.round(P.x),y:Math.round(P.y),hp:Math.round(P.hp)})};
   `;

@@ -24,7 +24,7 @@ const racine = path.join(__dirname, '..');
       objets.push({k,type:K.type||'Consommable',slot:K.slot,fam:K.alt?'alt':K.t7?'t7':K.slot==='conso'?'conso':'base',base:K.base||k.replace(/7$/,''),cls:K.cls&&K.slot!=='anneau'?K.cls.map(c=>CLASSES[c].nom):[],l});}
     const ou=k=>{const o=[];ZONES.forEach((z,i)=>{if(z.pool.includes(k))o.push(z.nom);});for(const t in DTYPES){const T=DTYPES[t];if((T.pool||[]).includes(k)||T.bk===k||T.bk2===k)o.push(T.nom);}
       if(CENTRAL.includes(k))o.push('Centre des Plaines (boss)');if(DUNGEON_POOL.includes(k))o.push('Donjons (renforts)');if(typeof ASTRAL_POOL!=='undefined'&&(ASTRAL_POOL.includes(k)||GARDIENS.includes(k)))o.push(DTYPES.a.nom);if(MON[k].tuto)o.push('Tutoriel');if(k==='dragon')o.push('Raid de guilde');return o;};
-    const monstres=Object.keys(MON).map(k=>{const d=MON[k];return{k,nom:d.nom,hp:d.hp,xp:d.xp,dmg:d.dmg,arm:d.arm||0,boss:!!d.boss,loot:d.loot||null,drop:d.drop||0,n:d.n||1,rel:d.rel||0,or:d.or||null,ou:ou(k),ic:url(MSPR[k]),dun2:d.dun2||0,mid:!!d.midBoss,z:ZONES.findIndex(z=>z.pool.includes(k))};});
+    const monstres=Object.keys(MON).map(k=>{const d=MON[k];return{k,nom:d.nom,hp:d.hp,xp:d.xp,dmg:d.dmg,arm:d.arm||0,boss:!!d.boss,loot:d.loot||null,drop:d.drop||0,n:d.n||1,rel:d.rel||0,or:d.or||null,ou:ou(k),ic:url(MSPR[k]),fr:(typeof MFR!=='undefined'&&MFR[k])?[url(MFR[k][1]),url(MFR[k][2])]:null,tir:(()=>{const b=MON[k].bspr,l=Array.isArray(b)?b:b?[b]:[];return l.filter(n=>BULLET_ART[n]).map(n=>url(BULLET_ART[n].c));})(),dun2:d.dun2||0,mid:!!d.midBoss,star:d.star!=null,tuto:!!d.tuto,z:ZONES.findIndex(z=>z.pool.includes(k))};});
     const zones=ZONES.map((z,i)=>({nom:z.nom,niv:z.niv,pool:z.pool,col:z.col[0],dun:i>=5?DUN_RATE[i]:0}));
     const donjons=Object.keys(DTYPES).map(t=>{const T=DTYPES[t];return{t,nom:T.nom,boss:T.boss,niv:T.niv,mech:T.mech||'',pool:T.pool||[],bk:T.bk,bk2:T.bk2||null,col:T.col[1]};});
     const poissons=FISHES.map(f=>({nom:f.nom,site:f.site,r:FISH_RAR[f.r].nom,col:FISH_RAR[f.r].col,min:f.min,max:f.max,ic:fishURL(f.id)}));
@@ -35,6 +35,11 @@ const racine = path.join(__dirname, '..');
   const butin = fs.readFileSync(path.join(racine, 'butin.js'), 'utf8');
   const num = (re, d) => { const m = butin.match(re); return m ? +m[1] : d; };
   data.taux = { oeuf: num(/Math\.random\(\) < ([\d.]+)\) \{ out\.oeuf/, 0.005), t7: num(/TAUX_T7 = ([\d.]+)/, 0.05), potion: 0.12, plus1: 0.08 };
+  // constantes de butin (potions de caractéristique par donjon, boss à potion garantie, donjons à clef, Tier 7)
+  const cst = n => { const m = butin.match(new RegExp('const ' + n + ' = ([^;]+);')); return m ? Function('return (' + m[1] + ')')() : null; };
+  data.butin = { DUN_POT: cst('DUN_POT'), GARANTIS: cst('GARANTIS'), CLEF: cst('DONJONS_A_CLEF'), T7: (butin.match(/DONJONS_T7 = '([^']+)'/) || [0, 'ah'])[1] };
+  // captures du guide « Bien débuter » (outils/guide/*.jpg), intégrées à la page
+  data.guide = {}; try { for (const f of fs.readdirSync(path.join(__dirname, 'guide'))) if (/\.jpg$/.test(f)) data.guide[f.replace(/^\d+-|\.jpg$/g, '')] = 'data:image/jpeg;base64,' + fs.readFileSync(path.join(__dirname, 'guide', f)).toString('base64'); } catch {}
   data.date = new Date().toISOString().slice(0, 10);
   const page = fs.readFileSync(path.join(__dirname, 'wiki-modele.html'), 'utf8').replace('/*POLICE*/', police).replace('"__DONNEES__"', JSON.stringify(data).replace(/</g, '\\u003c'));
   fs.writeFileSync(path.join(racine, 'public', 'wiki.html'), page);

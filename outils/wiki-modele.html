@@ -18,6 +18,7 @@ header p{margin:6px 0 0;color:var(--muted)}
 nav{position:sticky;top:0;z-index:5;background:rgba(11,10,18,.95);border-block:2px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 12px}
 nav button,.chip{font:inherit;color:var(--txt);background:var(--panel2);border:2px solid var(--line);padding:6px 12px;cursor:pointer}
 nav button.on{border-color:var(--gold);color:var(--gold)}
+.chip.on{border-color:var(--gold);color:var(--gold)}
 nav input{font:inherit;color:var(--txt);background:#0b0a12;border:2px solid var(--line);padding:6px 10px;min-width:180px}
 nav input:focus,nav button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
@@ -32,6 +33,12 @@ p.intro{color:var(--muted);margin:0 0 12px;max-width:75ch}
 .mon{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start}
 .mon img{width:64px;height:64px;object-fit:contain}
 .mon.boss{border-color:var(--gold)}
+img.tir{width:24px;height:24px;vertical-align:middle}
+.etape{display:grid;grid-template-columns:minmax(240px,1fr) minmax(280px,1.25fr);gap:16px;align-items:center;margin-bottom:12px}.etape h3{margin:0 0 6px;border:0;padding:0;color:var(--gold)}.etape p{margin:0;max-width:60ch}.etape p b{color:#fff}.etape figure{margin:0}.etape figure img{width:100%;height:auto;display:block;border:2px solid var(--line);image-rendering:auto}
+@media (max-width:760px){.etape{grid-template-columns:1fr}}
+.barre{display:grid;grid-template-columns:40px 130px 1fr 64px;gap:4px 10px;align-items:center;padding:8px 0;border-bottom:1px dotted var(--line)}.barre:last-child{border-bottom:0}.barre img{width:36px;height:36px;grid-row:1/3}.barre b{color:var(--gold)}.barre span{text-align:right;color:var(--green)}.barre small{grid-column:2/5;color:var(--muted);font-size:12px}
+.jauge{height:16px;background:#0b0a12;border:2px solid var(--line)}.jauge i{display:block;height:100%;background:linear-gradient(90deg,#6a3ad0,#a45be8)}
+@media (max-width:560px){.barre{grid-template-columns:40px 1fr 60px}.barre .jauge{grid-column:2/4}.barre small{grid-column:2/4}}
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;border-top:1px dotted var(--line);padding-top:2px;margin-top:2px}
 .kv span:last-child{color:var(--green);text-align:right}
 .rowi{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:10px;align-items:center;background:var(--panel);border:2px solid var(--line);padding:6px 10px;margin-bottom:6px}
@@ -66,16 +73,36 @@ const pct=v=>(v*100>=10?Math.round(v*100):Math.round(v*1000)/10).toString().repl
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const nomMon=k=>(D.monstres.find(m=>m.k===k)||{nom:k}).nom;
 $('#sous').textContent='Tout sur les objets, les monstres, les zones et les donjons · '+D.ver+' · mis à jour le '+D.date.split('-').reverse().join('/');
-const RUB=[['objets','Objets'],['monstres','Monstres'],['zones','Zones'],['donjons','Donjons'],['butin','Butin et taux'],['classes','Héros'],['poissons','Pêche']];
+const RUB=[['debuter','Bien débuter'],['objets','Objets'],['monstres','Monstres'],['zones','Zones'],['donjons','Donjons'],['butin','Butin et taux'],['classes','Héros'],['joues','Héros joués'],['poissons','Pêche'],['classement','Classement']];
 const main=$('#main'),nav=$('#nav'),S={};
 for(const [id,nom] of RUB){const b=el('button',null,nom);b.type='button';b.dataset.r=id;nav.insertBefore(b,$('#q'));S[id]=el('section');S[id].id=id;S[id].hidden=true;main.append(S[id]);}
-function montrer(id){if(!S[id])id='objets';for(const k in S)S[k].hidden=k!==id;nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.r===id));$('#q').value='';filtrer('');history.replaceState(null,'','#'+id);}
+function montrer(id){if(!S[id])id='debuter';for(const k in S)S[k].hidden=k!==id;nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.r===id));$('#q').value='';filtrer('');history.replaceState(null,'','#'+id);}
 nav.addEventListener('click',e=>{const b=e.target.closest('button');if(b)montrer(b.dataset.r);});
 // recherche : cache les éléments [data-f] de la rubrique affichée qui ne contiennent pas le texte
 function filtrer(t){t=t.trim().toLowerCase();const s=Object.values(S).find(x=>!x.hidden);if(!s)return;s.querySelectorAll('[data-f]').forEach(e=>{e.hidden=!!t&&!e.dataset.f.includes(t);});}
 $('#q').addEventListener('input',e=>filtrer(e.target.value));
 const tip=$('#tip');
 function bulle(e,h){tip.innerHTML=h;tip.hidden=false;const r=e.currentTarget.getBoundingClientRect(),w=tip.offsetWidth,ht=tip.offsetHeight;let x=r.left+r.width/2-w/2,y=r.bottom+8;x=Math.max(6,Math.min(innerWidth-w-6,x));if(y+ht>innerHeight-6)y=r.top-ht-8;tip.style.left=x+'px';tip.style.top=Math.max(6,y)+'px';}
+
+// ---------- bien débuter ----------
+{const s=S.debuter;s.append(el('h2',null,'Bien débuter'),el('p','intro','Le chemin d’un nouveau joueur, pas à pas, du premier héros jusqu’au contenu de fin de jeu. Les captures viennent du jeu.'));
+  const E=[
+   ['titre','1 · Lance le jeu','Sur l’écran titre, clique sur <b>Jouer</b> (ou appuie sur Entrée), crée ton compte, puis accepte les conditions. Ta progression est gardée sur le serveur : tu la retrouves depuis n’importe quel ordinateur.'],
+   ['heros','2 · Choisis ton premier héros','Quatre héros sont disponibles au départ : <b>Guerrier</b> (résistant, au corps à corps), <b>Mage</b> (dégâts de zone), <b>Archer</b> (longue portée) et <b>Prêtre</b> (soins). Tu pourras tous les jouer sur le même compte. Pour hésiter moins longtemps, regarde la rubrique <a href="#joues" onclick="montrer(\'joues\');return false">Héros joués</a>.'],
+   ['village','3 · Découvre le Village','Le Village est une zone sûre. La <b>fontaine</b> te soigne (et sert à changer de serveur avec E). À droite l’<b>échoppe</b> du marchand, à gauche la <b>forge</b>, en bas le portail de ta <b>Maison</b> (tes coffres et ton parc de familiers), au sud les prés, l’étang et le pêcheur. Le <b>guide</b> te fait refaire le tutoriel quand tu veux.'],
+   ['portail','4 · Passe le portail des Plaines Sauvages','Le grand portail violet, en haut du Village, mène aux Plaines : c’est là que tout se passe. Touche <b>E</b> pour entrer, touche <b>R</b> pour revenir au Village à tout moment (pense-y quand ta vie est basse).'],
+   ['combat','5 · Apprends à te battre','Déplace-toi avec ZQSD, <b>maintiens le clic</b> pour tirer vers la souris, <b>Espace</b> lance la capacité de ton héros (elle coûte du mana) et <b>Maj</b> fait une esquive. Chaque monstre a sa propre attaque : apprends à les esquiver plutôt qu’à les encaisser. F et V boivent une potion de vie ou de mana.'],
+   ['carte','6 · Avance zone par zone','L’île est faite d’anneaux : la plage sur le bord (niveaux 1 à 3), puis des zones de plus en plus dures jusqu’au centre (niveaux 18 à 20). Les <b>chemins de briques</b> te font courir plus vite. La touche <b>M</b> affiche la grande carte. Ne fonce pas vers le centre : monte de niveau et change d’équipement d’abord (tiers T0 à T6, la couleur de l’icône indique le tier).'],
+   ['donjon','7 · Entre dans les donjons','En tuant des monstres, un <b>portail de donjon</b> s’ouvre parfois pendant 60 secondes : tout le monde peut y entrer. Au bout, un boss qui donne plus d’équipement, une potion de caractéristique (un bonus définitif pour ton héros) et, une fois sur cinq, sa <b>ressource de talisman</b>. Commence par le Terrier des Gobelins, sur la plage et dans les Plaines d’Émeraude.'],
+   ['forge','8 · Améliore ton équipement à la forge','Le <b>forgeron</b> fond deux objets identiques en un objet +1 (jusqu’à +2) : +10 % de puissance par niveau. Au fond de la forge, la <b>table enchantée</b> transforme 10 ressources d’un même boss en talisman, un bonus qui profite à tous tes héros. Vends ce qui ne te sert pas au marchand.'],
+   ['enclos','9 · Adopte un familier','Les monstres lâchent parfois un <b>œuf</b>. Porte-le à l’<b>éleveur</b>, près des enclos au sud du Village : il en sort un familier qui te suit et te donne un bonus. Trois familiers identiques et une croquette donnent un familier du rang au-dessus ; trois familiers dont tu ne veux plus se relancent en un nouveau.'],
+   ['quetes','10 · Fais tes quêtes et ouvre ton cadeau du jour','Touche <b>J</b> : trois quêtes par jour et des quêtes de la semaine rapportent des pièces et de la Cursite. Le <b>bonus de connexion</b> donne un cadeau chaque jour pendant sept jours (anneau T6, Cursite, une Relique, un titre). Les <b>succès</b> (touche N) débloquent des titres.'],
+   ['debloquer','11 · Débloque les autres héros','Un héros au <b>niveau 15</b> débloque le suivant : Guerrier → Porte-bouclier, Mage → Mystificateur, Archer → Assassin, Prêtre → Démoniste. On change de héros à l’autel du Village. À la mort, ton héros perd une partie de ses niveaux mais garde son équipement.'],
+   ['boss','12 · Fin de jeu : les boss du centre','Tous les 20 monstres tués dans les Plaines, un boss apparaît au centre : le <b>Roi Bouffon</b> ou le <b>Béhémoth d’Obsidienne</b>. Vas-y à plusieurs. Les vaincre ouvre souvent le portail doré de l’<b>Observatoire Céleste</b>, où tombent les objets <b>Tier 7</b> et où le Dévoreur d’Étoiles donne une Relique à coup sûr.'],
+   ['chronos','13 · Le sommet : l’Horloge Brisée','Les grands boss lâchent rarement une <b>Clef du Temps</b>. Elle ouvre l’Horloge Brisée, le donjon le plus dur, où attend <b>Chronos</b> : chaque victoire donne une Relique de Chronos, les meilleurs objets du jeu. Rejoins aussi une <b>guilde</b> pour le Raid du Dragon, et vise le <b>classement</b> (touche L).'],
+   ['maison','14 · La vie du serveur : maison, ventes, amis','Ta <b>Maison</b> se meuble : au pupitre « Décoration », achète des meubles avec tes pièces, pose-les où tu veux, puis invite les autres à la visiter (clic sur un joueur → « Visiter sa maison ») et à y laisser un cœur. À l’échoppe, l’<b>hôtel des ventes</b> permet de vendre ton équipement aux autres joueurs au prix que tu fixes (5 % de taxe), et d’acheter le leur. Le bouton <b>Parrainage</b> récompense en Cursite le parrain et son filleul quand ce dernier atteint les niveaux 10 et 20. Chaque semaine, tout le serveur partage un <b>objectif commun</b> de monstres à tuer (+25 % d’expérience pour tous une fois atteint), et chaque dimanche le <b>tournoi de pêche</b> couronne la plus grosse prise.']];
+  for(const [img,titre,txt] of E){const c=el('article','card etape');c.dataset.f=(titre+' '+txt.replace(/<[^>]+>/g,'')).toLowerCase();c.innerHTML='<div><h3>'+titre+'</h3><p>'+txt+'</p></div>';if(D.guide&&D.guide[img]){const f=el('figure'),im=el('img');im.src=D.guide[img];im.alt='Capture du jeu : '+titre.replace(/^\d+ · /,'');im.loading='lazy';f.append(im);c.append(f);}s.append(c);}
+  s.append(el('p','intro','Tout le détail est dans les autres rubriques : <b>Monstres</b> pour savoir ce que chaque créature donne, <b>Donjons</b> pour savoir où trouver les portails, <b>Butin et taux</b> pour les pourcentages.'));}
 
 // ---------- objets ----------
 {const s=S.objets;s.append(el('h2',null,'Objets'),el('p','intro','Passe la souris (ou le doigt) sur une icône pour voir ses caractéristiques. Les objets vont du Tier 0 au Tier 6, puis viennent le Tier 7 d’obsidienne, les Reliques (turquoise) et les Reliques de Chronos (or).'));
@@ -88,14 +115,35 @@ function bulle(e,h){tip.innerHTML=h;tip.hidden=false;const r=e.currentTarget.get
   s.append(el('h3',null,'Consommables'));const c=D.objets.filter(o=>o.fam==='conso');if(c.length)s.append(ligne({type:'Potions, œufs, clefs',cls:[],slot:'conso'},c.flatMap(o=>o.l)));}
 
 // ---------- monstres ----------
-function carteMon(m){const c=el('div','card mon'+(m.boss?' boss':''));c.dataset.f=(m.nom+' '+m.ou.join(' ')).toLowerCase();const im=el('img');im.src=m.ic;im.alt='';const b=el('div');
+// butin possible d'un monstre, avec la chance de chaque ligne (mêmes règles que le serveur)
+function butinDe(m){const L=[],B=D.butin,p=v=>pct(v),don=D.donjons.find(d=>d.bk===m.k||d.bk2===m.k),dans=D.donjons.filter(d=>d.pool.includes(m.k)||d.bk===m.k||d.bk2===m.k||m.ou.includes(d.nom));
+  if(m.tuto)return [['Expérience doublée, pas de butin','—']];
+  if(m.loot&&m.drop){const n=m.boss?m.n:1,ti='T'+m.loot[0]+(m.loot[1]>m.loot[0]?' à T'+m.loot[1]:'');L.push(['Équipement '+ti+(n>1?' ('+n+' objets)':''),p(m.drop)]);
+    for(const [nom,k] of [['Arme',0.4],['Spécial',0.2],['Armure',0.25],['Anneau',0.15]])L.push(['· '+nom+' '+ti,p(m.drop*k)]);L.push(['· chance de gagner un tier (max T6)',p(D.taux.plus1)]);}
+  if(m.rel)L.push(['Relique (turquoise)',m.k==='devoreur'?'100 %':p(m.rel)]);
+  if(m.k==='chronos')L.push(['Relique de Chronos (or)','100 %']);
+  if(dans.some(d=>B.T7.includes(d.t)))L.push(['Objet Tier 7 d’obsidienne',p(D.taux.t7)]);
+  L.push(['Potion de vie',p((m.boss?1:D.taux.potion)*0.6)],['Potion de mana',p((m.boss?1:D.taux.potion)*0.4)]);
+  if(m.mid||B.GARANTIS.includes(m.k))L.push(['Potion de caractéristique (garantie)','100 %']);
+  if(don&&B.DUN_POT[don.t]){const [st,ch]=B.DUN_POT[don.t];L.push(['Potion de '+(st==='*'?'caractéristique au hasard':(D.stats[st]||st).toLowerCase())+' en plus',p(ch)]);}
+  if(m.k==='chronos')L.push(['2 à 3 potions de caractéristique','100 %']);else if(m.star||m.k==='devoreur')L.push(['1 à 2 potions de caractéristique','100 %']);
+  if(m.ou.includes('Centre des Plaines (boss)'))L.push(['Potion de caractéristique','20 %']);
+  if(m.z===5&&!m.boss)L.push(['Potion de caractéristique','0,8 %']);if(m.z===6&&!m.boss)L.push(['Potion de caractéristique','1,1 %']);
+  if(don&&B.CLEF.includes(don.t))L.push(['Clef du Temps','1 %']);if(m.star)L.push(['Clef du Temps','10 %']);
+  L.push(['Œuf de familier',p(D.taux.oeuf)]);
+  if(m.or)L.push(['Pièces ('+Math.round(m.or[1]*1.3)+(m.or[2]>m.or[1]?' à '+Math.round(m.or[2]*1.3):'')+')',p(m.or[0])]);
+  if(m.dun2)L.push(['Portail doré (Observatoire Céleste)',p(m.dun2)]);
+  if(!m.boss&&m.z>=0){if(m.z<=1)L.push(['Portail : Terrier des Gobelins','3,6 %']);if(m.z===3||m.z===4)L.push(['Portail : donjon intermédiaire','1,5 %']);if(D.zones[m.z].dun)L.push(['Portail : grand donjon',p(D.zones[m.z].dun)]);}
+  return L;}
+function bulleButin(m){return '<b style="color:var(--gold)">'+esc(m.nom)+' · butin</b><span class="d">chance par monstre tué</span>'+butinDe(m).map(([a,b])=>'<div><span>'+esc(a)+'</span><span>'+b+'</span></div>').join('');}
+function carteMon(m){const c=el('div','card mon'+(m.boss?' boss':''));c.tabIndex=0;c.style.cursor='help';c.addEventListener('mouseenter',e=>bulle(e,bulleButin(m)));c.addEventListener('focus',e=>bulle(e,bulleButin(m)));c.addEventListener('mouseleave',()=>tip.hidden=true);c.addEventListener('blur',()=>tip.hidden=true);c.dataset.f=(m.nom+' '+m.ou.join(' ')).toLowerCase();const im=el('img');im.src=m.ic;im.alt='';if(m.fr){im.dataset.a=m.ic;im.dataset.b=m.fr[0];im.dataset.c=m.fr[1];im.className='anim';}const b=el('div');
   let h='<h4>'+esc(m.nom)+(m.boss?' · boss':'')+'</h4><div class="sub">'+esc(m.ou.join(' · ')||'—')+'</div>';const kv=(a,v)=>{h+='<div class="kv"><span>'+a+'</span><span>'+v+'</span></div>';};
   kv('Points de vie',m.hp.toLocaleString('fr-FR'));kv('Dégâts par tir',m.dmg);if(m.arm)kv('Armure',pct(m.arm)+' de dégâts en moins');kv('Expérience',m.xp.toLocaleString('fr-FR'));
   if(m.loot&&m.drop)kv('Équipement',pct(m.drop)+' · T'+m.loot[0]+(m.loot[1]>m.loot[0]?' à T'+m.loot[1]:'')+(m.boss&&m.n>1?' · '+m.n+' objets':''));
   if(m.rel)kv('Relique',m.k==='devoreur'?'100 %':pct(m.rel)+' ('+sur(m.rel)+')');if(m.or)kv('Pièces',pct(m.or[0])+' · '+Math.round(m.or[1]*1.3)+(m.or[2]>m.or[1]?' à '+Math.round(m.or[2]*1.3):''));
-  if(m.dun2)kv('Portail doré',pct(m.dun2));b.innerHTML=h;c.append(im,b);return c;}
-{const s=S.monstres;s.append(el('h2',null,'Monstres'),el('p','intro',D.monstres.length+' monstres et boss. Les boss ont un cadre doré.'));const vus=new Set();
-  const bloc=(titre,l)=>{l=l.filter(m=>m&&!vus.has(m.k));if(!l.length)return;l.forEach(m=>vus.add(m.k));s.append(el('h3',null,esc(titre)));const g=el('div','grid');l.forEach(m=>g.append(carteMon(m)));s.append(g);};
+  if(m.dun2)kv('Portail doré',pct(m.dun2));if(m.tir&&m.tir.length)kv('Attaque',m.tir.map(u=>'<img class="tir" src="'+u+'" alt="">').join(' '));b.innerHTML=h;c.append(im,b);return c;}
+{const s=S.monstres;s.append(el('h2',null,'Monstres'),el('p','intro',D.monstres.length+' monstres et boss, animés comme en jeu (repos, puis attaque). Les boss ont un cadre doré. La ligne « Attaque » montre leurs projectiles. <b>Passe la souris sur un monstre pour voir tout ce qu’il peut donner, avec les pourcentages.</b>'));const vus=new Set();
+  const bloc=(titre,l)=>{l=[...new Set(l)].filter(m=>m&&!vus.has(m.k));if(!l.length)return;l.forEach(m=>vus.add(m.k));s.append(el('h3',null,esc(titre)));const g=el('div','grid');l.forEach(m=>g.append(carteMon(m)));s.append(g);};
   const par=k=>D.monstres.find(m=>m.k===k);
   D.zones.forEach(z=>bloc(z.nom+' · '+z.niv,z.pool.map(par)));bloc('Boss du centre des Plaines',D.monstres.filter(m=>m.ou.includes('Centre des Plaines (boss)')));
   D.donjons.forEach(d=>bloc(d.nom,[...d.pool,d.bk,d.bk2].filter(Boolean).map(par).concat(D.monstres.filter(m=>m.ou.includes(d.nom)))));
@@ -139,7 +187,28 @@ function carteMon(m){const c=el('div','card mon'+(m.boss?' boss':''));c.dataset.
   for(const [site,titre] of [['lac','Lac et étang'],['mer','Mer des Plaines Sauvages']]){s.append(el('h3',null,titre));const g=el('div','grid');
     for(const f of D.poissons.filter(x=>x.site===site)){const d=el('div','card mon');d.dataset.f=(f.nom+' '+f.r).toLowerCase();const im=el('img');im.src=f.ic;im.alt='';const b=el('div');const kg=v=>v<1?Math.round(v*1000)+' g':v.toLocaleString('fr-FR')+' kg';
       b.innerHTML='<h4>'+esc(f.nom)+'</h4><div class="sub" style="color:'+f.col+'">'+esc(f.r)+'</div><div class="kv"><span>Poids</span><span>'+kg(f.min)+' à '+kg(f.max)+'</span></div>';d.append(im,b);g.append(d);}s.append(g);}}
-montrer((location.hash||'#objets').slice(1));
+// ---------- classement (lu en direct sur le serveur du jeu) ----------
+{const s=S.classement;s.append(el('h2',null,'Classement'),el('p','intro','Le même classement qu’en jeu (touche L), mis à jour en direct : les 20 premiers de chaque catégorie.'));
+  const CAT=[['or','Top Or','Pièces','Pièces actuellement possédées.'],['prestige','Top Prestige gagné','Prestige gagné','Tout le prestige gagné depuis le début par les morts définitives, tous héros confondus.'],['kills','Top Monstres tués','Monstres tués','Monstres tués depuis le début, tous héros confondus.'],['precision','Top Précision','Précision','Tirs qui touchent un monstre, depuis la création du héros actuel. 300 tirs minimum pour être classé.']];
+  const tabs=el('div');tabs.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px';const note=el('p','intro'),w=el('div','tablewrap'),t=el('table');w.append(t);s.append(tabs,note,w);let data=null,cur='or';
+  const nomC=k=>(D.classes.find(c=>c.k===k)||{nom:'?'}).nom,icC=k=>(D.classes.find(c=>c.k===k)||{ic:''}).ic;
+  const rendre=()=>{tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===cur));const c=CAT.find(x=>x[0]===cur);note.textContent=c[3];t.innerHTML='<tr><th class="r">#</th><th>Joueur</th><th>Héros</th><th class="r">'+c[2]+'</th></tr>';
+    const rows=data&&data[cur]||[];if(!rows.length){const tr=el('tr');tr.innerHTML='<td colspan="4" class="vide">'+(data?'Personne pour l’instant.':'Chargement…')+'</td>';t.append(tr);return;}
+    rows.forEach((r,i)=>{const tr=el('tr');tr.dataset.f=String(r.n).toLowerCase();const v=Number(r.v)||0;tr.innerHTML='<td class="r" style="color:'+(i===0?'#ffd23f':i===1?'#dcd8e4':i===2?'#c88a52':'')+'">'+(i+1)+'</td><td>'+esc(r.n)+'</td><td><img src="'+icC(r.c)+'" alt="" style="width:22px;height:22px;vertical-align:middle;margin-right:6px">'+esc(nomC(r.c))+' '+(r.l|0)+'</td><td class="r">'+(cur==='precision'?v.toFixed(1).replace('.',',')+' %':v.toLocaleString('fr-FR'))+'</td>';t.append(tr);});};
+  for(const c of CAT){const b=el('button','chip',c[1]);b.type='button';b.dataset.c=c[0];b.addEventListener('click',()=>{cur=c[0];rendre();});tabs.append(b);}
+  const charger=()=>fetch('/top').then(r=>r.json()).then(j=>{data=j;rendre();}).catch(()=>{data={};note.textContent='Classement indisponible pour le moment.';});
+  rendre();charger();setInterval(()=>{if(!s.hidden)charger();},30000);}
+// ---------- héros les plus joués (lu en direct sur le serveur) ----------
+{const s=S.joues;s.append(el('h2',null,'Héros les plus joués'),el('p','intro','Chaque compte possède tous les héros : on additionne donc les niveaux de chaque héros sur tous les comptes. Plus la barre est longue, plus le héros est joué et monté. Pratique pour choisir son premier héros.'));
+  const zone=el('div','card');zone.innerHTML='<div class="vide">Chargement…</div>';const note=el('p','intro');note.style.marginTop='10px';s.append(zone,note);
+  const charger=()=>fetch('/classes').then(r=>r.json()).then(j=>{const tot=Object.values(j.niv||{}).reduce((a,b)=>a+b,0);if(!tot){zone.innerHTML='<div class="vide">Pas encore de données.</div>';return;}
+    const l=D.classes.map(c=>({c,n:(j.niv||{})[c.k]||0,h:(j.heros||{})[c.k]||0})).sort((a,b)=>b.n-a.n),max=l[0].n||1;zone.innerHTML='';
+    for(const {c,n,h} of l){const r=el('div','barre');r.dataset.f=c.nom.toLowerCase();r.innerHTML='<img src="'+c.ic+'" alt=""><b>'+esc(c.nom)+'</b><div class="jauge"><i style="width:'+(n/max*100).toFixed(1)+'%"></i></div><span>'+(n/tot*100).toFixed(1).replace('.',',')+' %</span><small>'+n.toLocaleString('fr-FR')+' niveaux · '+h+' héros créés'+(h?' · niveau moyen '+(n/h).toFixed(1).replace('.',','):'')+'</small>';zone.append(r);}
+    note.textContent=j.comptes+' comptes pris en compte · mis à jour toutes les 5 minutes.';}).catch(()=>{zone.innerHTML='<div class="vide">Indisponible pour le moment.</div>';});
+  charger();setInterval(()=>{if(!s.hidden)charger();},300000);}
+// animation des monstres : repos A, repos B, et de temps en temps l'image d'attaque
+{let n=0;const reduit=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(!reduit)setInterval(()=>{n++;if(S.monstres.hidden)return;document.querySelectorAll('img.anim').forEach((im,i)=>{const k=(n+i)%14;im.src=k>=12?im.dataset.c:(n%2?im.dataset.b:im.dataset.a);});},300);}
+montrer((location.hash||'#debuter').slice(1));
 </script>
 </body>
 </html>

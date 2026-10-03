@@ -26,7 +26,7 @@ function chargerRegles(html) {
     const c = html.indexOf('const MKEYS=Object.keys(MON);'), z0 = html.indexOf('const ZONES=['), z1 = html.indexOf('const DUNGEON_POOL='), d0 = html.indexOf('const DTYPES={'), d1 = html.indexOf('const REG_DUN=');
     if (c < 0 || z0 < 0 || z1 < 0 || d0 < 0 || d1 < 0) throw new Error('monstres introuvables');
     const code2 = code + '\n' + html.slice(b, c) + '\nconst MKEYS=Object.keys(MON);\n' + html.slice(z0, z1) + '\n' + html.slice(d0, d1);
-    R = new Function('__G', 'with(__G){' + code2 + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,MON,MKEYS,ZONES,DTYPES,WB};}')(bac());
+    R = new Function('__G', 'with(__G){' + code2 + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,MON,MKEYS,ZONES,DTYPES,WB,TALIS};}')(bac());
   } catch (e) {
     console.error('[arbitre] monstres non chargés (butin serveur désactivé) :', e.message);
     R = new Function('__G', 'with(__G){' + code + '\n;return {KINDS,CLASSES,SK,SP_DEF,mkItem,WB};}')(bac());
@@ -224,7 +224,9 @@ function verifier(ancien, nouveau, ctx) {
   // valeur de revente des équipements disparus (vendus au marchand ou jetés)
   let ventes = 0;
   for (const [k, n] of c0) { const moins = n - (c1.get(k) || 0); if (moins > 0) { const t = +k.split('|')[1], K = R.KINDS[k.split('|')[0]]; if (K && K.slot !== 'conso') ventes += moins * (R.SELL_PRICE[t] || 0); } }
-  const gainBrut = d('gold') + orDepenseMin;
+  // familiers vendus : 40, 150, 600 ou 2500 pièces selon le rang
+  { const PRIX = [40, 150, 600, 2500], ids1 = new Set((nouveau.pets || []).map(p => p.id)); for (const p of (ancien.pets || [])) if (!ids1.has(p.id)) ventes += PRIX[Math.min(3, p.t | 0)] || 0; }
+  const gainBrut = d('gold') + orDepenseMin + (ctx.aPayer || 0); // aPayer : objets achetés à l'hôtel des ventes
   const orServeur = Math.min(Math.max(0, gainBrut), dons.or || 0);
   const gainOr = gainBrut - (dons.or || 0) - (etape2 ? ventes : 0);
   if (gainOr > sx.or + 0.5) pb.push('or gagné trop vite (+' + Math.round(gainOr) + ')'); else if (gainOr > 0) sx.or -= gainOr;
@@ -319,9 +321,22 @@ function verifier(ancien, nouveau, ctx) {
     const croq = Math.max(0, nbKind(o0, it => it.kind === 'croquette') - nbKind(o1, it => it.kind === 'croquette'));
     let communs = 0, evos = 0;
     for (const p of neufs) { if ((p.t | 0) === 0) communs++; else { const meme = partis.filter(q => q.k === p.k && (q.t | 0) === (p.t | 0) - 1).length; if (meme >= 3) evos++; else pb.push('familier de rang supérieur injustifié'); } }
-    if (communs > oeufs + (dons.objets || 0)) pb.push('familier sans œuf');
+    // relance : 3 familiers rendus (hors évolutions) donnent droit à 1 familier commun
+    const relances = Math.floor(Math.max(0, partis.length - 3 * evos) / 3);
+    if (communs > oeufs + relances + (dons.objets || 0)) pb.push('familier sans œuf');
     if (evos > croq + (dons.objets || 0)) pb.push('évolution sans croquette');
   }
+
+  // --- ressources de boss et talismans : chaque ressource vient du serveur, un talisman coûte 10 ressources de son donjon ---
+  const resReste = Object.assign({}, dons.res || {});
+  { const r0 = ancien.res || {}, r1 = nouveau.res || {}, t0 = ancien.talis || {}, t1 = nouveau.talis || {};
+    for (const t of new Set([...Object.keys(r1), ...Object.keys(t1)])) {
+      if (!R.TALIS || !R.TALIS[t]) { pb.push('ressource inconnue'); continue; }
+      const n1 = r1[t] | 0; if (!estEntier(r1[t] ?? 0, 0, 99999)) { pb.push('ressource impossible'); continue; }
+      const gain = (n1 - (r0[t] | 0)) + (t1[t] && !t0[t] ? 10 : 0);
+      if (gain > (resReste[t] | 0)) pb.push('ressource de boss injustifiée'); else if (gain > 0) resReste[t] = (resReste[t] | 0) - gain;
+    }
+    if (nouveau.talisEq != null && !(t1[nouveau.talisEq] && R.TALIS && R.TALIS[nouveau.talisEq])) pb.push('talisman non possédé'); }
 
   if (pb.length) return { ok: false, raisons: [...new Set(pb)].slice(0, 6), enTrop };
   // ce qui reste des dons du serveur après cette sauvegarde (butin pas encore ramassé, etc.)
@@ -335,7 +350,7 @@ function verifier(ancien, nouveau, ctx) {
     if (sol.length > 40) sol.splice(0, sol.length - 40); }
   // cadeaux pas encore dans le sac (sac plein : l'objet attend au sol) : le crédit reste valable
   const reste = { sol, cursite: 0, prestige: 0, objets: Math.min(12, donsObj + libT6 + libRel), or: Math.max(0, (dons.or || 0) - orServeur),
-    xp: Math.max(0, (dons.xp || 0) - gainXP), kills: Math.max(0, (dons.kills || 0) - gainKills), boss: Math.max(0, (dons.boss || 0) - gainBoss), liste };
+    xp: Math.max(0, (dons.xp || 0) - gainXP), kills: Math.max(0, (dons.kills || 0) - gainKills), boss: Math.max(0, (dons.boss || 0) - gainBoss), liste, res: resReste };
   return { ok: true, reste, aPerdre: [] };
 }
 
@@ -343,7 +358,7 @@ function verifier(ancien, nouveau, ctx) {
 function degatsMax(s) {
   const ch = s && s.chars && s.chars[s.current], c = ch && R.CLASSES[s.current]; if (!ch || !c) return 25000;
   const lvl = Math.max(1, ch.lvl | 0), w = (ch.equip || [])[0];
-  const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30;
+  const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30 + ((s.talisEq && s.talis && s.talis[s.talisEq] && R.TALIS && R.TALIS[s.talisEq] && R.TALIS[s.talisEq].st[k]) || 0);
   if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
   const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5 * Math.max(1, R.WB[w.kind].rk || 1) * 2 /* frénésie */;
   const tirs = (R.WB[w.kind].shots + (w.extra || 0)) * (R.WB[w.kind].dm || 1);
