@@ -19,7 +19,7 @@ const racine = path.join(__dirname, '..');
     const ver=(document.body.textContent.match(/ver\\.0\\.0\\.\\d+/)||[''])[0];
     const classes=Object.keys(CLASSES).map(k=>{const c=CLASSES[k];return{k,nom:c.nom,role:c.role,arme:KINDS[c.arme].type,capa:KINDS[c.capa].type,armure:KINDS[c.armure].type,base:c.base,gain:c.gain,req:c.req?CLASSES[c.req].nom:null,ic:url(heroSprite(k,null,c.arme,3,'idle'))};});
     const objets=[];
-    for(const k of Object.keys(KINDS)){const K=KINDS[k],tiers=K.slot==='conso'?[0]:K.alt?[7]:K.t7?[6]:[0,1,2,3,4,5,6,7];
+    for(const k of Object.keys(KINDS)){if(KINDS[k].art||KINDS[k].slot==='meuble')continue;const K=KINDS[k],tiers=K.slot==='conso'?[0]:K.alt?[7]:K.t7?[6]:[0,1,2,3,4,5,6,7];
       const l=tiers.map(t=>{const it=mkItem(k,t);return{n:it.name,ic:icon(it),tip:itemTipHTML(it),col:K.slot==='conso'?'#dcd8e4':itemCol(it),tag:K.slot==='conso'?'':K.alt?'Chronos':K.t7?'T7':t>=7?'Relique':'T'+t};});
       objets.push({k,type:K.type||'Consommable',slot:K.slot,fam:K.alt?'alt':K.t7?'t7':K.slot==='conso'?'conso':'base',base:K.base||k.replace(/7$/,''),cls:K.cls&&K.slot!=='anneau'?K.cls.map(c=>CLASSES[c].nom):[],l});}
     const ou=k=>{const o=[];ZONES.forEach((z,i)=>{if(z.pool.includes(k))o.push(z.nom);});for(const t in DTYPES){const T=DTYPES[t];if((T.pool||[]).includes(k)||T.bk===k||T.bk2===k)o.push(T.nom);}

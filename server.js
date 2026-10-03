@@ -42,7 +42,7 @@ function enregistrerScore(m) {
   };
   scoresModifies = true;
 }
-function top(demandeur) {
+function top(demandeur, demandeurCompte) {
   const liste = Object.entries(scores);
   const ligne = (id, s, v) => ({ n: s.n, c: s.c, l: s.l, v, moi: id === demandeur });
   const tri = (f, filtre) => liste.filter(([, s]) => !filtre || filtre(s)).map(([id, s]) => ligne(id, s, f(s))).sort((a, b) => b.v - a.v).slice(0, 20);
@@ -50,6 +50,7 @@ function top(demandeur) {
     t: 'top',
     or: tri(s => s.gold),
     prestige: tri(s => s.pres),
+    maisons: (() => { try { return MAISON.top20.all().map(r => ({ id: r.id, n: r.nom, v: r.n, moi: !!(demandeurCompte && r.id === demandeurCompte) })); } catch { return []; } })(),
     precision: tri(s => Math.round(s.hits / s.shots * 1000) / 10, s => s.shots >= 300),
     kills: tri(s => s.kills)
   };
@@ -117,6 +118,7 @@ const db = new DatabaseSync(path.join(DATA_DIR, 'jeu.db'));
 db.exec(`PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS comptes (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT NOT NULL UNIQUE COLLATE NOCASE, sel TEXT NOT NULL, hash TEXT NOT NULL, cree INTEGER NOT NULL, vu INTEGER, save TEXT, maj INTEGER);
 CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, compte INTEGER NOT NULL, cree INTEGER NOT NULL);`);
+const ALPHAS = new Set(String(process.env.ALPHA_COMPTES || 'Heartless,Foxy').split(',').map(x => x.trim().toLowerCase()).filter(Boolean)); // titre « Alpha testeur »
 const ADMINS = new Set(String(process.env.ADMIN_COMPTES || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
 const sql = {
   parNom: db.prepare('SELECT * FROM comptes WHERE nom = ?'),
@@ -165,7 +167,7 @@ function connecter(moi, c, ws) {
   envoyer(ws, { t: 'authres', ok: true, token, nom: c.nom, id: c.id, admin: moi.compte.admin, save, cgu });
   if (save) { envoyerCapGardien(moi, save); moi.cpt.boost = +save.boostXP || 0; }
   if (concoursVisible()) envoyer(ws, etatConcours());
-  envoyer(ws, etatObjectif()); tournoiCloture(); envoyer(ws, etatTournoi(moi));
+  envoyer(ws, etatObjectif()); tournoiCloture(); envoyer(ws, etatTournoi(moi)); if (ALPHAS.has(String(c.nom).toLowerCase())) envoyer(ws, { t: 'titres', l: ['alpha'] });
   console.log(`[compte] ${c.nom} connecté${moi.compte.admin ? ' (admin)' : ''}`);
 }
 function actionCompte(moi, ws, m) {
@@ -439,7 +441,7 @@ wss.on('connection', (ws, req) => {
     if (m && m.t === 'auth') { actionCompte(moi, ws, m); return; }
     if (m && m.t === 'save') { sauverCompte(moi, m); return; }
     if (m && m.t === 'score') { enregistrerScore(m); moi.idJoueur = String(m.id || ''); return; }
-    if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''))); return; }
+    if (m && m.t === 'top') { envoyer(ws, top(moi.idJoueur || String(m.id || ''), moi.compte && moi.compte.id)); return; }
     if (m && m.t === 'g') { actionGuilde(moi, salle, m); return; }
     if (m && m.t === 'serveurs') { envoyer(ws, { t: 'serveurs', ici: nom, l: SERVEURS.map(([id, n]) => ({ id, n, j: salles.get(id) ? [...salles.get(id).values()].filter(j => !j.gardien).length : 0 })) }); return; }
     if (m && m.t === 'cle') { utiliserCle(moi, nom); return; }
@@ -493,7 +495,7 @@ wss.on('connection', (ws, req) => {
       if (cmd === 'unban') { const id = String(m.to || ''); if (!modo.bans[id]) { res(false, 'Déjà débanni'); return; } const n = modo.bans[id].n; delete modo.bans[id]; sauverModo(); res(true, n + ' est débanni', { bans: Object.entries(modo.bans).map(([ip, b]) => ({ id: ip, ip: masquer(ip), n: b.n, t: b.t })) }); console.log(`[modo] débanni ${n}`); return; }
       if (cmd === 'raid') { lancerRaid(); res(true, 'Raid lancé : portail ouvert, le Dragon arrive dans 30 secondes (5 minutes de combat)'); console.log('[raid] lancé'); return; }
       if (cmd === 'raidstop') { if (!raidEv || !raidEv.actif) { res(false, 'Aucun raid en cours'); return; } finirRaid(); res(true, 'Raid terminé, classement envoyé'); return; }
-      if (cmd === 'infos') { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push({ peer: j.peer, muet: !!modo.mutes[j.ip] }); res(true, '', { infos: out }); return; }
+      if (cmd === 'infos') { const out = []; for (const s of salles.values()) for (const j of s.values()) out.push({ peer: j.peer, muet: !!modo.mutes[j.ip], bot: j.bot ? 1 : 0 }); res(true, '', { infos: out }); return; }
       const cible = trouverJoueur(String(m.to || ''));
       if (!cible) { res(false, 'Joueur introuvable (déconnecté ?)'); return; }
       const nom = String((cible.etat && cible.etat.n) || 'Joueur').slice(0, 16);
@@ -567,6 +569,7 @@ wss.on('connection', (ws, req) => {
       let v = m.patch[k];
       if (k === 'ti' && v === 'admin' && !(moi.compte && moi.compte.admin)) v = null; // titre ADMIN réservé aux comptes admin
       if (k === 'gd' && !moi.gardien) v = null; // seul le vrai Gardien peut s'annoncer
+      if (k === 'ti' && v === 'alpha' && !(moi.compte && ALPHAS.has(String(moi.compte.nom).toLowerCase()))) v = null; // titre réservé aux premiers testeurs
       if (k === 'ti' && v === 'roipeche' && !(moi.compte && roiPeche() && roiPeche().compte === moi.compte.nom)) v = null; // titre du vainqueur du tournoi de pêche
       if (k === 'm' && typeof v === 'string') { if (modo.mutes[moi.ip]) { if (!moi.averti) { moi.averti = true; envoyer(ws, { t: 'dev', cmd: 'mute', arg: 0 }); } continue; } v = filtrer(v).slice(0, 140); }
       if (k === 'n' && typeof v === 'string') v = filtrer(v).slice(0, 16);
@@ -798,7 +801,8 @@ function hvAPayer(cpt, ancien, nouveau) { let tot = 0; for (const a of (cpt.acha
 // ---------- parrainage : un nouveau joueur désigne son parrain, les deux sont récompensés quand le filleul progresse ----------
 db.exec(`CREATE TABLE IF NOT EXISTS parrainage (filleul INTEGER PRIMARY KEY, parrain INTEGER NOT NULL, quand INTEGER NOT NULL, palier INTEGER NOT NULL DEFAULT 0)`);
 db.exec(`CREATE TABLE IF NOT EXISTS parrainage_dus (id INTEGER PRIMARY KEY AUTOINCREMENT, compte INTEGER NOT NULL, cursite INTEGER NOT NULL, nom TEXT, niv INTEGER)`);
-const PARR = { PALIERS: [[10, 25], [20, 75]], MAX: 10, DELAI: 7 * 86400000,
+const PARR = { PALIERS: [], // récompenses de niveau retirées : le parrain gagnera de la Cursite sur les achats de ses filleuls quand la boutique sera en place
+  MAX: 10, DELAI: 7 * 86400000,
   get: db.prepare('SELECT * FROM parrainage WHERE filleul = ?'), de: db.prepare('SELECT p.filleul, p.palier, c.nom, c.save FROM parrainage p JOIN comptes c ON c.id = p.filleul WHERE p.parrain = ? ORDER BY p.quand'),
   ins: db.prepare('INSERT INTO parrainage (filleul, parrain, quand) VALUES (?, ?, ?)'), maj: db.prepare('UPDATE parrainage SET palier = ? WHERE filleul = ?'),
   duIns: db.prepare('INSERT INTO parrainage_dus (compte, cursite, nom, niv) VALUES (?, ?, ?, ?)'), duDe: db.prepare('SELECT * FROM parrainage_dus WHERE compte = ?'), duDel: db.prepare('DELETE FROM parrainage_dus WHERE id = ?') };
@@ -843,21 +847,21 @@ function parrConnexion(moi) { try { const cpt = moi.cpt || (moi.cpt = etatCompte
 // ---------- maisons : on visite la maison meublée des autres joueurs et on y laisse un cœur ----------
 db.exec(`CREATE TABLE IF NOT EXISTS maison_coeurs (maison INTEGER NOT NULL, de INTEGER NOT NULL, quand INTEGER NOT NULL, PRIMARY KEY (maison, de))`);
 const MAISON = { nb: db.prepare('SELECT COUNT(*) AS n FROM maison_coeurs WHERE maison = ?'), a: db.prepare('SELECT 1 AS x FROM maison_coeurs WHERE maison = ? AND de = ?'), ins: db.prepare('INSERT OR IGNORE INTO maison_coeurs (maison, de, quand) VALUES (?, ?, ?)'),
-  top: db.prepare('SELECT m.maison AS id, COUNT(*) AS n, c.nom AS nom FROM maison_coeurs m JOIN comptes c ON c.id = m.maison GROUP BY m.maison ORDER BY n DESC, m.maison LIMIT 10') };
+  top20: db.prepare('SELECT m.maison AS id, COUNT(*) AS n, c.nom AS nom FROM maison_coeurs m JOIN comptes c ON c.id = m.maison GROUP BY m.maison ORDER BY n DESC, m.maison LIMIT 20') };
 function planMaison(c, moi) {
   let sv = null; try { sv = c.save ? JSON.parse(c.save) : null; } catch {} sv = sv || {};
   const h = (sv.house && typeof sv.house === 'object') ? sv.house : {}, vus = new Set(), m = [];
-  for (const e of (Array.isArray(h.m) ? h.m : []).slice(0, 80)) { if (!Array.isArray(e)) continue; const id = String(e[0] || ''), x = e[1] | 0, y = e[2] | 0; if (!/^[a-zA-Z0-9]{1,12}$/.test(id) || x < 1 || x > 25 || y < 1 || y > 16 || vus.has(x + ',' + y)) continue; vus.add(x + ',' + y); m.push([id, x, y]); }
+  const salle = h.salle ? 1 : 0;
+  for (const e of (Array.isArray(h.m) ? h.m : []).slice(0, salle ? 140 : 80)) { if (!Array.isArray(e)) continue; const id = String(e[0] || ''), x = e[1] | 0, y = e[2] | 0; if (!/^[a-zA-Z0-9]{1,12}$/.test(id) || x < (salle ? -15 : 1) || x > 25 || y < 1 || y > 16 || vus.has(x + ',' + y)) continue; vus.add(x + ',' + y); m.push([id, x, y, e[3] & 3]); }
   const pets = (Array.isArray(sv.pets) ? sv.pets : []).filter(q => q && q.id !== sv.petEq).slice(0, 12).map(q => ({ k: String(q.k || '').slice(0, 16), t: Math.max(0, Math.min(3, q.t | 0)) }));
   const lig = enLigne.get(c.id);
-  return { t: 'maison', a: 'plan', ok: 1, id: c.id, n: String((lig && lig.etat && lig.etat.n) || c.nom).slice(0, 16), skin: String(h.skin || 'bois').slice(0, 12), m, coffres: Math.max(1, Math.min(10, (sv.vault && sv.vault.n) | 0 || 1)), pets,
+  return { t: 'maison', a: 'plan', ok: 1, id: c.id, n: String((lig && lig.etat && lig.etat.n) || c.nom).slice(0, 16), skin: String(h.skin || 'bois').slice(0, 12), salle, m, coffres: Math.max(1, Math.min(10, (sv.vault && sv.vault.n) | 0 || 1)), pets,
     coeurs: MAISON.nb.get(c.id).n, aime: MAISON.a.get(c.id, moi.compte.id) ? 1 : 0, moi: c.id === moi.compte.id ? 1 : 0 };
 }
 function maison(moi, m, salle) {
   if (!moi.compte) return; if (Date.now() - (moi.maisT || 0) < 500) return; moi.maisT = Date.now();
   try {
     const nomDe = j => String((j.etat && j.etat.n) || j.compte.nom).slice(0, 16);
-    if (m.a === 'top') return envoyer(moi.ws, { t: 'maison', a: 'top', l: MAISON.top.all().map(r => ({ id: r.id, n: r.nom, c: r.n })), moi: MAISON.nb.get(moi.compte.id).n });
     if (m.a === 'voir') {
       let c = null; if (m.peer) { const j = salle && salle.get(String(m.peer)); if (j && j.compte) c = sql.parId.get(j.compte.id); } else if (m.id) c = sql.parId.get(m.id | 0); else if (m.nom) c = sql.parNom.get(String(m.nom).trim().slice(0, 16));
       if (!c) return envoyer(moi.ws, { t: 'maison', a: 'plan', ok: 0, msg: m.peer ? 'Ce joueur n\'a pas de compte' : 'Aucune maison à ce nom' });

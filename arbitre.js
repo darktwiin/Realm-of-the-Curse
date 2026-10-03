@@ -212,6 +212,17 @@ function verifier(ancien, nouveau, ctx) {
     cursiteDepenseMin += R.BOOST_PRIX;
     if (!(+nouveau.boostXP <= Date.now() + 3600000 + 10 * 60000)) pb.push('boost d\'XP trafiqué');
   }
+  // --- cristaux de Cursite : un meuble acheté 1000 Cursite, qui peut passer dans le sac (pour l'hôtel des ventes) et rapporte 10 Cursite par jour une fois posé ---
+  const nbCr = sv => objets(sv).filter(it => it.kind === 'cristal').length, hCr = sv => Math.max(0, (sv.house && sv.house.inv && sv.house.inv.cristal) | 0);
+  const crI0 = nbCr(ancien), crI1 = nbCr(nouveau), crH0 = hCr(ancien), crH1 = hCr(nouveau);
+  if (crH1 > 60) pb.push('trop de cristaux');
+  let crDus = 0; for (const e of (ctx.aPerdre || [])) if (String(e.sig).split('|')[0] === 'cristal') crDus += Math.max(0, crI0 - e.max); // vendus ou échangés : ils ne peuvent pas « revenir » dans les meubles
+  const crRanges = Math.max(0, (crI0 - crI1) - crDus);                 // du sac vers les meubles
+  cursiteDepenseMin += Math.max(0, (crH1 - crH0) - crRanges) * 1000;    // le reste a été acheté
+  let libCristal = Math.max(0, crH0 - crH1);                            // des meubles vers le sac
+  { const cj0 = (ancien.house && ancien.house.cj) | 0, cj1 = (nouveau.house && nouveau.house.cj) | 0;
+    if (cj1 !== cj0) { if (cj1 < cj0 || Math.abs(cj1 - today) > 1) pb.push('production de cristal trafiquée');
+      else bonusCursite += 10 * Math.min(crH1, ((nouveau.house && Array.isArray(nouveau.house.m) && nouveau.house.m) || []).filter(e => Array.isArray(e) && e[0] === 'cristal').length); } }
   if (d('cursite') > (dons.cursite || 0) + bonusCursite - cursiteDepenseMin + 0.5) pb.push('Cursite injustifiée (+' + Math.round(d('cursite')) + ')');
   if ((nouveau.titles || []).includes('beta') && !(ancien.titles || []).includes('beta') && (L1.n | 0) < 7 && !(L1.day !== L0.day)) pb.push('titre bêta injustifié');
 
@@ -272,6 +283,7 @@ function verifier(ancien, nouveau, ctx) {
     let plus = n - (c0.get(k) || 0); if (plus <= 0) continue;
     nouveaux += plus;
     const L = liste[k]; while (plus > 0 && L && L.length) { L.shift(); plus--; } // donné par le serveur (butin, échange)
+    if (k.split('|')[0] === 'cristal') { while (plus > 0 && libCristal > 0) { libCristal--; plus--; } if (plus > 0) horsListe += plus; continue; } // un cristal ne vient que des meubles ou du serveur
     while (plus > 0 && duSol(k)) plus--; // repris au sol
     if (!plus) continue;
     { const pp = k.split('|'), upN = pp.length > 3 && pp[pp.length - 1][0] === '+' ? +pp[pp.length - 1].slice(1) : 0;
@@ -361,7 +373,7 @@ function degatsMax(s) {
   const stat = k => c.base[k] + c.gain[k] * (lvl - 1) + (((ch.sp || {})[k] | 0) * ((R.SP_DEF[k] || {}).step || 1)) + (ch.equip || []).reduce((a, it) => a + ((it && it.stats && it.stats[k]) || 0), 0) + 30 + ((s.talisEq && s.talis && s.talis[s.talisEq] && R.TALIS && R.TALIS[s.talisEq] && R.TALIS[s.talisEq].st[k]) || 0);
   if (!w || !Array.isArray(w.dmg) || !R.WB || !R.WB[w.kind]) return 25000;
   const mult = (0.5 + stat('puissance') / 50) * 1.45 * 1.3, cadence = (1.5 + 6.5 * stat('vatt') / 75) * 1.5 * Math.max(1, R.WB[w.kind].rk || 1) * 2 /* frénésie */;
-  const tirs = (R.WB[w.kind].shots + (w.extra || 0)) * (R.WB[w.kind].dm || 1);
+  const tirs = (R.WB[w.kind].shots + (w.extra || 0)) * (R.WB[w.kind].dm || 1) * (R.WB[w.kind].am || 1); // am : nombre de monstres touchés par une aura
   return Math.round(Math.max(3000, w.dmg[1] * (1 + 0.1 * Math.min(2, w.up | 0)) * mult * tirs * cadence * 3));
 }
 

@@ -1,5 +1,22 @@
 # The Curse — notes de mise à jour
 
+## ver.0.0.43 (server.js, gardien.js et arbitre.js modifiés ; wiki.html régénéré)
+- **Stabilité des Plaines et des donjons** : un Gardien en retard de quelques secondes reste l'hôte (plus de monde « refait » par un joueur pendant ce temps : monstres qui disparaissent, portails d'une seconde). Une erreur dans le Gardien ne l'arrête plus. Les monstres sont envoyés jusqu'à 22 cases (15 avant) et ne réapparaissent plus à moins de 24 cases d'un joueur (14 avant) : plus d'apparition à l'écran sur les grands écrans.
+- La zone affichée ne passe plus à « Plage des Naufragés » quand on nage dans un lac au milieu de l'île.
+- **Monstres agrandis** de 25 % (boss : 10 %), mêmes dessins.
+- **Maison** : les meubles se tournent (clic droit ou T, 4 orientations, vues de côté et de dos dessinées) ; **salle en plus** à gauche pour 1 000 pièces (porte dans le mur de gauche, 140 meubles au lieu de 80) ; le catalogue s'ouvre sans à-coup.
+- **Visites** : plus de saisie de nom. Bouton « Joueurs » → clic sur un joueur → « Visiter sa maison » ou « Inviter dans ma maison ». Nouvel onglet **Maisons ♥** dans le classement, avec un bouton « Visiter ».
+- **Cristal de Cursite** : coûte 1 000 Cursite, rapporte 10 Cursite par jour et par cristal posé. Il peut passer dans le sac (« Mettre dans le sac ») pour être vendu à l'hôtel des ventes ou échangé.
+- **Liste des joueurs** : elle quitte le panneau de droite (qui ne bouge plus) pour une fenêtre à part, bouton « Joueurs » ou touche K, les plus proches en premier.
+- **Parrainage** : les récompenses de niveau sont retirées. Le parrain gagnera de la Cursite sur les achats de ses filleuls quand la boutique sera en place ; on peut déjà indiquer son parrain.
+- **Lame de l'Aura** (artefact, violet, pas encore obtenable en jeu : onglet Objets du panneau admin) : puissance d'une épée Tier 6, ne tire pas ; une aura de 2,5 cases blesse chaque seconde jusqu'à 8 monstres autour du joueur (dégâts de l'arme × vitesse d'attaque).
+- Titre **✦ ALPHA TESTEUR ✦** pour les comptes Heartless et Foxy (liste modifiable : variable `ALPHA_COMPTES`).
+- Bots : ils parlent cinq fois moins, et n'apparaissent plus dans l'onglet « Joueurs » du panneau admin.
+- Nouvelle musique de l'écran titre (boîte à musique en ré mineur, cloche et tic-tac).
+
+## ver.0.0.42 (index.html seulement)
+- Correctif : le message « objectif commun » faisait planter le Gardien, qui redémarrait avec un monde neuf (donjon réinitialisé après le boss, monstres et portails qui disparaissent).
+
 ## ver.0.0.41 (server.js, butin.js et arbitre.js modifiés ; wiki.html régénéré ; nouvelle image outils/guide/14-maison.jpg)
 - **Hôtel des ventes** : un nouveau personnage dans l'échoppe (à gauche du comptoir). Onglet « Vendre » : choisis un objet de ton sac, fixe ton prix, il reste en vente 7 jours (10 ventes à la fois, les potions ne se vendent pas). Onglet « Acheter » : tous les objets des autres joueurs, avec filtre par type et tri par prix ou par tier. Le vendeur touche le prix moins 5 % de taxe, même s'il est déconnecté au moment de la vente (il reçoit ses pièces à son retour). Un objet invendu ou retiré revient dans le sac.
 - **Maison à décorer** : 25 meubles à acheter avec des pièces (de la chaise à 8 pièces au Cristal de Cursite à 1 200), à poser où tu veux dans ta maison. Pupitre « Décoration » → onglet « Meubles » → « Poser » : un clic sur une case pose le meuble, un clic sur un meuble le reprend, Échap termine. Un meuble ne peut jamais enfermer une partie de la pièce. 80 meubles au maximum.

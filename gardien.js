@@ -164,7 +164,7 @@ function initBot(bot) {
       // coincé contre un obstacle : on contourne
       if(time>B.bloque){B.bloque=time+0.8;if(Math.hypot(P.x-B.lx,P.y-B.ly)<0.5&&keys.size){B.evite=time+rnd(0.8,1.6);B.ea=(Math.random()<0.5?-1:1)*rnd(1.2,1.9);}B.lx=P.x;B.ly=P.y;}}
     function botSalue(){if(time<B.parle)return;const k=sceneKey();for(const r of remotes.values()){if(!r.p||r.p.gd||r.p.s!==k||!r.p.n||BN.includes(r.p.n))continue;if(Math.hypot(r.x-P.x,r.y-P.y)>5)continue;if((B.salue.get(r.p.n)||0)>Date.now())continue;
-        B.salue.set(r.p.n,Date.now()+15*60000);B.parle=time+25;setTimeout(()=>{try{sendChat(pick(['salut','coucou','bonjour','salut !','coucou !','bonjour !','yo','cc','hello','salut '+String(r.p.n).slice(0,16)]));}catch(e){}},700+Math.random()*2200);return;}}
+        B.salue.set(r.p.n,Date.now()+15*60000);if(Math.random()>0.2)return;B.parle=time+25;setTimeout(()=>{try{sendChat(pick(['salut','coucou','bonjour','salut !','coucou !','bonjour !','yo','cc','hello','salut '+String(r.p.n).slice(0,16)]));}catch(e){}},700+Math.random()*2200);return;}}
     // de temps en temps, quand un vrai joueur est dans le coin, le bot parle des évènements en cours
     function botSujets(){const l=[],now=Date.now(),j=ms=>Math.max(0,Math.ceil(ms/86400000)),h=ms=>Math.max(1,Math.round(ms/3600000));
       if(typeof CONC!=='undefined'&&CONC&&!CONC.g){const d=CONC.debut-now;
@@ -175,8 +175,8 @@ function initBot(bot) {
       l.push('quelqu un a déjà eu une clef du temps ?','chronos est vraiment dur','vous avez vu la table à dessin au village ?','le pêcheur donne un titre si on attrape tout','pensez au cadeau de connexion du jour','j ai enfin fait évoluer mon familier','le wiki est pratique pour les taux de drop (touche B)','qui vient dans les plaines ?','un boss au centre tous les 20 monstres, à plusieurs ça passe mieux','le tier 7 tombe que dans les deux derniers donjons','faut le niveau 15 pour débloquer le héros suivant');
       return l;}
     function botParle(){if(time<B.sujetT||time<B.parle)return;const k=sceneKey();let vu=false;for(const r of remotes.values()){if(r.p&&!r.p.gd&&r.p.s===k&&r.p.n&&!BN.includes(r.p.n)&&Math.hypot(r.x-P.x,r.y-P.y)<12){vu=true;break;}}
-      if(!vu){B.sujetT=time+15;return;}B.sujetT=time+rnd(150,420);B.parle=time+25;const l=botSujets().filter(t=>t!==B.dernier);const t=pick(l);B.dernier=t;try{sendChat(t);}catch(e){}}
-    B.sujetT=time+rnd(40,160);
+      if(!vu){B.sujetT=time+15;return;}B.sujetT=time+rnd(750,2100);B.parle=time+25;const l=botSujets().filter(t=>t!==B.dernier);const t=pick(l);B.dernier=t;try{sendChat(t);}catch(e){}}
+    B.sujetT=time+rnd(200,800);
     setInterval(()=>{try{paused=false;if(!deathEl.hidden)deathEl.hidden=true;mouse.down=false;if(B.mode==='village')botVillage();else botPlaines();botSalue();botParle();}catch(e){console.error('bot',e);}},120);
     B.until=time+rnd(30,240);
     window.__bot={etat:()=>({nom:pseudo,cls:save.current,lvl:C().lvl,mode:B.mode,scene,x:Math.round(P.x),y:Math.round(P.y),hp:Math.round(P.hp)})};
@@ -188,6 +188,9 @@ module.exports = { demarrer, NOMS_BOTS };
 // lancé par server.js (processus séparé) : pour chaque serveur (salle), une copie pour les Plaines
 // et une par donjon occupé ; une copie d'avance attend au Village pour aller vite
 if (require.main === module) {
+  // une erreur dans une copie du jeu ne doit jamais arrêter tout le Gardien (le monde entier repartirait de zéro)
+  process.on('uncaughtException', e => { console.error('[gardien] erreur ignorée :', (e && e.stack || e).toString().split('\n').slice(0, 4).join(' | ')); });
+  process.on('unhandledRejection', e => { console.error('[gardien] promesse rejetée :', e && e.message || e); });
   const port = +process.env.GARDIEN_PORT || 3000, cle = process.env.GARDIEN_CLE || '';
   const caps = new Map(), clip = new Map();
   const lancer = (cible, salle) => { const G = demarrer({ port, cle, cible, salle }); G.salle = salle; for (const [p, c] of caps) try { G.ctx.__gcap(p, c); } catch {} return G; };
